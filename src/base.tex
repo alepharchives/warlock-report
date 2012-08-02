@@ -1,0 +1,78 @@
+\documentclass[12pt,%
+               %draft,%
+               a4paper]{uiothesis}
+
+\author{Sukumar Yethadka}
+
+%\includeonly{%
+%abstract,%
+%preface,%
+%introduction,%
+%background,%
+%related.research,%
+%requirements,%
+%concepts,%
+%analysis.design,%
+%implementation,%
+%experiments.performance,%
+%conclusion,%
+%tools,%
+%development.process,%
+%testing,%
+%source.code,%
+%building.deployment,%
+%}
+
+\begin{document}
+  \chapterstyle{uio}
+  \pagestyle{uio}
+  \maxsecnumdepth{subsection}
+
+  \frontmatter
+    \pagenumbering{alph}
+    \maketitle
+    \pagenumbering{roman}
+    \clearpage
+    \include{abstract}
+    \cleardoublepage
+    \tableofcontents
+    \clearpage
+    \listoffigures
+    \clearpage
+    \listoftables
+
+    \include{preface}
+
+  \mainmatter
+    \include{introduction}
+
+    \part{Context}
+      \include{background}
+      \include{related.research}
+      \include{requirements}
+
+    \part{Contribution}
+      \include{concepts}
+      \include{analysis.design}
+      \include{implementation}
+      \include{experiments.performance}
+
+    \part{Summary}
+      \include{conclusion}
+      \include{future.work}
+
+      \bibliographystyle{uio}
+      \bibliography{bibliography}
+
+    \addcontentsline{toc}{part}{\appendixtocname}
+    \appendixpage*
+
+    \begin{appendices}
+      \include{tools}
+      \include{development.process}
+      \include{testing}
+      \include{source.code}
+      \include{building.deployment}
+    \end{appendices}
+
+\end{document}
