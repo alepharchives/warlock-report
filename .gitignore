@@ -1,3 +1,5 @@
 .inventory
 build
 dist
+*.log
+*.fls

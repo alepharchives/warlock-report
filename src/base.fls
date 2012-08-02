@@ -1,5 +1,0 @@
-PWD /home/suku/project/report/source
-INPUT /usr/share/texmf/web2c/texmf.cnf
-INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT base.tex
-OUTPUT base.log
