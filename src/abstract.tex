@@ -1,0 +1,16 @@
+\chapter{Abstract}
+
+Certain distributed applications require that its users strictly have one
+session across the distributed system at any given point of time. Systems
+based on weak consistency models might lead to diverging user states which
+in some cases are not possible to merge without acceptable effort.
+
+Wooga, a social games company encouters this scenario for many of its
+games, constituting a single point point of failure.
+
+Warlock is an effort to create a distributed consensus service that can
+be used as a distributed lock manager, tailor made for ditributed web
+applications at Wooga. This document describes the analysis and design of
+Warlock and details its implementation in Erlang and results. 
+This paper also compares Warlock with many similar applications and points
+out the use case differences between them.

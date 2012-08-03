@@ -1,14 +1,69 @@
-Ditributed consensus
+\chapter{Background}
+\label{chapter:background}
 
-Distributed locking
+\section{Distributed locking}
 
-Fallacies of distributed computing
+A distributed lock manager can be implemented in many different ways. One such
+method is using a consensus algorithm.
 
-Challenges
-  configure
-  scale
-  deploy
-  failure
-  bugs
-  testing
-  CAP?
+\section{Ditributed consensus}
+
+Write about consensus. - what is consensus.
+Paxos is one such algorithm. Most other algorithms are variations of paxos.
+
+\section{Fallacies of distributed computing}
+
+As with any distributed system, this one is also suscuptable to possible common
+failures of a ditributed system.
+
+\section{CAP}
+
+{define CAP.}
+
+In this project, we focus mainly on consistency as a primary goal with 
+availability as a secondary goal. (Partition tolerance is never really an
+option).
+
+\section{Challenges}
+
+Overcoming the inherent problems in a distributed system provides its own set of
+challenges.
+
+\subsection{Scale}
+
+{define scaling, its limitations from this project's perspective}
+
+\subsection{Configuration}
+
+\subsection{Deploy}
+
+{describe release early, release often, need for hot fixes, uninteruppted
+releases}
+
+\subsection{Failure tolerance}
+
+Machine failure common in commodity machines.
+
+Google number of machine failures.
+
+Need robust software to deal with faulty hardware.
+
+Deals with only non-byzantine failures.
+
+\subsection{Bug detection and fixing}
+
+Inherent problem in detecting bugs in a distributed system.
+
+Reproducing the bug.
+
+\subsection{Testing}
+
+Unit tests, system tests, integration tests
+
+Testing single node vs testing cluster
+
+System testing vs liveliness testing
+
+\subsection{Performance}
+
+Benchmarking and pushing code to be performance oriented.

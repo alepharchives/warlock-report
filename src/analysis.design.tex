@@ -1,32 +1,61 @@
-Iterations - gradual development over iterations
+\chapter{Analysis and Design}
+\label{chapter:analysis.design}
 
-Module split up / architecture
+Based on requirements, how the system was choosen to be modular
 
-lease
+\section{Architecture}
 
-api design
+\subsection{Key Value Store}
 
-key value store
+\subsection{Master lease}
 
-reads vs writes - local vs cluster
+\subsection{Read Write separation}
 
-routing requests
+local, cluster operations
 
-setnx/multiop
+\subsection{Routing}
 
-gen\_leader
+\subsection{Multiple operations}
 
-timeouts
+pipelining?
 
-performance optimization
+\subsection{Performance optimizations}
 
-dynamic cluster
+\section{Modules}
+
+\subsection{DB}
+
+\subsection{Utils}
+
+\subsection{Server}
+
+\subsection{Consensus}
+
+{architeture diagram}
+
+{timing diagram} - move to concepts?
+
+\section{API design}
+
+\section{Dynamic cluster}
 
 cluster setup
 
-failure tolerance/failure recovery
+maintenance
 
-pluggable modules/backends
+\section{Failure Recovery}
 
-clients?
+fault tolerance
+
+\section{Pluggable Backends}
+
+What is it?
+
+Why do we need it?
+
+\section{Client}
+
+Current state
+
+Why do we need it
 

@@ -1,13 +1,33 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
+Distributed software systems sometimes use services that allow them to 
+synchronize their activities or in order to access a shared resource. Such a
+service could itself act as a single point of failure depending on the
+application architecture.
 
+\section{Problem}
 
+Online social game Magic Land uses a stateful application server architecture to
+handle millions of users. This architecture uses Redis as a global registry to
+keep track of user sessions. Failure of the software Redis, or the machine it
+runs on can lead to application downtime.
 
+\section{Objective}
 
+This thesis deals with the design and implementation of a locking service that
+provides strong consistency, high-availability and performance.
 
-%motivation
-%objective
-%outline
+\section{Outline}
+The thesis is divided into three main sections.
 
+The first section provides the context and background information related to the
+project. It details the problem backgound, related projects and research in the
+area and the set of requirements the project is based on.
+
+The second section describes the analysis, design, implementation of the project
+and the experiments run on it.
+
+The final section discusses the project results and provides and outline for
+the future work on it.
 

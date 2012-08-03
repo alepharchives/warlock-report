@@ -1,9 +1,61 @@
-Description of current magic land backend
+\chapter{Requirements}
+\label{chapter:requirements}
 
-Need for locker
+{describe magic land backend}
 
-Specifics
-  Strongly consistent
-  Available
-  Performance
-  Erlang
+{figure of architecture}
+
+\section{Key value store}
+
+The initial version of the system should support simple key value storage
+
+\section{Strong consistency}
+
+All processes accessing the manager should see the same results
+
+Multiple simultaneous user sessions can lead to data corruption
+
+\section{Maximize availability}
+
+The system should target for maximum possible availability
+
+\section{High read to write ratio}
+
+The manager should be designed and optimized to handle large read to write ratio
+Small keys and values
+
+The system need not handle the general use case of large keys and values and can
+hence be optimized for small keys and values
+Note: Current system has 64 bit keys and Erlang PID values
+
+\section{Dynamic node addition and removal}
+
+It should be possible to add/remove nodes from the system as long as a certain 
+minimum number of nodes are always available
+
+\section{Masterless / System with master election}
+
+The system should not have a single point of failure
+
+\section{Fault / failure tolerant}
+
+The system should handle node failures gracefully
+
+
+\section{Lease}
+
+It should be possible to expire keys after a certain amount of time
+
+\section{Simple API}
+
+The system should have a simple API on the lines of that of Redis
+
+\section{Language support}
+
+The system should support Erlang to start with and possibly other protocols
+later on
+
+\section{Performance}
+
+The system needs to have high throughput.
+
