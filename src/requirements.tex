@@ -53,15 +53,10 @@ The system consists of the following components as shown in the figure
       \psframe[linewidth=0.038,dimen=outer,shadow=true,fillstyle=solid](5.8,-0.4)(1.8,-1.6)
       \psframe[linewidth=0.038,dimen=outer,shadow=true,fillstyle=solid](10.8,0.6)(7.8,-0.8)
       \psframe[linewidth=0.038,dimen=outer,shadow=true,fillstyle=solid](6.2,-3.2)(0.2,-4.6)
-      \usefont{T1}{ptm}{m}{n}
       \rput(2.9145312,3.905){Co-ordinator}
-      \usefont{T1}{ptm}{m}{n}
       \rput(3.2114062,0.705){Workers}
-      \usefont{T1}{ptm}{m}{n}
       \rput(3.7925,-0.895){Sessions}
-      \usefont{T1}{ptm}{m}{n}
       \rput(3.2517188,-3.895){Database}
-      \usefont{T1}{ptm}{m}{n}
       \rput(9.2475,-0.095){Lock Manager}
       \psline[linewidth=0.038cm,arrowsize=0.042cm 2.0,arrowlength=0.58,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(3.0,3.0)(3.0,2.0)
       \psline[linewidth=0.038cm,arrowsize=0.042cm 2.0,arrowlength=0.58,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(3.0,-2.0)(3.0,-3.0)
@@ -104,8 +99,9 @@ The lock manager used is Redis \citep{redis}%
 }
 . The worker uses the redis command SETNX%
 \sidenote{
-  \texttt{SETNX key value} - sets the \texttt{key} to hold \texttt{value} in a 
-  hash table only if \texttt{key} does not already exist in the table.
+  \texttt{SETNX key value} - is a command that sets the \texttt{key} to hold 
+  \texttt{value} in a hash table only if \texttt{key} does not already exist 
+  in the table.
 }. This makes sure that the worker can only start a new session if one is 
 not already running. Redis also supports asynchronous replication allowing the 
 data to be available in multiple locations.
