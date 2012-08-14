@@ -672,6 +672,11 @@
 \newcommand{\siste}{\q{Siste fra dine Favoritter}}
 \newcommand{\latest}{\q{Latest from your Favorites}}
 
+%%
+%% Latex Draw
+%%
+
+\usepackage[usenames,dvipsnames]{pstricks}
 
 %%
 %% Front matter

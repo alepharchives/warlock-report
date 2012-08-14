@@ -2,5 +2,6 @@
 :build_dir: build
 :graphics_dir: resource
 :vendor_dir: vendor
-:engine: :pdflatex
+:engine: :latex
 :color: true
+:format: pdf
