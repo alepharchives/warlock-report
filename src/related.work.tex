@@ -148,6 +148,9 @@ Basic Paxos is the simplest version of Paxos and is the same as described
 previously in \sectionref{paxos}. The algorithm proceeds over several rounds
 with the best case taking two rounds.
 
+It is typically not implemented and used in production due to possible race
+conditions and relatively poor performance.
+
 \subsection{Multi-Paxos}
 
 The Paxos algorithm needs to be run multiple times for agreeing on a sequence of
@@ -212,6 +215,14 @@ has the property that it provides fixed throughtput with variation in number
 of receivers. It claims the throughput of ip-multicast and low latency of
 unicast with the downside being that it provides weak synchrony.
 
+\begin{figure}
+  \includegraphics[width=0.5\wholewidth]{ring_paxos}
+  \caption[Ring Paxos]{%
+  Processes and their roles in Ring Paxos. Figure courtesy 
+  \citep{MarandiPSP10}.}
+  \label{figure:ring.paxos}
+\end{figure}
+
 \subsection{Stoppable Paxos}
 
 Basic Paxos algorithm is run under the assumption that all the participating
@@ -275,6 +286,23 @@ to synchronize their activities. For example, Google File System \citep{gfs}
 and BigTable \citep{ChangDGHWBCFG06} use Chubby locks for co-ordination and
 as a store for small metadata \citep{ChandraGR07}.
 
+\begin{figure}
+  \includegraphics[width=0.5\wholewidth]{chubby_structure}
+  \caption[Chubby structure]{%
+    Figure shows the connection between Chubby cell and Chubby clients. 
+    Figure courtesy \citet{Burrows06}.}
+  \label{figure:chubby.structure}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=0.5\wholewidth]{chubby_replica}
+  \caption[Chubby Replica]{%
+    Figure shows the internal of a single replica inside the Chubby cell.
+    Figure courtesy \citet{ChandraGR07}.}
+  \label{figure:chubby.structure}
+\end{figure}
+
+
 Chubby lock is made up of two compoments:
 
 \begin{itemize}
@@ -329,6 +357,14 @@ compliant, scalable datastore that guarantees high availability and
 consistency. It uses synchronous replication for high availibility and
 consistenct views while targeting performance by parititioning the data.
 
+\begin{figure}
+  \includegraphics[width=0.6\wholewidth]{megastore}
+  \caption[Google Megastore]{%
+    Figure shows the example achitecture for Google Megastore.
+    Figure courtesy \citet{BakerBCFKLLLLY11}.}
+  \label{figure:megastore}
+\end{figure}
+
 Megastore users Paxos to replicate a write-ahead log, replicate commit
 records for single phase ACID transactions and as a part of fast failover
 mechanisms. It provides fast local reads using a service called the
@@ -351,6 +387,15 @@ Zookeeper Atomic Broadcast (ZAB)
 \citep{Reed:2008:STO:1529974.1529978, JunqueiraRS11} is a 
 totally ordered atomic broadcast protocol created for usage in Zookeeper. ZAB
 satisfies the constraints imposed by Zookeeper viz.,
+
+\begin{figure}
+  \includegraphics[width=0.7\wholewidth]{zkcomponents}
+  \caption[Zookeeper Components]{%
+    Figure shows the components of Zookeeper and the messaging between them.
+    Figure courtesy \citet{zookeeper}.}
+  \label{figure:megastore}
+\end{figure}
+
 
 \begin{itemize}
     \iterm{Reliable delivery}: Message delived to one server must eventually
@@ -400,6 +445,16 @@ write consistency.
 
 Riak \citep{riak} is a distributed eventually consistent datastore written in 
 Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
+
+\begin{figure}
+  \includegraphics[width=0.7\wholewidth]{riak-ring}
+  \caption[Riak Ring]{%
+    Figure shows the Riak Ring and details how the key space is divided among 
+    four nodes
+    Figure courtesy \citet{riak}.}
+  \label{figure:megastore}
+\end{figure}
+
 
 \section{Amazon Dynamo}
 
