@@ -8,6 +8,14 @@ of the system and then detail how it maps on to to the specified requirements.
 
 \section{Architecture}
 
+The goal for Warlock is to
+
+\begin{itemize}
+  \item Satisfy all the requirements specified in \chapterref{requirements}.
+  \item Implement the system in Erlang while following OTP principles.
+  \item Create a modular design to allow for customization for other projects.
+\end{itemize}
+
 The Warlock system can be divided into different components based on their
 functionality as shown in figure \figureref{warlock.arch}.
 
@@ -20,7 +28,7 @@ functionality as shown in figure \figureref{warlock.arch}.
   % \usepackage{epsfig}
   % \usepackage{pst-grad} % For gradients
   % \usepackage{pst-plot} % For axes
-  \scalebox{1} % Change this value to rescale the drawing.
+  \scalebox{0.8} % Change this value to rescale the drawing.
   {
     \begin{pspicture}(0,-4.3)(16.642187,4.3)
       \psframe[linewidth=0.038,dimen=outer](16.6,0.9)(0.0,-4.3)
@@ -63,24 +71,109 @@ commonly used modules. The library consists of
 \begin{itemize}
     \iterm{Configuration Helper}: Reads configuration files to be used as 
     settings for Warlock.
-    \iterm{Hash Table}: A hash table implementation based on ETS and dict. [[]]
+    \iterm{Hash Table}: A hash table implementation based on ETS%
+    \sidenote{
+      Erlang Term Storage (ETS) is a an in-memory storage provided by the Erlang
+      Virtual Machine. It supports multiple datas structures and operations over
+      them.}
+    and dict%
+    \sidenote[5]{
+      dict is Erlang's in-built dictionary implementation. Unline ETS, its 
+      immutable.}
 \end{itemize}
+
+It is used as a dependency in rest of the Warlock components. It also defines
+Erlang macros%
+\sidenote[5]{
+  Erlang macros are similar to C macros. They allow us to define small functions
+  and constants that is taken care of by the pre-processor during code 
+  compilation.
+}
+for enabling different levels of logging.
 
 \subsection{Server}
 
 The server component of Warlock ties all the other components together and 
-indirectly routes messages between them. It provides the below functionalities:
+indirectly routes messages between them. It provides many functionalities.
+
+\subsubsection{Handle client connections}
+
+Server manages the incoming client connections which can then send requests. The
+client connections are over TCP and use the Redis binary protocol 
+\citep{RedisProtocol}%
+\sidenote{
+  The reasoning behing using the Redis binary protocol is that it is well 
+  defined and has a good set of features. It also has implementation in 
+  multiple languages allowing for usage from a much wider audience.
+}. Once a connection is setup, it becomes an individual process unaffected by
+other connections making it more robust.
+
+\subsubsection{Callback}
+
+Server provides the callback module that is executed once the request is 
+processed. This allows us to keep the core of Warlock independent of the
+database implementation and to treat the commands as simple messages. This
+helps increase the robustness of the consensus component by isolating the
+command execution to the database component.
+
+\todo{active and passive modes}
+
+\subsubsection{Console}
+
+Server provides interface that allows us to interact with Warlock from the 
+console. This allows us to start, setup and modify the Warlock cluster from
+the command line. Commandline access helps us use automation tools such as
+Chef \citep{Chef} to rapidly deploy it on cloud servers 
+\citep{Armbrust:2010:VCC:1721654.1721672, amazonAWS}.
+
+\subsubsection{Replication}
+
+Server setups connection between two servers and oversees the data transfer 
+between them when a new node is being added to the cluster. The steps for
+this are:
 
 \begin{itemize}
-    \iterm{Handle client connections}: Server manages the incoming client 
-    connections which can then send requests.
-    \iterm{Callback}: Server provides the callback module that is executed
-    once the request is processed.
-    \iterm{Console}: Server provides interface that allows us to interact with
-    Warlock from the console.
-    \iterm{Replication}: Server setups connection between two servers and 
-    oversees the data transfer between them when a new node is being added to
-    the cluster.
+  \item All the nodes in the member group listen on a pre-defined port.
+  \item A command is executed on the new node that is to be added to the cluster
+    with the address of a seed%
+    \sidenote{
+      A \emph{seed node} in this context is one that provided all the necessary
+      information to setup a data transfer connection.
+    } node.
+  \item The seed node sends the target node (new node) with the information of 
+    the source node%
+    \sidenote[1]{
+      Since data transfer is resource intensive, we do not use the master node
+      as the seed. So the \emph{source node} is picked to be a health cluster
+      member other than the master.
+    }.
+  \item The target node sets up a TCP connection with the seed node and sends
+    a SYNC%
+    \sidenote[3]{
+      The \emph{SYNC} signal is used to indicate that the target node is ready
+      to receive the data.
+    } signal.
+  \item On the reception of the signal, the seed node does the following:
+    \begin{itemize}
+      \item Change the status of the callback module to ``passive''.
+      \item Ask the database component to backup the entire database to a
+        pre-defined file.
+      \item Transfer the file to the target node using a binary protocol.
+      \item Once transfer is complete and the callback module has synced
+        the data of the two nodes, request for a state reconfiguration via
+        consensus.
+      \item Once callback queue is processes, reset it back to ``active'' state.
+    \end{itemize}
+  \item On the reception of the data file, the target machine does the 
+    following:
+    \begin{itemize}
+      \item Reset the local database.
+      \item Load the transferred file into the database.
+      \item Receive commands from the source node when it executes its local
+        command queue.
+      \item Gets added to the members group and closes connection with the 
+        source node.
+    \end{itemize}
 \end{itemize}
 
 \subsection{Database}
@@ -89,20 +182,186 @@ The database component is used to store all the data and provides at its
 least the simple API required for a key value store. It has a pluggable backend 
 which allows us to use different backends as needed.
 
-Besides the hash table interface, the database component can provide data
+\subsubsection{Pluggable backends}
+
+As per the requirement \sectionref{ml.kv.store}, the database needs to a
+key value store. However, any type of database can be used 
+since Warlock by itself does not execute the commands. The commands are passed
+on to the database driver after a successful round allowing us the flexiblity
+to use other types of databases. We create a specific behaviour%
+\sidenote{
+  Erlang behaviours \citep{ErlangBehaviour} are a set of specifications that
+  can be used to create a generic reusable component.
+}
+for this purpose. Drivers can then be written for different databases
+implementing the functions specified in the behaviour.
+
+\subsubsection{Key Expiry}
+
+\todo{...}
+
+Besides the simple database interface, the this component can provide data
 backup and restore functions that can be used by the server component to
-enable the Warlock feature of adding nodes dynamically.
+enable the Warlock feature of adding fresh nodes dynamically.
 
 \subsection{Consensus}
 
 The consensus component is the core of Warlock. It uses a modified version of 
-the Paxos algorithm from \citet{Robbert2011} for its implementation. It also
+the Paxos algorithm from \citet{Robbert2011} as described in 
+\chapterref{concepts} for its implementation. It also
 uses ideas from \citet{LamportSP08} and \citet{LamportMZ10} to allow for
 a dynamic cluster.
 
-\subsection{Key Value Store}
+\section{Reconfigurable State Machine}
 
-\subsection{Master lease}
+The set of valid nodes in the cluster that take part in the protocol must
+be static. We need to explicitly design the system to handle the requirement
+\sectionref{req.dynamic.cluster}. This can be done by following certain
+ideas from \citet{LamportSP08} and \citet{LamportMZ10}.
+
+We can achieve this by treating the consensus state itself as a separate
+parallel state machine along with the data state machine. Now we can use
+the Paxos protocol itself to reconfigure the consensus state which consists
+of the list of valid member nodes among other data. This modification allows
+us to add new nodes, remove existing nodes, replace nodes as required at any
+point of time.
+
+For the implementation, instead of using the regular slots, we use specialized
+alphabetic indexes allowing us better control during reconfiguration. This also
+allows us to make the reconfiguration immediately instead of blocking requests
+like in \citet{LamportSP08}.
+
+The ballot is made up the leaders unique id and a monotonically increading 
+integer that increments whenever there is a change in the leader. It is possible
+that messages tagged with the old ballot is still in transit after a 
+reconfiguration. We introduce a new variable called ``view'' to avoid conflits 
+caused by this. ``view'' is a monotonically increasing integer that increments
+whenever there is a cluster configuration change
+
+The downside of this specific design is that if the master changes during
+reconfiguration, any of the proposals making progress will time out. It
+should be possible to fix this by transferring such proposals to the new master
+as new proposals.
+
+\section{Consensus Optimization}
+
+The straight implementation of Paxos is not very efficient owing to the overhead
+that comes with duplicate messages, duplicate states and the detection of these
+duplicates. The default implementation also requires the entire history of the
+state be stored making it impractical. This section describes the optimizations
+performed in this project, some of which are from \citet{Robbert2011}.
+
+\subsection{Backoff and Preemption}
+
+Consider the following situation in a Paxos system with two leaders L1 and L2.
+
+\begin{itemize}
+  \item L1 intiates the protocol by issuing P1a message.
+  \item L1 receives quorum acceptance and all the acceptors accept its ballot.
+  \item L2 intiates the protocol by issuing P1a message.
+  \item L2 receives quorum acceptance and all the acceptors accept its ballot.
+  \item L1 initiates P2a phase only to be pre-empted with a higher ballot.
+  \item L1 initiates phase 1 with a P1a message.
+  \item L2 initiates P2a phase only to be pre-empted with a higher ballot.
+\end{itemize}
+
+As we can see, this leads to a race condition which can exist indefinitely. To
+fix this, whenever a leader is preempted, it waits for a pre-defined period of
+time called the ``backoff'' time. This provides the leader with the higher 
+ballot sufficient time to make progress, thus avoiding the deadlock.
+
+\subsection{Timeouts}
+
+The leaders launches scouts and commanders depending on the phase the protocol
+is currently running in. These processes have to wait for the response from
+a quorum of acceptors after sending out their initial message. It is possible
+that not all of these acceptors respond due to reasons such as a network
+partition%
+\sidenote{
+  \emph{Network Partition}; In a connected group of nodes, the connection 
+  between the nodes can be severed in such a way that it creates two separate 
+  smaller groups termed ``partitions''.
+}.
+
+Introduction of timeouts in scouts and commanders allows us to timebox the
+protocol creating a maximum bound for response time to the client. The client
+itself can use timeouts, but this should always be greater than the internal
+Warlock timeout to maintain consistency.
+
+\subsection{State reduction}
+
+In the basic version of Paxos, the acceptor maintains all the accepted values
+for all the slots. This can be reduced by having the acceptor store only the 
+value corresponding to the maximum ballot for each slot resulting in smaller
+acceptor state and P1b message size sent to the leader.
+
+The acceptors are notified at the end of a successful operation. This allows
+the them to store the values for only the slots that are currently making
+progress resulting in reduced P1b message size.
+
+Similarly the replica only needs to maintain the data for slots that are
+making progress allowing it to purge data for decided slots. The leader can
+also purge the completed proposal data it maintains to spawn commanders.
+
+All the above optimizations are possible by co-locating replica, leader
+and acceptor for each node. While it is possible to use shared datastructures
+between these processes residing on the same node, we avoid it to allow for
+a cleaner implementation.
+
+\subsection{Master Node and Leases}
+
+A leader that is not pre-empted can proceed directly with phase 2 of the
+protocol for a proposal cutting the message latency by half. We use the
+mechanism of lease to use this to our advantage.
+
+The initial node whose leader manages to complete one round of Paxos is
+termed the master node. We define a period of time called the master lease 
+during which leaders from other nodes cannot spawn scouts to push for a
+higher ballot. The master renews its lease before it expires.
+
+Failure detectors%
+\sidenote{
+  Erlang has bulit in failure detectors called monitors \citep{ErlangMonitor}. 
+  Using this feature it is possible to monitor the failure of local or 
+  remote processes.
+}
+are used to detect if the master node goes down to accelate the election
+of the next master node. The leaders from other node themselves try to
+get election as soon as the lease of the current master expires. If the 
+failure detector takes a long time, then the system as a whole
+stops making progress as long as the lease lasts. By balancing the lease
+time, we can restrict the system to have reasonably short downtimes in
+the worst case.
+
+\subsection{Message Reduction}
+
+\chapterref{concepts} discussed the Paxos protocol used detailing the number
+of messages sent between processes. By co-locating sets of processes and
+using a master node, we can reduce this number by a large extent.
+
+In the reduced version, the client sends the message directly to the
+replica on the master node (master replica). The master replica only
+sends the proposal to the local leader (master leader). On receiving quorum
+acceptance, the leader directly responds to the client.
+
+The above optimization allows us to reduce the number of messages from
+$O(n^2)$ to $O(n)$.
+
+\subsection{Monitoring}
+
+All the member nodes%
+\sidenote{
+  \emph{Member nodes}: Nodes which are in sync with rest of the cluster
+and actively take part in the concensus protocol.}
+keep a list of available nodes.
+The leader of the master node monitors the leaders of rest of the member
+of the cluster. When the master leader detects any failures, it moves the
+node from the list of available nodes to the list of down nodes via the
+consensus protocol.
+
+Failure of the master leader itself will eventually trigger the election
+leading to a new master node. This node will then take over the role of
+monitoring rest of the members.
 
 \subsection{Read Write separation}
 
@@ -116,27 +375,7 @@ pipelining?
 
 \subsection{Performance optimizations}
 
-\section{Modules}
-
-\subsection{DB}
-
-\subsection{Utils}
-
-\subsection{Server}
-
-\subsection{Consensus}
-
-{architeture diagram}
-
-{timing diagram} - move to concepts?
-
 \section{API design}
-
-\section{Dynamic cluster}
-
-cluster setup
-
-maintenance
 
 \section{Failure Recovery}
 

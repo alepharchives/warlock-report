@@ -114,6 +114,7 @@ Redis as a locking system while being fault tolerant.
 From the above background, we can now elaborate the system requirements:
 
 \section{Key value store}
+\label{section:ml.kv.store}
 
 \req{The system should act as a key value store.}
 
@@ -150,6 +151,7 @@ to login. This means that the system can be opitimized to maximize reads as
 compared to writes.
 
 \section{Dynamic node addition and removal}
+\label{section:req.dynamic.cluster}
 
 \req{It should be possible to add/remove nodes from the system as long as a 
 certain minimum number of nodes are available.}
