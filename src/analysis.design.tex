@@ -17,7 +17,10 @@ The goal for Warlock is to
 \end{itemize}
 
 The Warlock system can be divided into different components based on their
-functionality as shown in figure \figureref{warlock.arch}.
+functionality as shown in figure \figureref{warlock.arch}. In terms of the
+data flow and interaction between the components, the system design is quite
+close to that of Chubby locks \citep{Burrows06} as in 
+\figureref{chubby.structure}.
 
 \begin{figure}
   \captionstyle{\raggedright}
@@ -98,12 +101,22 @@ indirectly routes messages between them. It provides many functionalities.
 
 \subsubsection{Handle client connections}
 
-Server manages the incoming client connections which can then send requests. The
+The system can be interacted with by
+
+\begin{itemize}
+  \item Embedding Warlock in the same virtual machine as the
+    client application.
+  \item Accessing the system using RPC.
+  \item Using a well defined binary protocol.
+\end{itemize}
+
+The first two of the options are trivial to implement. For the last option, the 
+server manages the incoming client connections which can then send requests. The
 client connections are over TCP and use the Redis binary protocol 
 \citep{RedisProtocol}%
 \sidenote{
   The reasoning behing using the Redis binary protocol is that it is well 
-  defined and has a good set of features. It also has implementation in 
+  defined and has a good set of features. It is also implementated in 
   multiple languages allowing for usage from a much wider audience.
 }. Once a connection is setup, it becomes an individual process unaffected by
 other connections making it more robust.
@@ -116,7 +129,22 @@ database implementation and to treat the commands as simple messages. This
 helps increase the robustness of the consensus component by isolating the
 command execution to the database component.
 
-\todo{active and passive modes}
+To enable replication \sectionref{analysis.design.replication} the
+callback module needs to provide few additional features. The database
+component of Warlock has to be in read-only mode to avoid the chances of
+data corruption when it is a source node being replicated from. To allow
+this, callback has two modes of operation.
+
+\begin{itemize}
+    \iterm{Active}: The callback module works normally accepting requests
+    and forwarding them to the database component.
+
+    Change from active to passive mode can be done immediately.
+    \iterm{Passive}: The callback module add new decisions to a queue.
+
+    When changing from passive to active mode, the queue is first processed
+    asynchronously and mode change only happens when the queue is empty.
+\end{itemize}
 
 \subsubsection{Console}
 
@@ -127,7 +155,10 @@ Chef \citep{Chef} to rapidly deploy it on cloud servers
 \citep{Armbrust:2010:VCC:1721654.1721672, amazonAWS}.
 
 \subsubsection{Replication}
+\label{section:analysis.design.replication}
 
+For the requirement \sectionref{req.dynamic.cluster} of enabling a dynamic
+cluster we need to enable to copy/replicate data between servers.
 Server setups connection between two servers and oversees the data transfer 
 between them when a new node is being added to the cluster. The steps for
 this are:
@@ -179,8 +210,7 @@ this are:
 \subsection{Database}
 
 The database component is used to store all the data and provides at its
-least the simple API required for a key value store. It has a pluggable backend 
-which allows us to use different backends as needed.
+least the simple API required for a key value store.
 
 \subsubsection{Pluggable backends}
 
@@ -198,7 +228,13 @@ implementing the functions specified in the behaviour.
 
 \subsubsection{Key Expiry}
 
-\todo{...}
+Allowing stored objects to expire after a certain period of time allows the
+system to remove entries which were left behind when the cleanup process
+of the application using the system fails. However, key expiry in is a
+complex process in itself \todo{appendix?} which can potentially lead to
+poor performance. For our system, we store the expiry time, but cleanup is
+only done when it gets accessed the next time. This allows us to keep 
+flexibility while keeping the system performance predictable.
 
 Besides the simple database interface, the this component can provide data
 backup and restore functions that can be used by the server component to
@@ -210,7 +246,8 @@ The consensus component is the core of Warlock. It uses a modified version of
 the Paxos algorithm from \citet{Robbert2011} as described in 
 \chapterref{concepts} for its implementation. It also
 uses ideas from \citet{LamportSP08} and \citet{LamportMZ10} to allow for
-a dynamic cluster.
+a dynamic cluster. However, the algorithm needs some modifications 
+\sectionref{consensus.optimization} before it can be used.
 
 \section{Reconfigurable State Machine}
 
@@ -244,6 +281,7 @@ should be possible to fix this by transferring such proposals to the new master
 as new proposals.
 
 \section{Consensus Optimization}
+\label{section:consensus.optimization}
 
 The straight implementation of Paxos is not very efficient owing to the overhead
 that comes with duplicate messages, duplicate states and the detection of these
@@ -344,7 +382,7 @@ replica on the master node (master replica). The master replica only
 sends the proposal to the local leader (master leader). On receiving quorum
 acceptance, the leader directly responds to the client.
 
-The above optimization allows us to reduce the number of messages from
+The above optimization allows us reduce the number of messages from
 $O(n^2)$ to $O(n)$.
 
 \subsection{Monitoring}
@@ -363,6 +401,68 @@ Failure of the master leader itself will eventually trigger the election
 leading to a new master node. This node will then take over the role of
 monitoring rest of the members.
 
+\section{API Design}
+
+We try and keep the Application Programming Interface (API) of Warlock as
+simple as possible. A typical command is of the format 
+\sourcecoderef{warlock.generic.cmd}
+
+\begin{scode}{Erlang}{warlock.generic.cmd}{%
+  Warlock's generic command format}{%
+  Warlock's generic command format}
+  \begin{lstlisting}
+war_server:x(<LOCATION>, <COMMAND>)
+  \end{lstlisting}
+\end{scode}
+
+The parts of the format are:
+
+\begin{itemize}
+  \item \texttt{war\_server:x} is the module and function name which acts
+    as the external interface.
+  \item \texttt{<COMMAND>} operation requested by the client that has to
+    be eventually executed by the database component.
+  \item \texttt{<LOCATION>} indicates where \texttt{<COMMAND>} has to be 
+    run.
+\end{itemize}
+
+\begin{scode}{Erlang}{warlock.clu.cmd}{%
+  Warlock's cluster command format}{%
+  Warlock's cluster command format}  
+  \begin{lstlisting}
+1> (warlock@127.0.0.1)> war_server:x(clu, [set, key, value]).
+{ok,success}
+  \end{lstlisting}
+\end{scode}
+
+
+\begin{scode}{Erlang}{warlock.loc.cmd}{% 
+  Warlock's local command format}{%
+  Warlock's local command format}
+  \begin{lstlisting}
+2> (warlock@127.0.0.1)> war_server:x(loc, [get, key]).
+{ok,value}
+  \end{lstlisting}
+\end{scode}
+
+\texttt{<LOCATION>} has two possible values:
+
+\begin{itemize}
+    \iterm{Cluster}: Cluster (\texttt{clu}) indicates that the full
+    consensus protocol must be run so that the command can be executed
+    on all the servers.
+
+    The commands are run on \texttt{clu} whenever its execution changes
+    the database's state. For example, \sourcecoderef{warlock.clu.cmd}
+
+    \iterm{Local}: Local (\texttt{loc}) indicates that the command only
+    needs to be run on the local replica the client is connected to.
+
+    The commands that have no effect on the database's state can be run
+    on \texttt{loc}. For example, \sourcecoderef{warlock.loc.cmd}
+\end{itemize}
+
+
 \subsection{Read Write separation}
 
 local, cluster operations
@@ -374,8 +474,6 @@ local, cluster operations
 pipelining?
 
 \subsection{Performance optimizations}
-
-\section{API design}
 
 \section{Failure Recovery}
 
