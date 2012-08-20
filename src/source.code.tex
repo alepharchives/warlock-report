@@ -1,0 +1,137 @@
+﻿\chapter{Source Code}
+\label{chapter:source.code}
+
+The source of the project is currently closed source, though there are plans
+to open source it in the future. Below we see the source tree providing
+an overview of the application structure.
+
+\section{Root Tree}
+
+\begin{scode}{Erlang}{source.code.main.tree}{%
+  Root tree of the project}{%
+  Root source tree of the project}
+  \begin{lstlisting}
+.
+|-- apps
+|   |-- war_consensus
+|   |-- war_db
+|   |-- war_server
+|   |-- war_util
+|-- deps
+|   |-- eredis
+|   |-- lager
+|   |-- ranch
+|-- Makefile
+|-- priv
+|   |-- warlock.term
+|-- README.md
+|-- rebar
+|-- rebar.config
+|-- rel
+
+  \end{lstlisting}
+\end{scode}
+
+\section{Applications}
+
+\begin{scode}{Erlang}{source.code.util.tree}{%
+  Utilities tree of the project}{%
+  Utilities source tree}
+  \begin{lstlisting}
+apps/war_util
+|-- include
+|   |-- war_common.hrl
+|-- Makefile
+|-- rebar.config
+|-- src
+|   |-- war_util.app.src
+|   |-- war_util_conf.erl
+|   |-- war_util_dict_ht.erl
+|   |-- war_util_ets_ht.erl
+|   |-- war_util_ht.erl
+|-- test
+    |-- war_util_dict_ht_tests.erl
+    |-- war_util_ets_ht_tests.erl
+
+  \end{lstlisting}
+\end{scode}
+
+\begin{scode}{Erlang}{source.code.consensus.tree}{%
+  Consensus tree of the project}{%
+  Consensus source tree}
+  \begin{lstlisting}
+apps/war_consensus/
+|-- include
+|   |-- war_consensus.hrl
+|-- Makefile
+|-- rebar.config
+|-- src
+|   |-- war_consensus_acceptor.erl
+|   |-- war_consensus_app.erl
+|   |-- war_consensus.app.src
+|   |-- war_consensus_client.erl
+|   |-- war_consensus_commander.erl
+|   |-- war_consensus.erl
+|   |-- war_consensus_leader.erl
+|   |-- war_consensus_msngr.erl
+|   |-- war_consensus_rcfg.erl
+|   |-- war_consensus_replica.erl
+|   |-- war_consensus_scout.erl
+|   |-- war_consensus_state.erl
+|   |-- war_consensus_sup.erl
+|   |-- war_consensus_util.erl
+|-- test
+    |-- war_consensus_test.erl
+    |-- war_consensus_util_test.erl
+  \end{lstlisting}
+\end{scode}
+
+\begin{scode}{Erlang}{source.code.server.tree}{%
+  Server tree of the project}{%
+  Server source tree}
+  \begin{lstlisting}
+apps/war_server
+|-- include
+|   |-- war_server.hrl
+|-- Makefile
+|-- rebar.config
+|-- src
+|   |-- war_server_app.erl
+|   |-- war_server.app.src
+|   |-- war_server_callback.erl
+|   |-- war_server_console.erl
+|   |-- war_server.erl
+|   |-- war_server_receiver.erl
+|   |-- war_server_sender.erl
+|   |-- war_server_sup.erl
+|   |-- war_server_worker.erl
+|-- test
+    |-- war_server_callback_test.erl
+        |-- war_server_test.erl
+  \end{lstlisting}
+\end{scode}
+
+\begin{scode}{Erlang}{source.code.db.tree}{%
+  Database tree of the project}{%
+  Database source tree}
+  \begin{lstlisting}
+apps/war_db
+|-- include
+|   |-- war_db.hrl
+|-- Makefile
+|-- rebar.config
+|-- src
+|   |-- war_db_app.erl
+|   |-- war_db.app.src
+|   |-- war_db_backend.erl
+|   |-- war_db.erl
+|   |-- war_db_ets_backend.erl
+|   |-- war_db_kingdom_backend.erl
+|   |-- war_db_redis_backend.erl
+|   |-- war_db_sup.erl
+|   |-- war_db_worker.erl
+|-- test
+    |-- war_db_test.erl
+  \end{lstlisting}
+\end{scode}
+
