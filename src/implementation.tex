@@ -1,45 +1,71 @@
 \chapter{Implementation}
 \label{chapter:implementation}
 
-How implementation was done
+We implement the system as per the requirements (\chapterref{requirements}) and 
+design (\chapterref{analysis.design}) in this chapter. We try to explain how the
+design goals matches on to the features of Erlang \citep{erlang} programming
+language and OTP libraries.
 
-what was used
+The choice of Erlang as the programming language for implementation was
+motivated by the factor that the Magic Land backend was already implemented in
+Erlang. A new system in the same language will be much easier to integrate with
+the existing architecture.
 
-request flow
+The development of the system was done in iterations, roughly a week in size. 
+The target of each iteration would be to extend the existing base or to develop 
+new features. This allowed us to quickly identify the part of the system that
+forms the core and other features that are just good to have. More details of
+the development process can be read at [[appendix]].
 
-erlang
+\section{Prototype}
 
-build
+The core of the consensus component is the variation of Paxos protocol based
+in \citet{Robbert2011}. While the algorithm is straight forwardi, implementation
+oriented and covers more edge cases than \citet{Lamport01}, a working prototype
+helps to get a more through understanding of the protocol itself.
 
-otp
+We built a prototype that is a straight one is to one implementation of the 
+pseudo code from \citet{Robbert2011}. It supported a configurable number of 
+replicas, leaders and acceptors, allowing us to get an idea of how the protocol
+behaves with different configurations using simple unit tests. Building the 
+prototype helps us to single out the core of the system and make sure the 
+protocol works correctly before getting to to the other parts.
 
-unit tests
+\section{Application structure}
 
-interfaces
+The source structure of the application can be see at \chapterref{source.code}.
+As described earlier, the code is split into different applications according
+to their functionality.
 
-logging using lager
 
-rebar
 
-release and deplyment
 
-creating and using dev cluster for developement and testing
 
-master leader transitions
 
-warlock-admin command
 
-connecting and running commands on warlock
+
+
+
+
+Erlang application
+  OTP
+    Supervision tree
+    gen\_servers
+      Individual modules
+
+Request flow - messages vs libraries
+
+Building and deployment - rebar
+
+Testing
+  Unit tests
+  dev clusters
+
+Logging
+
+Console and admiistration
 
 pluggable backends and how to implement them
 
 pluggable erlang hash tables
-
-command syntax and examples
-
-supervision and supervisor tree
-
-module integration?
-
-system setup and startup? - move to appendix - user manual
 
