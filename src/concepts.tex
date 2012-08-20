@@ -114,27 +114,108 @@ behind Erlang maps well on to the building large web applications.
 
 Open Telecom Platorm (OTP) is a collection of Erlang libraries. The OTP code is
 well tested, robust and provide design patterns allowing us to quickly build 
-Erlang applications.
+Erlang applications. We take a look at few of the priciples from OTP that is
+used in the project.
 
-OTP provides a set of principles for structuring code:
+\subsection{Supervision}
+\label{section:concepts.supervision}
 
-\begin{itemize}
-    \iterm{Supervision}: Supervisors are processes that monitor workers 
-    processes and restart them based on a pre-defined set of rules. An 
-    application can be designed in the form of a tree with fine grained
-    control to handle crashing processes and to localize such crashes.
-    \iterm{Behaviours}: Behaviours are commonly used Erlang design patterns.
-    They contain a pre-defined set of functions necessary to implement
-    specific design patterns allowing for quick implementation.
-    \iterm{Applications}: Logical group of components can be glued together
-    to form applications. Applications have well-defined roles and Erlang
-    provides convinient modules to manage them.
-    \iterm{Releases}: A release is a complete system packaged for deployment.
-    Erlang provides modules necessary to create packages for deploying new
-    code and upgrading existing code.
-\end{itemize}
+Supervisors are processes that monitor workers processes and restart them based 
+on a pre-defined set of rules. An application can be designed in the form of a 
+tree with fine grained control to handle crashing processes and to localize such
+crashes. A typical Erlang supervisor tree looks like 
+\figureref{supervision.tree}.
 
-\todo{descrine genserver}
+\begin{figure}
+  \captionstyle{\raggedright}
+  
+  % Generated with LaTeXDraw 2.0.7
+  % Mon Aug 20 17:48:00 CEST 2012
+  % \usepackage[usenames,dvipsnames]{pstricks}
+  % \usepackage{epsfig}
+  % \usepackage{pst-grad} % For gradients
+  % \usepackage{pst-plot} % For axes
+  \scalebox{1} % Change this value to rescale the drawing.
+  {
+    \begin{pspicture}(0,-4.95)(10.26,4.95)
+      \definecolor{color173b}{rgb}{0.27450980392156865,0.5098039215686274,0.7058823529411765}
+      \definecolor{color54b}{rgb}{0.1803921568627451,0.5450980392156862,0.3411764705882353}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color173b](4.27,4.02){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color173b](0.95,0.58){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color173b](7.55,0.78){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](0.93,-2.82){0.93}
+      \psline[linewidth=0.04cm](4.26,3.09)(0.98,1.49)
+      \psline[linewidth=0.04cm](4.26,3.09)(4.26,1.57)
+      \psline[linewidth=0.04cm](4.28,3.09)(7.6,1.69)
+      \psline[linewidth=0.04cm](0.96,-0.35)(0.96,-1.93)
+      \psline[linewidth=0.04cm](7.58,-0.13)(5.86,-1.95)
+      \psline[linewidth=0.04cm](7.58,-0.13)(9.28,-1.89)
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](4.27,0.64){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](5.95,-2.82){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](9.33,-2.8){0.93}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color173b](0.54,-4.61){0.34}
+      \usefont{T1}{ptm}{m}{n}
+      \rput(1.9598438,-4.605){Supervisor}
+      \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](3.74,-4.59){0.34}
+      \usefont{T1}{ptm}{m}{n}
+      \rput(4.96875,-4.625){Worker}
+    \end{pspicture} 
+  }
+
+  \caption[Supervision Tree]{%
+    Supervision Tree: Structure of a typical Erlang supervision tree.}
+  \label{figure:supervision.tree}
+  \normalcaption
+\end{figure}
+
+A process as per the supervision tree can either be a supervisor%
+\sidenote{
+  \emph{Supervisor}: An Erlang process responsible for creating, terminating, 
+  monitoring and restarting processes as defined.
+}
+or a worker%
+\sidenote[3]{
+  \emph{Worker}: A worker process in this context is any other process started 
+  by the supervisor that is not a supervisor itself.
+}. Processes that crash are restarted by the supervisor as per its 
+restart strategy%
+\sidenote[6]{
+  \emph{Restart Strategy}: This defines how the supervisor should restart
+  crashed children.
+  \begin{inparaenum}[(i)]
+    \iterm{One for one}: Only the crashed process is restarted.
+    \iterm{One for all}: All the children under the supervisor are restarted if
+    any of the process terminates.
+    \iterm{Rest for one}: Similar to one for all, but children restart is based
+    on just the first process.
+    \iterm{Simple one for one}: Same as one for one, but the children are
+    created dynamically.
+  \end{inparaenum}
+}
+. The supervisor also provides several other options such as child 
+specifications, restart frequency, restart policy and so on to provide
+fine grained control on the restart procedure.
+
+\subsection{Behaviours}
+\label{section:concepts.behaviours}
+Behaviours are commonly used Erlang design patterns. They contain a pre-defined 
+set of functions necessary to implement specific design patterns allowing for 
+quick implementation.
+
+\subsubsection{gen\_server}
+
+\todo{...}
+
+\subsection{Applications}
+\label{section:concepts.applications}
+Logical group of components can be glued together to form applications. 
+Applications have well-defined roles and Erlang provides convinient modules to 
+manage them.
+
+\subsection{Releases}
+\label{section:concepts.releases}
+A release is a complete system packaged for deployment. Erlang provides modules 
+necessary to create packages for deploying new code and upgrading existing code.
 
 \section{Erlang libraries}
 
