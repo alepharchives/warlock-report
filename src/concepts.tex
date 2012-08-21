@@ -5,7 +5,7 @@ We discuss the various concepts discussed in the thesis scope in this chapter.
 
 \section{Paxos}
 
-The consensus algorithm used in the system is Paxos \sectionref{paxos}. 
+The consensus algorithm used in the system is Paxos \sectionref{paxos}.
 \citet{Robbert2011} is the specific paper referred to for the implementation of
 Warlock. This section describes the specific flavour of the algorithm.
 
@@ -13,14 +13,14 @@ The processes of the group can be classified into different roles based on the
 part of algorithm they are responsible for.
 
 \begin{itemize}
-    \iterm{Replica}: Replicas are processes responsible for assigning proposal 
+    \iterm{Replica}: Replicas are processes responsible for assigning proposal
     number to an operation and handle decisions made.
     \iterm{Acceptor}: Acceptors are the ``memory'' of the algorithm. They keep
     track of which leader is currrently in-charge to issue commands.
     \iterm{Leader}: Leaders receive proposals from replicas and they try to
     co-ordinate the messaging to acceptors for that proposal. It uses ballots%
     \sidenote{
-      \emph{Ballots} are monotonically increasing ids that are unique to a 
+      \emph{Ballots} are monotonically increasing ids that are unique to a
       specific leader. Each leader has an infinite number of ballots.
     }
     to track the execution order or proposals.
@@ -35,14 +35,14 @@ largest one, lets see a typical flow of the proposal from its intiation to its
 execution skipping on the smaller details and corner cases.
 
 \begin{itemize}
-    \item A proposal is created by the client based on the request. This 
-      proposal is uniquely identified and contains all the necessary request 
+    \item A proposal is created by the client based on the request. This
+      proposal is uniquely identified and contains all the necessary request
       information. This proposal is sent to the replica.
     \item The replica checks if the propsal is a duplicate and if not it
       assigs a sequence number%
       \sidenote{
         The replica is resposible for maintaning a consistent log of operations.
-        This log is made up of slots with each of the slots indexed by a 
+        This log is made up of slots with each of the slots indexed by a
         sequence number.
       }
       to it before sending it off to the leader.
@@ -52,14 +52,14 @@ execution skipping on the smaller details and corner cases.
       information to all acceptors asking them to approve the proposal.
     \item The acceptors respond positively if it has not seem another larger
       ballot number and negatively otherwise.
-    \item The commander waits for a quorum (usually a majority of total 
+    \item The commander waits for a quorum (usually a majority of total
       acceptors) of acceptors. Once it has received majority of the approvals,
       the commander asks all the replicas to execute the proposal and exits.
     \item The replica checks if the received decision is the next index on
       the consistent log and executes the proposal if it is.
 \end{itemize}
 
-In the above use case we see the routing for one instance of individual 
+In the above use case we see the routing for one instance of individual
 processes running. There will be sevaral simultaneously running processes. The
 routing in the algorithm is as follows.
 
@@ -80,12 +80,12 @@ The paper details several optimizations to make the algorithm more practical.
 
 \section{Erlang}
 
-Erlang \citep{erlang} is a virtual machine based general purpose functional 
-programming language built by Ericsson mainly to develop telephony applications 
+Erlang \citep{erlang} is a virtual machine based general purpose functional
+programming language built by Ericsson mainly to develop telephony applications
 \citep{Armstrong07}. Erlang was build to handle large number of network
 requests with special attention given to handling failures.
 
-A process is the concurrency primitive of Erlang. Each of the processes are 
+A process is the concurrency primitive of Erlang. Each of the processes are
 isolated and have access to their own private memory. This allows us to build
 large scale applications with the Actor model%
 \sidenote{
@@ -98,7 +98,11 @@ large scale applications with the Actor model%
 }
 \citep{Clinger81}.
 
-Erlang also supports hot code loading which allows us to upgrade the system's
+Erlang also supports hot code loading%
+\sidenote[3]{
+  \emph{Hot code loading}: Dynamically updating running software.
+}
+which allows us to upgrade the system's
 code without restarting or disrupting the service.
 
 The ideas of concurrency, fault tolerance, distributabilityi, hot code loading
@@ -113,22 +117,22 @@ behind Erlang maps well on to the building large web applications.
 \label{section:concepts.otp}
 
 Open Telecom Platorm (OTP) is a collection of Erlang libraries. The OTP code is
-well tested, robust and provide design patterns allowing us to quickly build 
+well tested, robust and provide design patterns allowing us to quickly build
 Erlang applications. We take a look at few of the priciples from OTP that is
 used in the project.
 
 \subsection{Supervision}
 \label{section:concepts.supervision}
 
-Supervisors are processes that monitor workers processes and restart them based 
-on a pre-defined set of rules. An application can be designed in the form of a 
+Supervisors are processes that monitor workers processes and restart them based
+on a pre-defined set of rules. An application can be designed in the form of a
 tree with fine grained control to handle crashing processes and to localize such
-crashes. A typical Erlang supervisor tree looks like 
+crashes. A typical Erlang supervisor tree looks like
 \figureref{supervision.tree}.
 
 \begin{figure}
   \captionstyle{\raggedright}
-  
+
   % Generated with LaTeXDraw 2.0.7
   % Mon Aug 20 17:48:00 CEST 2012
   % \usepackage[usenames,dvipsnames]{pstricks}
@@ -159,7 +163,7 @@ crashes. A typical Erlang supervisor tree looks like
       \pscircle[linewidth=0.04,dimen=outer,fillstyle=solid,fillcolor=color54b](3.74,-4.59){0.34}
       \usefont{T1}{ptm}{m}{n}
       \rput(4.96875,-4.625){Worker}
-    \end{pspicture} 
+    \end{pspicture}
   }
 
   \caption[Supervision Tree]{%
@@ -170,14 +174,14 @@ crashes. A typical Erlang supervisor tree looks like
 
 A process as per the supervision tree can either be a supervisor%
 \sidenote{
-  \emph{Supervisor}: An Erlang process responsible for creating, terminating, 
+  \emph{Supervisor}: An Erlang process responsible for creating, terminating,
   monitoring and restarting processes as defined.
 }
 or a worker%
 \sidenote[3]{
-  \emph{Worker}: A worker process in this context is any other process started 
+  \emph{Worker}: A worker process in this context is any other process started
   by the supervisor that is not a supervisor itself.
-}. Processes that crash are restarted by the supervisor as per its 
+}. Processes that crash are restarted by the supervisor as per its
 restart strategy%
 \sidenote[6]{
   \emph{Restart Strategy}: This defines how the supervisor should restart
@@ -192,29 +196,56 @@ restart strategy%
     created dynamically.
   \end{inparaenum}
 }
-. The supervisor also provides several other options such as child 
+. The supervisor also provides several other options such as child
 specifications, restart frequency, restart policy and so on to provide
 fine grained control on the restart procedure.
 
 \subsection{Behaviours}
 \label{section:concepts.behaviours}
-Behaviours are commonly used Erlang design patterns. They contain a pre-defined 
-set of functions necessary to implement specific design patterns allowing for 
+Behaviours are commonly used Erlang design patterns. They contain a pre-defined
+set of functions necessary to implement specific design patterns allowing for
 quick implementation.
+
+The three main behaviours provided by the OTP library are
+
+\begin{itemize}
+    \iterm{gen\_server}: A process that waits for incoming events, performs
+    actions based on the events and responds to the request.
+    \iterm{gen\_event}: A process that acts as an event manager waiting for
+    events to happen and runs specific event handlers based depending on it.
+    \iterm{gen\_fsm}: A process that acts as a finite state machine.
+\end{itemize}
 
 \subsubsection{gen\_server}
 
-\todo{...}
+gen\_server is based on the typical architecture of client-server model
+\citep{reliable.dist.sys}. It supports two types of requests viz, synchronous
+calls%
+\sidenote{
+  \emph{Synchronous calls}: Also called blocking calls, has the caller wait till
+  the process can provide a response.
+}
+and asynchronous calls%
+\sidenote[2]{
+  \emph{Asynchronous calls}: Also called non-blocking calls, is received by the
+  process and handled when it has processed all the messages it had received
+  before this request.
+}
+.
+
+It also provides other features such as handling other types of messages (such
+as TCP/UDP messages), hot code loading and sending requests to other
+processes.
 
 \subsection{Applications}
 \label{section:concepts.applications}
-Logical group of components can be glued together to form applications. 
-Applications have well-defined roles and Erlang provides convinient modules to 
+Logical group of components can be glued together to form applications.
+Applications have well-defined roles and Erlang provides convinient modules to
 manage them.
 
 \subsection{Releases}
 \label{section:concepts.releases}
-A release is a complete system packaged for deployment. Erlang provides modules 
+A release is a complete system packaged for deployment. Erlang provides modules
 necessary to create packages for deploying new code and upgrading existing code.
 
 \section{Erlang libraries}
@@ -239,6 +270,6 @@ implementation of Redis protocol support.
 
 Ranch \citep{ranch} is a socket acceptor pool for TCP protocols.
 
-Ranch is used in this project for accepting and managing multiple client 
+Ranch is used in this project for accepting and managing multiple client
 connections for the Redis protocol implementation.
 
