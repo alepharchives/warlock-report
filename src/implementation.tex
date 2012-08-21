@@ -25,47 +25,246 @@ oriented and covers more edge cases than \citet{Lamport01}, a working prototype
 helps to get a more through understanding of the protocol itself.
 
 We built a prototype that is a straight one is to one implementation of the 
-pseudo code from \citet{Robbert2011}. It supported a configurable number of 
+pseudo code from \citet{Robbert2011}. It supports a configurable number of 
 replicas, leaders and acceptors, allowing us to get an idea of how the protocol
 behaves with different configurations using simple unit tests. Building the 
 prototype helps us to single out the core of the system and make sure the 
 protocol works correctly before getting to to the other parts.
 
-\section{Application structure}
+\section{Algorithm Implementation}
 
-The source structure of the application can be see at \chapterref{source.code}.
+Each of the process described in \sectionref{concepts.paxos} have some state
+and have to send/receive messages to other process. We use gen\_servers 
+\sectionref{gen.server} to implement these processes since it maps on to 
+this behaviour.
+
+gen\_servers can internally maintain state that can be accessed by all of its 
+callback functions. It also provides functions to send messages%
+\sidenote{
+  gen\_server messages can either be call (synchronous) or cast (asynchronous).
+}
+to one or more processes and callback functions handle\_cast%
+\sidenote{
+  \emph{handle\_cast}: A gen\_server calllback function
+  used to handle asynchrounous messages. It also cannot reply to the caller
+  directly and must use $gen\_server:reply/2$ function if it wants to do so.
+}
+, handle\_call%
+\sidenote[5]{
+  \emph{handle\_call}: A gen\_server callback fuctuion used to handle
+  synchronous messages. It has the callers address and it blocks the caller
+  till it sends a reply.
+} and handle\_info%
+\sidenote[10]{
+  \emph{handle\_info} is the gen\_server callback function used to handle all
+  the other types of messages e.g., plain Erlang messages, TCP, UDP messages
+  and so on.  
+}
+to handle incoming messages.
+
+Warlock uses handle\_cast instead of handle\_call since the protocol is for 
+a system that communicates with asynchronous messaging. This also allows us
+to decouple the processes and take a step towards creating a lock-free system.
+
+Let us take a look at the individual gen\_server processes.
+
+\subsection{Replica}
+
+The replicas are responsible for maintaining the state of the system. They
+represent the state machine that updates based on the events sent to it. We
+have state machine replication by making sure we execute the events in the same
+sequence across all the nodes in the cluster.
+
+\subsubsection{State}
+
+\begin{itemize}
+    \iterm{Current slot number}: Each of the decisions are discrete events. 
+    These discrete events can be thought of as slots of a log. The strictly
+    increasing property can be used to ensure the set of decisions taken by
+    the algorithm is sequential and ordered.
+
+    The current slot number is the next open slot available waiting for a
+    decision.
+    \iterm{Minimum slot number}: The protocol allows for concurrent proposals.
+    Each of the incoming proposals are allotted the next available slot and
+    until they are decided upon and committed.
+
+    The minimum slot number is the next available slot for a new incoming
+    proposal.
+    \iterm{Proposals}: A table that maps proposals to slot numbers. It is
+    implemented as a hash table.
+    \iterm{Decisions}: It is somtimes possible that we receive decisions for
+    higher numbered slots before the lower ones because the protocol is
+    asynchronous. Since it is also sequential, we have to wait till we
+    commit all the lower numbered slots before we can proceed.
+
+   Decisions is a table that maps decided proposals to slot numbers and is
+   implemented as a hash table.
+\end{itemize}
+
+\subsubsection{Role}
+
+\begin{itemize}
+  \item Receive proposals, assign slot number to them and forward it to the 
+    leader.
+  \item Receive decisions from the leader, commit them sequentially.
+\end{itemize}
+
+\subsection{Acceptor}
+
+The acceptors form the ``memory'' of the protocol and ballots is the
+mechanism used for it.
+
+\subsubsection{State}
+
+\begin{itemize}
+    \iterm{Ballot Number}: The maximum ballot number it has seen in all
+    of the messages it has seen.
+    \iterm{Accepted}: The leader sends a proposal to the acceptor along with
+    its ballot for a specific slot. The acceptors stores the proposal for
+    the maximum ballot it has seen for that specific slot. It is implemented as
+    a hash table.
+\end{itemize}
+
+\subsubsection{Role}
+
+\begin{itemize}
+  \item Responds to \texttt{P1a} messages with the \texttt{P1b} message 
+    along with maximum ballot and the entire accepted table.
+  \item Responds to \texttt{P2a} messages with the \texttt{P2b} message
+    along with maximum ballot. If the ballot in the \texttt{P2a} message
+    was equal to or great than the one in its state, it adds it to as
+    an entry in the accepted table.
+\end{itemize}
+
+
+\subsection{Scout}
+
+The scout is a process spawned by the leader to handle the first phase of the
+protocol.
+
+\subsubsection{State}
+\label{section:scout.state}
+
+\begin{itemize}
+    \iterm{Leader}: Address of the leader that spawned it.
+    \iterm{PValues}:%
+    \sidenote{
+      A PValue is a tuple consisting of the ballot number, slot number and the
+      proposal.
+    }
+    Unique set of PValues returned by the acceptor. It is implemented as a
+    hash table.
+\end{itemize}
+
+\subsubsection{Role}
+
+\begin{itemize}
+  \item Initiates the first phase of the protocol by sending \texttt{P1a}
+    message to all the acceptors in the group.
+  \item It waits to get replies from majority of acceptors while collecting
+    all the PValues sent by them. It only maintains the PValues for slots
+    with maximum ballots.
+  \item Replies to the leader with the set of PValues if it gets majority
+    acceptance.
+\end{itemize}
+
+\subsection{Commander}
+
+The commander is a process spawned by the leader to handle the second part of 
+the protocol. It is very similar to the implementation of the scout. A commander
+is spawned for every proposal, which allows several proposals to make concurrent
+progress.
+
+\subsubsection{State}
+
+Same as that of scout \sectionref{scout.state} but instead of storing all the
+PValues, it only stores it own.
+
+\subsubsection{Role}
+
+\begin{itemize}
+  \item Initiates the second phase of the protocol by sending \texttt{P2a}
+    messages to all the acceptors.
+  \item It waits of replies from all the acceptors.
+  \item On receiving majority acceptance, it sends a message to all the replicas
+    that the proposal has been accepted.
+\end{itemize}
+
+\subsection{Leader}
+
+
+\subsubsection{State}
+
+\begin{itemize}
+  \item a
+\end{itemize}
+
+\subsubsection{Role}
+
+\begin{itemize}
+  \item a
+\end{itemize}
+
+
+
+
+
+All processes in the same node
+
+genservers
+
+cast
+
+monitor
+
+timer
+
+rcfg
+
+
+\section{Application Structure}
+
+The source structure of the application can be seen at \chapterref{source.code}.
 As described earlier, the code is split into different applications according
-to their functionality.
+to their functionality. A tree view of the source structure is provided in
+\appendixref{source.code} for reference.
+
+\section{Building and Deployment}
+
+A build%
+\sidenote{
+  \emph{Software Build}: Compiled set of source code ready to be run.
+}
+process is necessary for Warlock since it is made up of multiple Erlang
+applcations. We also need to create a small cluster of Warlock nodes during 
+development for observation. This requires us to have an automated procedure
+to generate and deploy builds.
+
+The final build consits of a portable Erlang runtime system, log
+paths setup and all the required libraries. rebar \citep{rebar}, reltool
+\citep{reltool} and make files \citep{makefiles} are the tools used to enable
+this automation. 
+
+\section{Testing}
+
+\subsection{Unit Testing}
+
+\subsection{Development Cluster}
+
+\section{Logging}
+
+\section{Administration}
+
+\section{Pluggable Backends}
+
+\section{Pluggable Hash Tables}
+
+\section{Performance}
+
+\section{Profiling}
+
+\subsection{Basho Bench}
 
 
-
-
-
-
-
-
-
-
-
-Erlang application
-  OTP
-    Supervision tree
-    gen\_servers
-      Individual modules
-
-Request flow - messages vs libraries
-
-Building and deployment - rebar
-
-Testing
-  Unit tests
-  dev clusters
-
-Logging
-
-Console and admiistration
-
-pluggable backends and how to implement them
-
-pluggable erlang hash tables
 
