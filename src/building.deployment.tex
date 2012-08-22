@@ -1,0 +1,75 @@
+\chapter{Building and Deployment}
+\label{appendix:building.deployment}
+
+This appendix discusses the steps necessary to get Warlock running.%
+\sidenote[7]{
+  Warlock was not open source at the time of writing the thesis, though there
+  were plans around it. The interface and commands will most probably remain
+  the same, allowing us to use this section.
+}
+
+\section{Building}
+
+Download, build and start Warlock.
+
+\begin{scode}{bash}{a.build.code}{%
+  Build Warlock}{%
+  Download and build Warlock.}
+  \begin{lstlisting}
+# Get the source  
+$ git clone https://github.com/wooga/warlock
+
+# Build the code
+$ cd warlock
+$ make
+$ make rel
+
+# Create release
+$ cd rel/warlock
+$ bin/warlock start
+  \end{lstlisting}
+\end{scode}
+
+\section{Development Cluster}
+
+Build a simple 3 node development cluster.
+
+\begin{scode}{bash}{a.dev.code}{%
+  Create Warlock dev cluster.}{%
+  Create Warlock dev cluster.}
+  \begin{lstlisting}
+# Create dev release
+$ make devrel
+
+# Start all the nodes
+$ dev/dev1/bin/warlock start
+$ dev/dev2/bin/warlock start
+$ dev/dev3/bin/warlock start
+
+# Connect any of the two node with the other node, creating the cluster
+$ dev/dev2/bin/warlock-admin join warlock1@127.0.0.1
+$ dev/dev3/bin/warlock-admin join warlock1@127.0.0.1
+  \end{lstlisting}
+\end{scode}
+
+\section{Command execution}
+
+Execute commands on Warlock with ETS as backend.
+
+\begin{scode}{bash}{a.comm.exex}{%
+  Executing commands on Warlock.}{%
+  Executing commands on Warlock.}
+  \begin{lstlisting}
+# Connect to dev node 1 and run a set command  
+$ dev/dev1/bin/warlock attach
+
+(warlock1@127.0.0.1)1> war_server:x(clu, [set, key, value]).
+{ok,success}
+
+# Connect to dev node 2 and try to get the value set before
+$ dev/dev2/bin/warlock attach
+
+(warlock2@127.0.0.1)1> war_server:x(loc, [get, key]).
+{ok,value}
+  \end{lstlisting}
+\end{scode}
