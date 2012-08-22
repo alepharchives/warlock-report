@@ -491,7 +491,7 @@
 \lstset{%
   basicstyle=\footnotesize,
   numbers=left,
-  numberstyle=\footnotesize\texttt,
+  numberstyle=\tiny\color{gray},
   showstringspaces=false,
   frame=l,
   captionpos=b,
