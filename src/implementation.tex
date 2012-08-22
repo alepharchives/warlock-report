@@ -1,7 +1,7 @@
 \chapter{Implementation}
 \label{chapter:implementation}
 
-We implement the system as per the requirements (\chapterref{requirements}) and 
+We implement the system as per the requirements (\chapterref{requirements}) and
 design (\chapterref{analysis.design}) in this chapter. We try to explain how the
 design goals matches on to the features of Erlang \citep{erlang} programming
 language and OTP libraries.
@@ -11,8 +11,8 @@ motivated by the factor that the Magic Land backend was already implemented in
 Erlang. A new system in the same language will be much easier to integrate with
 the existing architecture.
 
-The development of the system was done in iterations, roughly a week in size. 
-The target of each iteration would be to extend the existing base or to develop 
+The development of the system was done in iterations, roughly a week in size.
+The target of each iteration would be to extend the existing base or to develop
 new features. This allowed us to quickly identify the part of the system that
 forms the core and other features that are just good to have. More details of
 the development process can be read at [[appendix]].
@@ -24,21 +24,21 @@ in \citet{Robbert2011}. While the algorithm is straight forwardi, implementation
 oriented and covers more edge cases than \citet{Lamport01}, a working prototype
 helps to get a more through understanding of the protocol itself.
 
-We built a prototype that is a straight one is to one implementation of the 
-pseudo code from \citet{Robbert2011}. It supports a configurable number of 
+We built a prototype that is a straight one is to one implementation of the
+pseudo code from \citet{Robbert2011}. It supports a configurable number of
 replicas, leaders and acceptors, allowing us to get an idea of how the protocol
-behaves with different configurations using simple unit tests. Building the 
-prototype helps us to single out the core of the system and make sure the 
+behaves with different configurations using simple unit tests. Building the
+prototype helps us to single out the core of the system and make sure the
 protocol works correctly before getting to to the other parts.
 
 \section{Algorithm Implementation}
 
 Each of the process described in \sectionref{concepts.paxos} have some state
-and have to send/receive messages to other process. We use gen\_servers 
-\sectionref{gen.server} to implement these processes since it maps on to 
+and have to send/receive messages to other process. We use gen\_servers
+\sectionref{gen.server} to implement these processes since it maps on to
 this behaviour.
 
-gen\_servers can internally maintain state that can be accessed by all of its 
+gen\_servers can internally maintain state that can be accessed by all of its
 callback functions. It also provides functions to send messages%
 \sidenote{
   gen\_server messages can either be call (synchronous) or cast (asynchronous).
@@ -58,15 +58,16 @@ to one or more processes and callback functions handle\_cast%
 \sidenote[10]{
   \emph{handle\_info} is the gen\_server callback function used to handle all
   the other types of messages e.g., plain Erlang messages, TCP, UDP messages
-  and so on.  
+  and so on.
 }
 to handle incoming messages.
 
-Warlock uses handle\_cast instead of handle\_call since the protocol is for 
+Warlock uses handle\_cast instead of handle\_call since the protocol is for
 a system that communicates with asynchronous messaging. This also allows us
 to decouple the processes and take a step towards creating a lock-free system.
 
-Let us take a look at the individual gen\_server processes.
+Let us take a look at the individual gen\_server processes. Note that all of
+these procesess reside on the same node inside an Erlang applications.
 
 \subsection{Replica}
 
@@ -78,7 +79,7 @@ sequence across all the nodes in the cluster.
 \subsubsection{State}
 
 \begin{itemize}
-    \iterm{Current slot number}: Each of the decisions are discrete events. 
+    \iterm{Current slot number}: Each of the decisions are discrete events.
     These discrete events can be thought of as slots of a log. The strictly
     increasing property can be used to ensure the set of decisions taken by
     the algorithm is sequential and ordered.
@@ -105,7 +106,7 @@ sequence across all the nodes in the cluster.
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Receive proposals, assign slot number to them and forward it to the 
+  \item Receive proposals, assign slot number to them and forward it to the
     leader.
   \item Receive decisions from the leader, commit them sequentially.
 \end{itemize}
@@ -129,7 +130,7 @@ mechanism used for it.
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Responds to \texttt{P1a} messages with the \texttt{P1b} message 
+  \item Responds to \texttt{P1a} messages with the \texttt{P1b} message
     along with maximum ballot and the entire accepted table.
   \item Responds to \texttt{P2a} messages with the \texttt{P2b} message
     along with maximum ballot. If the ballot in the \texttt{P2a} message
@@ -171,7 +172,7 @@ protocol.
 
 \subsection{Commander}
 
-The commander is a process spawned by the leader to handle the second part of 
+The commander is a process spawned by the leader to handle the second part of
 the protocol. It is very similar to the implementation of the scout. A commander
 is spawned for every proposal, which allows several proposals to make concurrent
 progress.
@@ -193,35 +194,88 @@ PValues, it only stores it own.
 
 \subsection{Leader}
 
+The leader process co-ordinates votes for proposals using scouts and commanders.
 
 \subsubsection{State}
 
 \begin{itemize}
-  \item a
+    \iterm{Ballot}: The ballot is unique to the leader and is used to tag all
+    proposals being sent to the acceptors.
+    \iterm{Active}: In multi-paxos, once the leader is in the second phase of
+    the protocol, it does not need to run first phase of the protocol again.
+
+    The ``active'' flag determines what phase of the protocol the leader is in.
+    If it is set to true, the leader is in active phase allowing it to directly
+    spawn commanders for every incoming proposal.
+    \iterm{Proposals}: A mapping from slots to proposals. It is implemented as
+    a hash table.
+    \iterm{Timer Reference}: The leader uses a single timer based on its current
+    status. This flag keeps track of it. Different possible values for the flag
+    are
+    \begin{itemize}
+        \iterm{renew}: The leader needs to renew its lease before it expires if
+        it is in the master node.
+        \iterm{backoff}: When the leader's scout gets pre-empted, instead of
+        immediately re-spawning the scout, the leader waits for a pre-specified
+        ``backoff'' time.
+        \iterm{master\_check}: Periodic check by the leader to see if the
+        exisitng master node's lease has expired. This is the check that is run
+        before spawning a new scout.
+        \iterm{membership}: A new node being added to the cluster has to wait
+        till it gets accepted. This flag is used to poll its acceptance.
+    \end{itemize}
+    \iterm{Monitors}: Monitors are used by the master leader to keep track of
+    the process status of leaders of the other nodes.
 \end{itemize}
 
 \subsubsection{Role}
 
 \begin{itemize}
-  \item a
+  \item Receives proposals from the replica and either queues or spawns a
+    commander for it based on its active flag's value.
+  \item Handles comminication between scout and commander, spawning them
+    when required and acting based on the results sent by them.
+  \item Handle all ballot related activities such as incrementing the ballot
+    when pre-empted and incrementing the view with the change in the system
+    configuration.
+  \item Initiate and participate in master node elections.
+  \item Receive and act on the messages resulting from monitoring of other
+    nodes.
+  \item Use a single timer based on its current status to poll for the
+    reasons mentioned.
 \end{itemize}
 
+\subsection{Client}
 
+The consensus client process is only used for reconfiguration requests
+\sectionref{impl.rcfg}. The client behaves as a code library for the actual
+proposals. It also acts as the execution point for the proposals when called
+by the replica.
 
+\section{System Reconfiguration}
+\label{section:impl.rcfg}
 
+As discussed in \sectionref{a.n.d.reconfig}, we use a parallel state machine
+to tract the node's configuration. This state machines is implemented as a
+hash table. The operations we can support with this design choice are:
 
-All processes in the same node
+\begin{itemize}
+    \iterm{join}: A fresh node can join the consensus cluster without copying
+    any data from the other nodes. This command is used to setup the initial
+    cluster.
+    \iterm{add\_repl\_member}: A new node can be added to the system by first
+    copying data into it and then add to to the cluster once it is in sync with
+    rest of the member nodes.
+    \iterm{leave}: A member node can leave the cluster.
+    \iterm{remove}: Any of the members nodes can remove any of the other member
+    node from the cluster.
+    \iterm{transfer\_master}: Nodes are designed to retain their master status
+    for as long as possible. This command can be used in any event it is needed
+    to move this status to other node.
+\end{itemize}
 
-genservers
-
-cast
-
-monitor
-
-timer
-
-rcfg
-
+The reconfiguration requests are treated as proposals allowing us to use the
+same set of functions albeit with different slots.
 
 \section{Application Structure}
 
@@ -237,34 +291,120 @@ A build%
   \emph{Software Build}: Compiled set of source code ready to be run.
 }
 process is necessary for Warlock since it is made up of multiple Erlang
-applcations. We also need to create a small cluster of Warlock nodes during 
+applcations. We also need to create a small cluster of Warlock nodes during
 development for observation. This requires us to have an automated procedure
 to generate and deploy builds.
 
 The final build consits of a portable Erlang runtime system, log
 paths setup and all the required libraries. rebar \citep{rebar}, reltool
 \citep{reltool} and make files \citep{makefiles} are the tools used to enable
-this automation. 
+this automation.
 
 \section{Testing}
 
+The importance of testing increases when building a system that changes
+rapidly. Even though we start with a stable set of requirements, we might
+need to changes different components of the system in order to improve
+performance, add features and refactor. Having a solid set of tests allows
+us to make bold changes to the code while minimizing the chances of breaking
+working code.
+
 \subsection{Unit Testing}
+
+Testing individual units of code without looking at the larger picture is unit
+testing. While we did not write tests for each and every part of the code as
+required by test driven development methodology \citep{Beck:2002:TDD:579193},
+we wrote tests in such a way that covered large portions of essential code.
+Some parts of the code that acts more as a library has unit tests for it.
 
 \subsection{Development Cluster}
 
+The system needs distributed system tests. We automate the creation of a test
+cluster allowing us to quickly inspect, reproduce and trace bugs that appear
+only when the system is running as a part of the cluster.
+
 \section{Logging}
 
-\section{Administration}
+Logging of events in the system is very essential since it is one of the primary
+methods of debugging in a distributed system. It also allows us to track rare
+failures and helps during system implementation.
+
+We use lager \citep{lager} library for logging that has the flexibility of
+providing many log levels%
+\sidenote{
+  \emph{Log levels}: Log levels determines the severity of the event that is
+  being logged allowing the developer to take approriate action.
+}
+and mutiple outputs (console logging, file based logging).
+
+The logging systems are designed with performance in mind. Even logging can have
+noticable effects even if the log level is higher. The key is to balance the
+points where events are logged and to keep them at a bare minimum when used in
+live systems.
 
 \section{Pluggable Backends}
 
-\section{Pluggable Hash Tables}
+The Warlock project was designed as a lock manager to replace Redis
+\citep{redis}. While the default Warlock system supports the operations
+required for the Magic Land backend, other projects using Warlock might need
+some other commands. A better solution than re-implementing the commands is to
+support entire backends.
+
+So Warlock acts as a consensus layer and its callback can be used to run
+commands on different backends. We implemented backends in ETS, Redis and
+Judy arrays \citep{judy}. It is possible to use other softwares as backend
+since Warlock is transparent to the commands.
 
 \section{Performance}
 
-\section{Profiling}
+While consistency is the primary goal, the system needs to focus on performance
+to handle systems with millions of users. Apart from the many optimizations
+described in \chapterref{analysis.design}, we use some tools to figure out
+the bottlenecks and attempt to fix it without affecting the primary goal.
 
-\subsection{Basho Bench}
+\subsection{Profiling}
 
+Profiling is analyzing the code dynamically based on different measurements such
+as CPU time, memory consumed, number of function calls made, number of messages
+sent and so on. It allows us to visualize the parts of the source code that take
+the longest to run or is run the most number of times.
 
+Erlang has a number of built in specialzied profilers available
+\citep{erlang.profiling}. It helped us identify that at one point logging was
+responsible for degrading 30\% of performance even though it was set to a
+lower log level.
 
+\subsection{Benchmarking}
+
+Profiling allows us to look though the performance of the code minutely.
+Benchmarking allows us to see how the system performance from an external
+point of view. It is the act of testing the performance of a system by
+repeatedly running it or interacting with it.
+
+Basho bench \citep{basho.bench} is the benchmarking tool used in our project.
+It allows us to define a number of options such as the number of concurrent
+workers, functions to call, rate of calls, system status measurements and so
+on. However, it wa unable to generate enough traffic to saturate the system
+on a network while running from a separate server. While distributed
+benchmarking can be done to generate more calls, it becomes harder to
+co-ordinate it and merge the resulting data.
+
+\subsection{Pluggable Hash Tables}
+
+Hash tables are used across the implementation of Warlock making the
+implemention choice a crucial factor in in its performance. Erlang provides
+many options:
+
+\begin{itemize}
+    \iterm{ETS}: Erlang Term Storage is a built-in storage module in Erlang
+    used mainly for storing tuples. It provides the option of multiple data
+    structures and many atomic operations on them.
+    \iterm{Dict}: Dict is Erlang's implementation of an immutable dictionary
+    data structure.
+    \iterm{gb\_trees}: Erlang's implementation of General Balanced Trees
+    \citep{Andersson99}. It is an efficient tree structure that can be used
+    as an hash table.
+\end{itemize}
+
+By using generalized hash tables in our code, we were able to evaluate these
+data structures finally choosing ETS for its performance and added features.
