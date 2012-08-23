@@ -1,16 +1,19 @@
 \chapter{Abstract}
 
-Certain distributed applications require that its users strictly have one
-session across the distributed system at any given point of time. Systems
-based on weak consistency models might lead to diverging user states which
-in some cases are not possible to merge without acceptable effort.
+Locking primitives are one of the mechanisms used by distributed systems
+to synchronize access to shared data or to serialize its actions. Depending
+on the design, the manager providing this locking service may consititute
+a single point of failure. This requires the manager itself to be
+distributed. Distributed solutions that address this using weak consistency 
+models might lead to diverging states which in some cases are not possible to
+merge without acceptable effort. The solutions that are based on strong
+consistency models dictate the requirement of a static cluster.
 
-Wooga, a social games company encouters this scenario for many of its
-games, constituting a single point point of failure.
+This thesis deals with creation of Warlock, a distributed
+consensus service based on Paxos, that can be used as a distributed lock 
+manager. The primary goal of Warlock is to provide strong consistency in a
+dynamic cluster with availability and performance as secondary targets.
 
-Warlock is an effort to create a distributed consensus service that can
-be used as a distributed lock manager, tailor made for ditributed web
-applications at Wooga. This document describes the analysis and design of
-Warlock and details its Erlang based implementation and results. 
-This paper also compares Warlock with many similar applications and points
-out the differences between them.
+In this document we discuss relevant algorithms and projects on distributed 
+computing and design the consensus service based on them. We also implement 
+this design and evaluate its reliability, availability and performance aspects.
