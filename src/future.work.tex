@@ -1,22 +1,201 @@
 \chapter{Future Work}
 \label{chapter:future.work}
 
-improve security
+The Warlock project in its current state is quite stable and ready to be used.%
+\sidenote[6]{
+  Based on load tests in chaper [[]]
+}
 
-scalability
+\todo{Add details about Warlock's current usage}
 
-performance improvements - profiling
+\section{Security}
 
-more backend support
+Warlock is meant to be run within the internal network and is currently lacking
+in terms of security. While this makes it reasonably safe to run within a secure
+network, improved security will allow it to run in more diverse environments.
 
-recovery by merging instead of full clean recovery
+The client based on Redis protocol supports basic authentication. However, it
+needs improvements interms of the password storage, configuration and
+transmission.
 
-more client support based in supporting redis api
+\section{Testing}
 
-smart client that does smart routing (stores and uses routing table)
-  client side cachine
-  client cache invalidation by master - open connection
-  
+As discussed in \sectionref{impl.testing}, testing is essential for distributed
+projects. While basic set of tests cover the common use cases and flows, more
+tests help us to cover the corner cases better.
 
-support additional data structures
+Warlock can benefit from PropEr%
+\sidenote{
+  PropEr \citep{proper} is a property based testing tool for Erlang.
+}
+by providing automated tests and can also help in improving the overall
+system stability. By just specifying the structure of the program and the range
+of input values, PropEr can generate the required number of tests needed for
+us to gain confidence in our implementation. This tool can then be made
+part of compile phase itself, allowing us to catch discrepencies at a much
+earlier stage.
+
+System tests%
+\sidenote{
+  \emph{System Testing}: Testing the system as a whole, usually treating it as 
+  a black box (ignoring the implementation details).
+}
+become necessary in distributed systems to make sure changes made to the code
+does not break any previous features. Common test \citep{common.test} is a
+system testing tool that is a part of the Erlang distribution. It is feature
+rich and allows us to implement system and integration tests. This tool can
+be used to run system tests during the build phase, thus helping to make sure
+the build works are expected on multiple nodes.
+
+\section{Performance}
+
+Performance is crucial for projects serving requests for millions of users.
+While Warlock if tuned to provide necessary performance for Magic Land, it
+can still be tweaked to push it even further.
+
+\subsection{Code Profiling}
+
+Profiling, as explained in \citep{impl.profiling}, can help us idetify the
+bottlenecks in the codebase. Erlang comes with lots of different profilers
+which can be used to identify bottlenecks from different perspectives. This
+should allow us to focus more on the most frequently used functions and try
+to reduce the most common messages, resulting in better performance.
+
+\subsection{Latency}
+
+While latency is not a major concern for Magic Land%
+\sidenote{
+  The front end of Magic Land (written in Adobe Flash) takes several seconds
+  to load. A difference for few milliseconds does not make an overall impact
+  on the user experience.
+}
+, improving it is necessary since it blocks the client accessing it. Latency
+can be improved by reducing the number of processes the proposal/message has
+to travel through. However, this is quite tricky to optimize without breaking
+the algorithm itself.
+
+\section{Scalability}
+
+In this context, scalability refers to increase the throughput of the system
+by increasing the number of nodes in the cluster.
+
+\subsection{Reads}
+
+Reads are performed locally from the replicas itself and we do not use the
+consensus protocol for it. This allows us to read directly from any of the
+replicas.
+
+It should be possible to create additional nodes that just subscribes to all
+the decisions without taking part in the consensus protocol. We can then use
+these nodes as read-only sources. This setup should allow us to scale the reads
+to a fairly large extent.
+
+\subsection{Writes}
+
+Increasing the number of nodes in the cluster decreases its throughput since
+more nodes are now involved in approving a proposal. Increasing number of writes
+is hence a much harder task.
+
+Couple of possible areas for improvements are:
+
+\begin{itemize}
+  \item Change the algorithm itself to reduce the total number of messages
+    exchanged.
+  \item Use different ways to broadcast messages. Such as ip-multicast as
+    described in \citet{MarandiPSP10}
+  \item Batch multiple request together to decrease individual round trip times.
+\end{itemize}
+
+\section{Backend Support}
+
+Warlock's current backends are key value stores. Since Warlock is transparent
+to the commands, we can potentially use any data store as a backend. Adding
+more types of backends to Warlock can bring it to a wider audience.
+
+\section{Recovery Techniques}
+
+Currently if a Warlock node fails, we wipe all its data and restore it from
+another node in the cluster using replication. While this method has its
+advantages, there are cases where this might be a problem.
+
+\begin{itemize}
+  \item Certain backends may be full blown disk recovery system. Allowing for
+    conflict resolution between nodes can decrease the recovery time for a
+    node drastically, especially for clusters with lot of data.
+  \item Certain backends may be provide the data backup and loading mechanism
+    required by Warlock.
+\end{itemize}
+
+\section{Smart Client}
+
+The current Warlock client is quite simple. It just connects to the server and
+issues commands to it. Improving the client can allow us to decrease some
+node on Warlock and improve availability. Some suggestions for such a improved
+client are:
+
+\begin{itemize}
+  \item The client can store the list of Warlock nodes when it intiates the
+    connection. This will allow the client to connect to other Warlock nodes
+    (say in a round robin fashion) in case the one it is connected to goes down.
+  \item Client can have certain timeout are provided by a Warlock node. Till
+    allows us to control client timeouts from the server side.
+  \item The Warlock nodes current route all the proposals they receive to the
+    Master node. An alternative would be to have the client broadcast the
+    request to all the nodes, resulting in reduction of traffic in the cluster.
+  \item The client could queue proposals when the Warlock service is down for
+    reasons such as leader election in progress or temporarily failed quorums.
+  \item A technique used in \citet{Burrows06}, the client could cache the data
+    and the master could actively invalidate cached data on updates. However,
+    this could require a change in the current Warlock client server
+    architecture, possibly making the system more complex.
+  \item 
+\end{itemize}
+
+\section{Expire}
+
+Key expiry has many benefits, as discussed in \citet{a.n.d.expiry}. However, its
+implementation has severe tradeoffs with performance. Hence, the needs for
+performant key expiry exits.
+
+\section{Others}
+
+\subsection{Code improvement}
+
+Several parts of the code that are open to improvement are tagged with 
+``TODO''s. These are possible performance enhancement poits, feature and
+stability improvement points. 
+
+For example, all the ETS tables used currently
+are directly running under the processes that created them. If these processes
+crash, the linked ETS table would also crash. Using a table manager would
+help survive these crashes.
+
+\subsection{More OTP}
+
+Certain portions of the code skip some OTP practices to trade for performance.
+For example, the commander is spawned directly by the leader instead of using
+a supervisor. This makes it harder when it comes to hot code loading. In this
+specific issue, it not much of a problem since commanders are short lived
+process. A high level tuning from the OTP perspective can help improve code
+stability and maintainability.
+
+\subsection{Timeouts}
+
+Warlock relies heavily in timers which are currently static. Making these
+timeouts as a function of, say system load, can make the system more tolerant
+of high loads.
+
+\subsection{Reconfiguration}
+
+The selection of nodes when transferring the master or when allocation the
+seed node for replication is currently very simple. By using things such
+as a priority list to keep track of the most stable nodes will allow us to
+ensure more stable and operation.
+
+\subsection{Shared Data}
+
+Certain data within the Warlock consensus application is repeated between
+processes. We currently do not share such data, making it simpler for us
+to reason the system and allowing for localizing the failures. It might
+be possible to improve preformance trading for more complex code.
 
