@@ -210,3 +210,10 @@ processes. We currently do not share such data, making it simpler for us
 to reason the system and allowing for localizing the failures. It might
 be possible to improve preformance trading for more complex code.
 
+\subsection{Backups}
+
+Warlock is designed to be an in-memory service with each node having a copy
+of the entire dataset. This allows the database module to directly access
+backup functions of the backend. The implementation of this feature should be
+quite simple.
+
