@@ -12,7 +12,7 @@ this domain in the later sections.
 Paxos is regarded as the simplest and most obvious of distributed algorithms 
 \citep{Lamport01}. It is a consensus protocol used for replication of state
 machines in an asynchronous environment \citep{Lamport98}. We use Paxos in this
-thesis primiarily since it has been shown that it has the minimal possible cost 
+thesis primarily since it has been shown that it has the minimal possible cost
 of any consensus algorithm in the presence of faults \citep{KeidarR03}.
 
 A consensus algorithm tries to get a group of processes to agree on a value 
@@ -20,10 +20,10 @@ while satisfying its safety requirements%
 \sidenote{
   Safety requirements of a consensus algorithm \citep{LamportM04}:
   \begin{inparaenum}[(i)]
-    \item \emph{Nontriviality}: A value has to be proposed to be choosen.
+    \item \emph{Nontriviality}: A value has to be proposed to be chosen.
     \item \emph{Consistency}: Different learners cannot learn different values.
-    \item \emph{Conservatism}: Only choosen values can be learned and it can be
-      learned atmost once.
+    \item \emph{Conservatism}: Only chosen values can be learned and it can be
+      learned at most once.
   \end{inparaenum}
 }. 
 These processes in the Paxos algorithm can be classified based on their roles
@@ -33,7 +33,7 @@ without affecting its correctness:
   \iterm{Proposer}: A process that can propose values to the group. 
   \iterm{Acceptor}: Acceptors form the ``memory'' of the algorithm to 
     allow choosing a single value.
-  \iterm{Learner}: The choosen values are ``learned'' by the other 
+  \iterm{Learner}: The chosen values are ``learned'' by the other
     processes.
 \end{itemize}
 
@@ -105,7 +105,7 @@ The algorithm proceeds in two phases with each phase having two sub phases.
   messages from a quorum%
   \sidenote{
     \emph{Quorum}: Majority agreement of processes. Quorum is used to ensure
-    liviness in the system.
+    liveliness in the system.
   }
   , it sends a reply (P2A) back to each of the acceptor with an \emph{accept} 
   message. The message also consists of the value \emph{v} which is the highest 
@@ -116,13 +116,13 @@ The algorithm proceeds in two phases with each phase having two sub phases.
   proposer, it sends a message (P2B) to the learner with the accepted value 
   \emph{v}.
   \iterm{Learner}: If the learner receives a message from quorum of acceptor, it
-  concludes that the value \emph{v} was choosen.
+  concludes that the value \emph{v} was chosen.
 \end{itemize}
 
 The algorithm makes progress when a proposed value is eventually learned by all
 the learners. However, a scenario where no progress is made is possible when we 
 have multiple proposers. Consider two proposers issuing \emph{prepare} requests
-with alternatively increasing \emph{n}. They would keep pre-empting each other
+with alternatively increasing \emph{n}. They would keep preempting each other
 in a loop leading do no agreement being reached among the group. A solution is
 to create the role of \emph{distinguished proposer} or \emph{leader} where it
 becomes the only process that can issue new requests. \citet{FisLynPat85}
@@ -131,7 +131,7 @@ or timeouts.
 
 Although the pseudo-code of the algorithm is relatively small, implementing it
 to create a stable, production ready system is non-trivial \citep{ChandraGR07}.
-Different flavours of Paxos allows us to choose specific based on the project's
+Different flavors of Paxos allows us to choose specific based on the project's
 requirements.
 
 The family of Paxos algorithms differ from each other based on the topology
@@ -156,7 +156,7 @@ conditions and relatively poor performance.
 The Paxos algorithm needs to be run multiple times for agreeing on a sequence of
 values. \emph{Phase 1 a} and \emph{Phase 1 b} of the algorithm become 
 an unnecessary overhead if the \emph{distinguished proposer} remains the same 
-throught.
+throughout.
 
 Multi-Paxos uses this as its basis to reduce the message flow. The first round 
 of Multi-Paxos is the same as Basic Paxos. For subsequent values, the same
@@ -177,13 +177,13 @@ the round in three message delays in case of a collision.
 
 Clients propose the values directly to the \emph{acceptors} and the 
 \emph{leader} gets involved only in case there is a collision. Versions of Fast
-Paxos can be optimized to a further extent by pre-specifling the collision
+Paxos can be optimized to a further extent by prespecifying the collision
 resolution technique allowing the clients to fix collisions themselves.
 
 However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007}
 Fast Paxos is not better than Basic Paxos in all scenarios. Basic Paxos was 
 found to be faster in case of systems with small number of replicas owing to 
-the stablility provided by its use of a single co-ordinator and the variation
+the stability provided by its use of a single coordinator and the variation
 of message latencies in practical networks. Fast Paxos also needs larger quorum 
 sizes of active replicas for it to function.
 
@@ -195,7 +195,7 @@ Using servers that are slower or cheaper for the additional \emph{N} servers
 allows us to reduce the total cost of the system. Cheap Paxos is designed along 
 these lines.
 
-Cheap Paxos uses \emph{N} auxilary servers along with \emph{N + 1} main servers
+Cheap Paxos uses \emph{N} auxiliary servers along with \emph{N + 1} main servers
 which allows it to tolerate \emph{N} failures. The idea is that the auxiliary
 server steps to to replace one of the main servers when it goes down 
 temporarily. The main server takes back control once restored. The auxiliary
@@ -204,14 +204,14 @@ in the protocol, but merely acting as observers.
 
 The downside of using Cheap Paxos is that it affects the liveliness of the 
 system when multiple main servers fail at the same time since it takes time
-for the auxillary servers to be configured into the system.
+for the axillary servers to be configured into the system.
 
 \subsection{Ring Paxos}
 
 Ring Paxos \citep{MarandiPSP10} is based on the observations that messaging
 using ip-multicast is more scalable and provides better throughput compared
 to unicast for a distributed system with a well-defined network. It also
-has the property that it provides fixed throughtput with variation in number
+has the property that it provides fixed throughput with variation in number
 of receivers. It claims the throughput of ip-multicast and low latency of
 unicast with the downside being that it provides weak synchrony.
 
@@ -227,7 +227,7 @@ unicast with the downside being that it provides weak synchrony.
 
 Basic Paxos algorithm is run under the assumption that all the participating
 processes are fixed and form a static system. However, the system should
-support reconfiguation to be able to run for long periods of time in a
+support reconfiguration to be able to run for long periods of time in a
 practical implementation. Reconfiguration includes adding new servers, 
 removing/replacing old/faulty servers, scaling down the number of servers
 when lower throughput is acceptable and so on.
@@ -242,13 +242,14 @@ This thesis uses a variation of Stoppable Paxos for reconfiguration.
 
 \subsection{Other}
 
-Many other flavours of Paxos exists with some of them focussed on the 
+Many other flavors of Paxos exists with some of them focused on the
 implementation aspects of the algorithm. Lets take a look at some of them.
 
 \begin{itemize}
     \iterm{Paxos for system builders}: \citet{Kirsch08paxosfor} provides the
     complete specification for implementing a system based on Paxos. It also
-    details the performance, safety and liviness properties of a protoype built.
+    details the performance, safety and liveliness properties of a prototype
+    built.
     \iterm{Paxos Made Live - An Engineering Perspective}: \cite{ChandraGR07}
     details the learning in engineering the Paxos algorithm for use in
     Google Chubby Locks \citep{Burrows06}.
@@ -269,10 +270,10 @@ in Erlang.
     as required during runtime.
     \iterm{LibPaxos}: \citet{Lugano2012} is a collection of open source 
     implementations of Paxos created specifically for performance measurements
-    in \citet{MarandiPSP10}. It also includes a similator written in Erlang to
-    observe the network behaviour.
+    in \citet{MarandiPSP10}. It also includes a simulator written in Erlang to
+    observe the network behavior.
     \iterm{gen\_leader}: \citet{Ulf2012} implements a leader election algorithm
-    not based on Paxos. It is one of the notable implemetations for leader
+    not based on Paxos. It is one of the notable implementations for leader
     election in Erlang.
 \end{itemize}
 
@@ -303,7 +304,7 @@ as a store for small metadata \citep{ChandraGR07}.
 \end{figure}
 
 
-Chubby lock is made up of two compoments:
+Chubby lock is made up of two components:
 
 \begin{itemize}
     \iterm{Chubby cell}: Chubby cell is typically made up of five servers 
@@ -329,7 +330,7 @@ Chubby lock is made up of two compoments:
 A Chubby replica mainly consists of a fault tolerant log that is consistent
 with other replicas in the cell by using Paxos protocol. The rest of the
 replica is made of a fault tolerant database and an interface to handle
-requests from Chubby clients. The specfic Paxos flavour used is Multi-Paxos
+requests from Chubby clients. The specific Paxos flavor used is Multi-Paxos
 with slight modifications such as having a ``catch-up'' mechanism for
 slower replicas.
 
@@ -354,21 +355,21 @@ Megastore \citep{BakerBCFKLLLLY11} is an ACID%
   \end{inparaenum}
 }
 compliant, scalable datastore that guarantees high availability and
-consistency. It uses synchronous replication for high availibility and
-consistenct views while targeting performance by parititioning the data.
+consistency. It uses synchronous replication for high availability and
+consistent views while targeting performance by partitioning the data.
 
 \begin{figure}
   \includegraphics[width=0.6\wholewidth]{megastore}
   \caption[Google Megastore]{%
-    Figure shows the example achitecture for Google Megastore.
+    Figure shows the example architecture for Google Megastore.
     Figure courtesy \citet{BakerBCFKLLLLY11}.}
   \label{figure:megastore}
 \end{figure}
 
 Megastore users Paxos to replicate a write-ahead log, replicate commit
-records for single phase ACID transactions and as a part of fast failover
+records for single phase ACID transactions and as a part of fast fail over
 mechanisms. It provides fast local reads using a service called the
-\emph{co-ordinator} which keeps track of the data version/Paxos write
+\emph{coordinator} which keeps track of the data version/Paxos write
 sequence over the group of replicas. It speeds up writes by pre-preparing
 optimizations and other heuristics.
 
@@ -398,7 +399,7 @@ satisfies the constraints imposed by Zookeeper viz.,
 
 
 \begin{itemize}
-    \iterm{Reliable delivery}: Message delived to one server must eventually
+    \iterm{Reliable delivery}: Message delivered to one server must eventually
     get delivered to all the servers.
     \iterm{Total order}: Every server should see the same ordering of the 
     delivered messages.
@@ -412,14 +413,14 @@ satisfies the constraints imposed by Zookeeper viz.,
 \end{itemize}
 
 ZAB is conceptually similar to Paxos, but uses certain optimizations and 
-tradeoffs. The service using ZAB has two modes of operation:
+trade-offs. The service using ZAB has two modes of operation:
 
 \begin{itemize}
-    \iterm{Broadcast mode}: Broadcast mode starts when a new leader is choosen
+    \iterm{Broadcast mode}: Broadcast mode starts when a new leader is chosen
     using a quorum from the group. The leader's state is now same as rest of
     the servers and can hence start broadcasting messages.
-    This mode is similar to two-phase commitn \citep{Gray78}, but with quorum.
-    \iterm{Recovery mode}: A new leader has to choosen when the exiting leader 
+    This mode is similar to two-phase commits \citep{Gray78}, but with quorum.
+    \iterm{Recovery mode}: A new leader has to chosen when the existing leader 
     is no longer valid. The service is now in recovery mode until a new leader
     emerges.
 \end{itemize}
@@ -427,12 +428,12 @@ tradeoffs. The service using ZAB has two modes of operation:
 Zookeeper uses the concept of ``observers'' to increase read throughput. They 
 are a set of servers that monitor the zookeeper service, but do not take part
 in the protocol directly thus acting as extended replicas. The write throughput
-is however inversly proportional to the number of servers in the group mainly
-due to the increased co-ordination required for concensus.
+is however inversely proportional to the number of servers in the group mainly
+due to the increased co-ordination required for consensus.
 
 Zookeeper worked on a static set of servers with no option to reconfigure the
 cluster at the time of writing. However, the feature is in the works 
-\citep{zab2012}and an initial release is avaiable.
+\citep{zab2012}and an initial release is available.
 
 \section{Doozerd}
 
@@ -469,7 +470,7 @@ Amazon DynamoDB \citep{dynamoDB} is proprietary key-value datastore based on
 \section{Scalaris}
 
 Scalaris \citep{scalaris} is distributed key-value database the supports
-consistent writes and full ACID properties. It is based on Distribtued Hash
+consistent writes and full ACID properties. It is based on Distributed Hash
 Table (DHT)%
 \sidenote{
   \emph{Distributed Hash Table}: DHT is a distributed system that provides

@@ -3,7 +3,7 @@
 
 The Warlock project in its current state is quite stable and ready to be used.%
 \sidenote[6]{
-  Based on load tests in chaper [[]]
+  Based on load tests in chapter [[]]
 }
 
 \todo{Add details about Warlock's current usage}
@@ -15,19 +15,19 @@ in terms of security. While this makes it reasonably safe to run within a secure
 network, improved security will allow it to run in more diverse environments.
 
 The client based on Redis protocol supports basic authentication. However, it
-needs improvements interms of the password storage, configuration and
+needs improvements in terms of the password storage, configuration and
 transmission.
 
 \section{Consistency Checks}
 
 We treat the database part of Warlock as the state machine and update it based
-on the proposals that made through the protocol. Hoever, it might be possible
+on the proposals that made through the protocol. However, it might be possible
 that few of nodes become slow in executing these decisions, falling behind
 rest of the cluster. If the decision queue grows too large, some of the
 decisions may even be skipped. While, this has not been observed even under
 heavy loads, it is a good idea to have a consistency hash based on the data
 which is shared periodically with the cluster, providing us with an idea of
-how many nodes are in synch and how many are catching up.
+how many nodes are in sync and how many are catching up.
 
 \section{Testing}
 
@@ -43,7 +43,7 @@ by providing automated tests and can also help in improving the overall
 system stability. By just specifying the structure of the program and the range
 of input values, PropEr can generate the required number of tests needed for
 us to gain confidence in our implementation. This tool can then be made
-part of compile phase itself, allowing us to catch discrepencies at a much
+part of compile phase itself, allowing us to catch discrepancies at a much
 earlier stage.
 
 System tests%
@@ -66,7 +66,7 @@ can still be tweaked to push it even further.
 
 \subsection{Code Profiling}
 
-Profiling, as explained in \citep{impl.profiling}, can help us idetify the
+Profiling, as explained in \citep{impl.profiling}, can help us identify the
 bottlenecks in the codebase. Erlang comes with lots of different profilers
 which can be used to identify bottlenecks from different perspectives. This
 should allow us to focus more on the most frequently used functions and try
@@ -117,11 +117,11 @@ Couple of possible areas for improvements are:
   \item Batch multiple request together to decrease individual round trip times.
 \end{itemize}
 
-\section{Backend Support}
+\section{Back end Support}
 
-Warlock's current backends are key value stores. Since Warlock is transparent
-to the commands, we can potentially use any data store as a backend. Adding
-more types of backends to Warlock can bring it to a wider audience.
+Warlock's current back ends are key value stores. Since Warlock is transparent
+to the commands, we can potentially use any data store as a back end. Adding
+more types of back ends to Warlock can bring it to a wider audience.
 
 \section{Recovery Techniques}
 
@@ -130,10 +130,10 @@ another node in the cluster using replication. While this method has its
 advantages, there are cases where this might be a problem.
 
 \begin{itemize}
-  \item Certain backends may be full blown disk recovery system. Allowing for
+  \item Certain back ends may be full blown disk recovery system. Allowing for
     conflict resolution between nodes can decrease the recovery time for a
     node drastically, especially for clusters with lot of data.
-  \item Certain backends may be provide the data backup and loading mechanism
+  \item Certain back ends may be provide the data backup and loading mechanism
     required by Warlock.
 \end{itemize}
 
@@ -145,7 +145,7 @@ node on Warlock and improve availability. Some suggestions for such a improved
 client are:
 
 \begin{itemize}
-  \item The client can store the list of Warlock nodes when it intiates the
+  \item The client can store the list of Warlock nodes when it initiates the
     connection. This will allow the client to connect to other Warlock nodes
     (say in a round robin fashion) in case the one it is connected to goes down.
   \item Client can have certain timeout are provided by a Warlock node. Till
@@ -165,7 +165,7 @@ client are:
 \section{Expire}
 
 Key expiry has many benefits, as discussed in \citet{a.n.d.expiry}. However, its
-implementation has severe tradeoffs with performance. Hence, the needs for
+implementation has severe trade-offs with performance. Hence, the needs for
 performant key expiry exits.
 
 \section{Others}
@@ -173,7 +173,7 @@ performant key expiry exits.
 \subsection{Code improvement}
 
 Several parts of the code that are open to improvement are tagged with 
-``TODO''s. These are possible performance enhancement poits, feature and
+``TODO''s. These are possible performance enhancement points, feature and
 stability improvement points. 
 
 For example, all the ETS tables used currently
@@ -208,12 +208,12 @@ ensure more stable and operation.
 Certain data within the Warlock consensus application is repeated between
 processes. We currently do not share such data, making it simpler for us
 to reason the system and allowing for localizing the failures. It might
-be possible to improve preformance trading for more complex code.
+be possible to improve performance trading for more complex code.
 
 \subsection{Backups}
 
 Warlock is designed to be an in-memory service with each node having a copy
 of the entire dataset. This allows the database module to directly access
-backup functions of the backend. The implementation of this feature should be
+backup functions of the back end. The implementation of this feature should be
 quite simple.
 

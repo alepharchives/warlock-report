@@ -8,7 +8,7 @@ We discuss the various concepts discussed in the thesis scope in this chapter.
 
 The consensus algorithm used in the system is Paxos \sectionref{paxos}.
 \citet{Robbert2011} is the specific paper referred to for the implementation of
-Warlock. This section describes the specific flavour of the algorithm.
+Warlock. This section describes the specific flavor of the algorithm.
 
 The processes of the group can be classified into different roles based on the
 part of algorithm they are responsible for.
@@ -17,7 +17,7 @@ part of algorithm they are responsible for.
     \iterm{Replica}: Replicas are processes responsible for assigning proposal
     number to an operation and handle decisions made.
     \iterm{Acceptor}: Acceptors are the ``memory'' of the algorithm. They keep
-    track of which leader is currrently in-charge to issue commands.
+    track of which leader is currently in-charge to issue commands.
     \iterm{Leader}: Leaders receive proposals from replicas and they try to
     co-ordinate the messaging to acceptors for that proposal. It uses ballots%
     \sidenote{
@@ -32,17 +32,17 @@ part of algorithm they are responsible for.
 \end{itemize}
 
 Assuming the scout was already run and the current leader has its ballot as the
-largest one, lets see a typical flow of the proposal from its intiation to its
+largest one, lets see a typical flow of the proposal from its initiation to its
 execution skipping on the smaller details and corner cases.
 
 \begin{itemize}
     \item A proposal is created by the client based on the request. This
       proposal is uniquely identified and contains all the necessary request
       information. This proposal is sent to the replica.
-    \item The replica checks if the propsal is a duplicate and if not it
-      assigs a sequence number%
+    \item The replica checks if the proposal is a duplicate and if not it
+      assigns a sequence number%
       \sidenote{
-        The replica is resposible for maintaning a consistent log of operations.
+        The replica is responsible for maintaining a consistent log of operations.
         This log is made up of slots with each of the slots indexed by a
         sequence number.
       }
@@ -61,7 +61,7 @@ execution skipping on the smaller details and corner cases.
 \end{itemize}
 
 In the above use case we see the routing for one instance of individual
-processes running. There will be sevaral simultaneously running processes. The
+processes running. There will be several simultaneously running processes. The
 routing in the algorithm is as follows.
 
 \begin{itemize}
@@ -94,7 +94,7 @@ large scale applications with the Actor model%
   \begin{inparaenum}[(i)]
     \item Send messages to other actors.
     \item Spawn new actors.
-    \item Specify the behaviour to be used when it receives its next message.
+    \item Specify the behavior to be used when it receives its next message.
   \end{inparaenum}
 }
 \citep{Clinger81}.
@@ -106,7 +106,7 @@ Erlang also supports hot code loading%
 which allows us to upgrade the system's
 code without restarting or disrupting the service.
 
-The ideas of concurrency, fault tolerance, distributabilityi, hot code loading
+The ideas of concurrency, fault tolerance, distributability, hot code loading
 behind Erlang maps well on to the building large web applications.
 
 \todo{Add and arrange features}
@@ -117,16 +117,16 @@ behind Erlang maps well on to the building large web applications.
 \section{Open Telecom Platform}
 \label{section:concepts.otp}
 
-Open Telecom Platorm (OTP) is a collection of Erlang libraries. The OTP code is
+Open Telecom Platform (OTP) is a collection of Erlang libraries. The OTP code is
 well tested, robust and provide design patterns allowing us to quickly build
-Erlang applications. We take a look at few of the priciples from OTP that is
+Erlang applications. We take a look at few of the principles from OTP that is
 used in the project.
 
 \subsection{Supervision}
 \label{section:concepts.supervision}
 
 Supervisors are processes that monitor workers processes and restart them based
-on a pre-defined set of rules. An application can be designed in the form of a
+on a predefined set of rules. An application can be designed in the form of a
 tree with fine grained control to handle crashing processes and to localize such
 crashes. A typical Erlang supervisor tree looks like
 \figureref{supervision.tree}.
@@ -201,13 +201,13 @@ restart strategy%
 specifications, restart frequency, restart policy and so on to provide
 fine grained control on the restart procedure.
 
-\subsection{Behaviours}
+\subsection{Behaviors}
 \label{section:concepts.behaviours}
-Behaviours are commonly used Erlang design patterns. They contain a pre-defined
+Behaviors are commonly used Erlang design patterns. They contain a predefined
 set of functions necessary to implement specific design patterns allowing for
 quick implementation.
 
-The three main behaviours provided by the OTP library are
+The three main behaviors provided by the OTP library are
 
 \begin{itemize}
     \iterm{gen\_server}: A process that waits for incoming events, performs
@@ -242,7 +242,7 @@ processes.
 \subsection{Applications}
 \label{section:concepts.applications}
 Logical group of components can be glued together to form applications.
-Applications have well-defined roles and Erlang provides convinient modules to
+Applications have well-defined roles and Erlang provides convenient modules to
 manage them.
 
 \subsection{Releases}
@@ -258,14 +258,14 @@ roles of these project.
 \subsection{lager}
 
 Lager \citep{lager} is a logging framework for Erlang applications. It provides
-features such as fine grained log levels, multiple backend support, optimized
+features such as fine grained log levels, multiple back end support, optimized
 logging and relatively better performance.
 
 \subsection{eredis}
 
 eRedis \citep{eredis} is a non-blocking Erlang client library for Redis.
 
-eRedis is used in this project to support the Redis backend and is used in the
+eRedis is used in this project to support the Redis back end and is used in the
 implementation of Redis protocol support.
 
 \subsection{Ranch}

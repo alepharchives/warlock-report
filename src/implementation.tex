@@ -7,7 +7,7 @@ design goals matches on to the features of Erlang \citep{erlang} programming
 language and OTP libraries.
 
 The choice of Erlang as the programming language for implementation was
-motivated by the factor that the Magic Land backend was already implemented in
+motivated by the factor that the Magic Land back end was already implemented in
 Erlang. A new system in the same language will be much easier to integrate with
 the existing architecture.
 
@@ -20,7 +20,7 @@ the development process can be read at [[appendix]].
 \section{Prototype}
 
 The core of the consensus component is the variation of Paxos protocol based
-in \citet{Robbert2011}. While the algorithm is straight forwardi, implementation
+in \citet{Robbert2011}. While the algorithm is straight forward, implementation
 oriented and covers more edge cases than \citet{Lamport01}, a working prototype
 helps to get a more through understanding of the protocol itself.
 
@@ -36,7 +36,7 @@ protocol works correctly before getting to to the other parts.
 Each of the process described in \sectionref{concepts.paxos} have some state
 and have to send/receive messages to other process. We use gen\_servers
 \sectionref{gen.server} to implement these processes since it maps on to
-this behaviour.
+this behavior.
 
 gen\_servers can internally maintain state that can be accessed by all of its
 callback functions. It also provides functions to send messages%
@@ -45,13 +45,13 @@ callback functions. It also provides functions to send messages%
 }
 to one or more processes and callback functions handle\_cast%
 \sidenote{
-  \emph{handle\_cast}: A gen\_server calllback function
-  used to handle asynchrounous messages. It also cannot reply to the caller
+  \emph{handle\_cast}: A gen\_server callback function
+  used to handle asynchronous messages. It also cannot reply to the caller
   directly and must use $gen\_server:reply/2$ function if it wants to do so.
 }
 , handle\_call%
 \sidenote[5]{
-  \emph{handle\_call}: A gen\_server callback fuctuion used to handle
+  \emph{handle\_call}: A gen\_server callback function used to handle
   synchronous messages. It has the callers address and it blocks the caller
   till it sends a reply.
 } and handle\_info%
@@ -67,7 +67,7 @@ a system that communicates with asynchronous messaging. This also allows us
 to decouple the processes and take a step towards creating a lock-free system.
 
 Let us take a look at the individual gen\_server processes. Note that all of
-these procesess reside on the same node inside an Erlang applications.
+these processes reside on the same node inside an Erlang applications.
 
 \subsection{Replica}
 
@@ -94,7 +94,7 @@ sequence across all the nodes in the cluster.
     proposal.
     \iterm{Proposals}: A table that maps proposals to slot numbers. It is
     implemented as a hash table.
-    \iterm{Decisions}: It is somtimes possible that we receive decisions for
+    \iterm{Decisions}: It is sometimes possible that we receive decisions for
     higher numbered slots before the lower ones because the protocol is
     asynchronous. Since it is also sequential, we have to wait till we
     commit all the lower numbered slots before we can proceed.
@@ -215,11 +215,11 @@ The leader process co-ordinates votes for proposals using scouts and commanders.
     \begin{itemize}
         \iterm{renew}: The leader needs to renew its lease before it expires if
         it is in the master node.
-        \iterm{backoff}: When the leader's scout gets pre-empted, instead of
-        immediately re-spawning the scout, the leader waits for a pre-specified
+        \iterm{backoff}: When the leader's scout gets preempted, instead of
+        immediately re-spawning the scout, the leader waits for a prespecified
         ``backoff'' time.
         \iterm{master\_check}: Periodic check by the leader to see if the
-        exisitng master node's lease has expired. This is the check that is run
+        existing master node's lease has expired. This is the check that is run
         before spawning a new scout.
         \iterm{membership}: A new node being added to the cluster has to wait
         till it gets accepted. This flag is used to poll its acceptance.
@@ -233,10 +233,10 @@ The leader process co-ordinates votes for proposals using scouts and commanders.
 \begin{itemize}
   \item Receives proposals from the replica and either queues or spawns a
     commander for it based on its active flag's value.
-  \item Handles comminication between scout and commander, spawning them
+  \item Handles communication between scout and commander, spawning them
     when required and acting based on the results sent by them.
   \item Handle all ballot related activities such as incrementing the ballot
-    when pre-empted and incrementing the view with the change in the system
+    when preempted and incrementing the view with the change in the system
     configuration.
   \item Initiate and participate in master node elections.
   \item Receive and act on the messages resulting from monitoring of other
@@ -291,11 +291,11 @@ A build%
   \emph{Software Build}: Compiled set of source code ready to be run.
 }
 process is necessary for Warlock since it is made up of multiple Erlang
-applcations. We also need to create a small cluster of Warlock nodes during
+applications. We also need to create a small cluster of Warlock nodes during
 development for observation. This requires us to have an automated procedure
 to generate and deploy builds.
 
-The final build consits of a portable Erlang runtime system, log
+The final build consists of a portable Erlang runtime system, log
 paths setup and all the required libraries. rebar \citep{rebar}, reltool
 \citep{reltool} and make files \citep{makefiles} are the tools used to enable
 this automation.
@@ -334,26 +334,26 @@ We use lager \citep{lager} library for logging that has the flexibility of
 providing many log levels%
 \sidenote{
   \emph{Log levels}: Log levels determines the severity of the event that is
-  being logged allowing the developer to take approriate action.
+  being logged allowing the developer to take appropriate action.
 }
-and mutiple outputs (console logging, file based logging).
+and multiple outputs (console logging, file based logging).
 
 The logging systems are designed with performance in mind. Even logging can have
-noticable effects even if the log level is higher. The key is to balance the
+noticeable effects even if the log level is higher. The key is to balance the
 points where events are logged and to keep them at a bare minimum when used in
 live systems.
 
-\section{Pluggable Backends}
+\section{Pluggable Back ends}
 
 The Warlock project was designed as a lock manager to replace Redis
 \citep{redis}. While the default Warlock system supports the operations
-required for the Magic Land backend, other projects using Warlock might need
+required for the Magic Land back end, other projects using Warlock might need
 some other commands. A better solution than re-implementing the commands is to
-support entire backends.
+support entire back ends.
 
 So Warlock acts as a consensus layer and its callback can be used to run
-commands on different backends. We implemented backends in ETS, Redis and
-Judy arrays \citep{judy}. It is possible to use other softwares as backend
+commands on different back ends. We implemented back ends in ETS, Redis and
+Judy arrays \citep{judy}. It is possible to use other software as back end
 since Warlock is transparent to the commands.
 
 \section{Performance}
@@ -371,7 +371,7 @@ as CPU time, memory consumed, number of function calls made, number of messages
 sent and so on. It allows us to visualize the parts of the source code that take
 the longest to run or is run the most number of times.
 
-Erlang has a number of built in specialzied profilers available
+Erlang has a number of built in specialized profilers available
 \citep{erlang.profiling}. It helped us identify that at one point logging was
 responsible for degrading 30\% of performance even though it was set to a
 lower log level.
@@ -386,7 +386,7 @@ repeatedly running it or interacting with it.
 Basho bench \citep{basho.bench} is the benchmarking tool used in our project.
 It allows us to define a number of options such as the number of concurrent
 workers, functions to call, rate of calls, system status measurements and so
-on. However, it wa unable to generate enough traffic to saturate the system
+on. However, it was unable to generate enough traffic to saturate the system
 on a network while running from a separate server. While distributed
 benchmarking can be done to generate more calls, it becomes harder to
 co-ordinate it and merge the resulting data.
@@ -394,7 +394,7 @@ co-ordinate it and merge the resulting data.
 \subsection{Pluggable Hash Tables}
 
 Hash tables are used across the implementation of Warlock making the
-implemention choice a crucial factor in in its performance. Erlang provides
+implementation choice a crucial factor in in its performance. Erlang provides
 many options:
 
 \begin{itemize}
