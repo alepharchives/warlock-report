@@ -689,7 +689,8 @@
 
   \begin{titlingpage}
     \begin{centered}
-        \null\vspace{8pc}
+        \null
+        \vspace{2pc}
 
         {\Huge\color{title}\uppercaps{A Distributed Lock Manager}} \\
         \vspace{2pc}
@@ -697,16 +698,16 @@
         \vspace{2pc}
         {\Huge\color{title}\uppercaps{Paxos}} \\
 
-        \vspace{4pc}
-        {\Large\leafNE} \\
-        \vspace{4pc}
+        \vspace{2pc}
 
         {\Large\textit{{
           Design and Implementation of Warlock,\\
           \vspace{1pc}
           a Consensus Based Lock Manager}}} \\
 
-        \vspace{5pc}
+        \vspace{4pc}
+        \includegraphics[width=5cm]{uu_logo}
+        \vspace{4pc}
 
         {\large\@author} \\
 
@@ -714,7 +715,7 @@
 
         {\large September 2012} \\
 
-        \vspace{5pc}
+        \vspace{3pc}
 
         \textit{
         Submitted in partial fulfillment of the requirements \\
