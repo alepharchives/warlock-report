@@ -271,7 +271,7 @@ in Erlang.
     \iterm{LibPaxos}: \citet{Lugano2012} is a collection of open source 
     implementations of Paxos created specifically for performance measurements
     in \citet{MarandiPSP10}. It also includes a simulator written in Erlang to
-    observe the network behavior.
+    observe the network behaviour.
     \iterm{gen\_leader}: \citet{Ulf2012} implements a leader election algorithm
     not based on Paxos. It is one of the notable implementations for leader
     election in Erlang.
@@ -373,6 +373,8 @@ mechanisms. It provides fast local reads using a service called the
 sequence over the group of replicas. It speeds up writes by pre-preparing
 optimizations and other heuristics.
 
+\todo{Explain diagram}
+
 \section{Zookeeper}
 \label{section:zookeeper}
 
@@ -442,6 +444,8 @@ Doozerd \citep{doozerd} is a consensus service similar to Chubby locks
 Go \citep{golang}. It uses Paxos protocol internally for maintaining
 write consistency.
 
+\todo{Add more details and explain differences}
+
 \section{Riak}
 
 Riak \citep{riak} is a distributed eventually consistent datastore written in 
@@ -456,16 +460,21 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
   \label{figure:megastore}
 \end{figure}
 
+\todo{Add more details and explain differences}
 
 \section{Amazon Dynamo}
 
 Dynamo \citep{DeCandia07} is a eventually consistent key-value store developed 
 inside Amazon designed to be incrementally scalable and highly available.
 
+\todo{Add more details and explain differences}
+
 \section{Dynamo DB}
 
 Amazon DynamoDB \citep{dynamoDB} is proprietary key-value datastore based on
 \citet{DeCandia07} available as a service.
+
+\todo{Add more details and explain differences}
 
 \section{Scalaris}
 
@@ -478,5 +487,6 @@ Table (DHT)%
 } 
 and is implemented in Erlang.
 
+\todo{Add more details and explain differences}
 
 

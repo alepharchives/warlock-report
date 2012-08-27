@@ -36,7 +36,7 @@ protocol works correctly before getting to to the other parts.
 Each of the process described in \sectionref{concepts.paxos} have some state
 and have to send/receive messages to other process. We use gen\_servers
 \sectionref{gen.server} to implement these processes since it maps on to
-this behavior.
+this behaviour.
 
 gen\_servers can internally maintain state that can be accessed by all of its
 callback functions. It also provides functions to send messages%
@@ -279,7 +279,8 @@ same set of functions albeit with different slots.
 
 \section{Application Structure}
 
-The source structure of the application can be seen at \chapterref{source.code}.
+The source structure of the application can be seen at 
+\appendixref{source.code}.
 As described earlier, the code is split into different applications according
 to their functionality. A tree view of the source structure is provided in
 \appendixref{source.code} for reference.

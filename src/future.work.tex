@@ -66,7 +66,7 @@ can still be tweaked to push it even further.
 
 \subsection{Code Profiling}
 
-Profiling, as explained in \citep{impl.profiling}, can help us identify the
+Profiling, as explained in \sectionref{impl.profiling}, can help us identify the
 bottlenecks in the codebase. Erlang comes with lots of different profilers
 which can be used to identify bottlenecks from different perspectives. This
 should allow us to focus more on the most frequently used functions and try
@@ -159,14 +159,13 @@ client are:
     and the master could actively invalidate cached data on updates. However,
     this could require a change in the current Warlock client server
     architecture, possibly making the system more complex.
-  \item 
 \end{itemize}
 
 \section{Expire}
 
-Key expiry has many benefits, as discussed in \citet{a.n.d.expiry}. However, its
-implementation has severe trade-offs with performance. Hence, the needs for
-performant key expiry exits.
+Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}. 
+However, its implementation has severe trade-offs with performance. Hence, the
+needs for performant key expiry exits.
 
 \section{Others}
 

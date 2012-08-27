@@ -224,13 +224,13 @@ As per the requirement \sectionref{ml.kv.store}, the database needs to a
 key value store. However, any type of database can be used
 since Warlock by itself does not execute the commands. The commands are passed
 on to the database driver after a successful round allowing us the flexibility
-to use other types of databases. We create a specific behavior%
+to use other types of databases. We create a specific behaviour%
 \sidenote{
-  Erlang behaviors \citep{ErlangBehaviour} are a set of specifications that
+  Erlang behaviours \citep{ErlangBehaviour} are a set of specifications that
   can be used to create a generic reusable component.
 }
 for this purpose. Drivers can then be written for different databases
-implementing the functions specified in the behavior.
+implementing the functions specified in the behaviour.
 
 \subsubsection{Key Expiry}
 \label{section:a.n.d.expiry}
@@ -257,7 +257,7 @@ a dynamic cluster. However, the algorithm needs some modifications
 \sectionref{consensus.optimization} before it can be used.
 
 \section{Reconfigurable State Machine}
-\label{section.a.n.d.reconfig}
+\label{section:a.n.d.reconfig}
 
 The set of valid nodes in the cluster that take part in the protocol must
 be static. We need to explicitly design the system to handle the requirement

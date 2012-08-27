@@ -151,7 +151,7 @@ of a user session as compared to writes which happen only when the user tries
 to login. This means that the system can be optimized to maximize reads as
 compared to writes.
 
-\section{Dynamic node addition and removal}
+\section{Dynamic Cluster}
 \label{section:req.dynamic.cluster}
 
 \req{It should be possible to add/remove nodes from the system as long as a
@@ -180,7 +180,7 @@ entire system being out if service.
 Server failures in the system should be handled without affecting the service.
 Individual failures should not cascade to rest of the system as well.
 
-\section{Lease}
+\section{Key Expiry}
 
 \req{It should be possible to expire keys after a certain amount of time.}
 

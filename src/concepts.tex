@@ -4,7 +4,7 @@
 We discuss the various concepts discussed in the thesis scope in this chapter.
 
 \section{Paxos}
-\label{concepts.paxos}
+\label{section:concepts.paxos}
 
 The consensus algorithm used in the system is Paxos \sectionref{paxos}.
 \citet{Robbert2011} is the specific paper referred to for the implementation of
@@ -42,9 +42,9 @@ execution skipping on the smaller details and corner cases.
     \item The replica checks if the proposal is a duplicate and if not it
       assigns a sequence number%
       \sidenote{
-        The replica is responsible for maintaining a consistent log of operations.
-        This log is made up of slots with each of the slots indexed by a
-        sequence number.
+        The replica is responsible for maintaining a consistent log of
+        operations. This log is made up of slots with each of the slots
+        indexed by a sequence number.
       }
       to it before sending it off to the leader.
     \item The leader, which already has run the scout, spawns a commander with
@@ -94,7 +94,7 @@ large scale applications with the Actor model%
   \begin{inparaenum}[(i)]
     \item Send messages to other actors.
     \item Spawn new actors.
-    \item Specify the behavior to be used when it receives its next message.
+    \item Specify the behaviour to be used when it receives its next message.
   \end{inparaenum}
 }
 \citep{Clinger81}.
@@ -112,6 +112,7 @@ behind Erlang maps well on to the building large web applications.
 \todo{Add and arrange features}
 
 \todo{define modules, processes}
+
 \todo{define ets, dict}
 
 \section{Open Telecom Platform}
@@ -201,13 +202,13 @@ restart strategy%
 specifications, restart frequency, restart policy and so on to provide
 fine grained control on the restart procedure.
 
-\subsection{Behaviors}
+\subsection{Behaviours}
 \label{section:concepts.behaviours}
-Behaviors are commonly used Erlang design patterns. They contain a predefined
+Behaviours are commonly used Erlang design patterns. They contain a predefined
 set of functions necessary to implement specific design patterns allowing for
 quick implementation.
 
-The three main behaviors provided by the OTP library are
+The three main behaviours provided by the OTP library are
 
 \begin{itemize}
     \iterm{gen\_server}: A process that waits for incoming events, performs
