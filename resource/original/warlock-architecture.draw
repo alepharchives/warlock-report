@@ -1,0 +1,29 @@
+  % Generated with LaTeXDraw 2.0.7
+  % Tue Aug 14 12:18:36 CEST 2012
+  % \usepackage[usenames,dvipsnames]{pstricks}
+  % \usepackage{epsfig}
+  % \usepackage{pst-grad} % For gradients
+  % \usepackage{pst-plot} % For axes
+  \scalebox{0.8} % Change this value to rescale the drawing.
+  {
+    \begin{pspicture}(0,-4.3)(16.642187,4.3)
+      \psframe[linewidth=0.038,dimen=outer](16.6,0.9)(0.0,-4.3)
+      \psframe[linewidth=0.038,dimen=outer](4.6,0.5)(0.4,-1.5)
+      \psframe[linewidth=0.038,dimen=outer](10.4,0.5)(6.2,-1.5)
+      \psframe[linewidth=0.038,dimen=outer](16.2,0.5)(12.0,-1.5)
+      \psframe[linewidth=0.038,dimen=outer](14.2,-2.9)(2.8,-3.9)
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(4.8,-0.5)(6.0,-0.5)
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(10.6,-0.5)(11.8,-0.5)
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(8.4,-1.7)(8.4,-2.7)
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(3.8,-1.7)(3.8,-2.7)
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(13.0,-1.7)(13.0,-2.7)
+      \rput(2.5571876,-0.395){Consensus}
+      \rput(8.259844,-0.395){Server}
+      \rput(14.051719,-0.395){Database}
+      \rput(8.332812,-3.395){Utilities}
+      \rput(15.98875,1.225){Warlock}
+      \psline[linewidth=0.038cm,arrowsize=0.05291667cm 2.0,arrowlength=0.45,arrowinset=0.4,doubleline=true,doublesep=0.12]{<->}(8.4,2.1)(8.4,1.1)
+      \psframe[linewidth=0.038,dimen=outer](10.4,4.3)(6.2,2.3)
+      \rput(8.21375,3.405){Client}
+    \end{pspicture}
+  }
