@@ -9,11 +9,12 @@ models might lead to diverging states which in some cases are not possible to
 merge without acceptable effort. The solutions that are based on strong
 consistency models dictate the requirement of a static cluster.
 
-This thesis deals with creation of Warlock, a distributed
-consensus service based on Paxos, that can be used as a distributed lock 
-manager. The primary goal of Warlock is to provide strong consistency in a
-dynamic cluster with availability and performance as secondary targets.
+We propose a design that combines Multi-Paxos algorithm with the idea of
+reconfigurable state machine for a locking service. The primary goal of
+the service is strong consistency with availability and performance as
+secondary requirements.
 
-In this document we discuss relevant algorithms and projects on distributed 
-computing and design the consensus service based on them. We also implement 
-this design and evaluate its reliability, availability and performance aspects.
+We demonstrate the feasibility of such a design by creating an implementation
+in Erlang and testing it to check if it conforms to specified requirements.
+We demonstrate that it can provide the throughput required for a large
+web application while guaranteeing strong consistency.
