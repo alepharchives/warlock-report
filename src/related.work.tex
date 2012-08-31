@@ -1,21 +1,19 @@
 \chapter{Related Work}
 \label{chapter:related.work}
 
-This chapter provides an overview of concepts related to this thesis. We
-discuss relevant algorithms in brief and talk about similar projects. In the 
-first section we discuss the Paxos family of algorithms and projects in 
-this domain in the later sections.
+The design of Warlock is based on well known distributed algorithms. We discuss
+these algorithms in this chapter and list similar projects.
 
 \section{Paxos}
 \label{section:paxos}
 
-Paxos is regarded as the simplest and most obvious of distributed algorithms 
+Paxos is regarded as the simplest and most obvious of distributed algorithms
 \citep{Lamport01}. It is a consensus protocol used for replication of state
 machines in an asynchronous environment \citep{Lamport98}. We use Paxos in this
 thesis primarily since it has been shown that it has the minimal possible cost
 of any consensus algorithm in the presence of faults \citep{KeidarR03}.
 
-A consensus algorithm tries to get a group of processes to agree on a value 
+A consensus algorithm tries to get a group of processes to agree on a value
 while satisfying its safety requirements%
 \sidenote{
   Safety requirements of a consensus algorithm \citep{LamportM04}:
@@ -25,23 +23,22 @@ while satisfying its safety requirements%
     \item \emph{Conservatism}: Only chosen values can be learned and it can be
       learned at most once.
   \end{inparaenum}
-}. 
+}.
 These processes in the Paxos algorithm can be classified based on their roles
 without affecting its correctness:
 
 \begin{itemize}
-  \iterm{Proposer}: A process that can propose values to the group. 
-  \iterm{Acceptor}: Acceptors form the ``memory'' of the algorithm to 
-    allow choosing a single value.
-  \iterm{Learner}: The chosen values are ``learned'' by the other
-    processes.
+  \iterm{Proposer}: A process that can propose values to the group.
+  \iterm{Acceptor}: Acceptors form the ``memory'' of the algorithm that allows
+  the algorithm to converge to a single value.
+  \iterm{Learner}: The chosen values are ``learned'' by the other processes.
 \end{itemize}
 
 \begin{figure}
   \includegraphics[width=0.6\wholewidth]{basic-paxos}
       \caption[Basic Paxos]{%
-        Basic Paxos Algorithm: Processes with roles - Proposer, Acceptor, 
-        Learner - send messages to each other illustrating the flow of the 
+        Basic Paxos Algorithm: Processes with roles - Proposer, Acceptor,
+        Learner - send messages to each other illustrating the flow of the
         algorithm in a failure free instance.}
       \label{figure:basic_paxos}
   \normalcaption
@@ -50,39 +47,38 @@ without affecting its correctness:
 The algorithm proceeds in two phases with each phase having two sub phases.
 
 \begin{itemize}
-  \iterm{Phase 1 a}: Proposer select a number \emph{n} and sends it as a
-  \emph{prepare} (P1A) message to all the acceptors.
-  \iterm{Phase 1 b}: Acceptors compares the \emph{prepare} \emph{n} it receives
-  and if it is greater than all previous numbers received as a part of 
-  \emph{prepare}, it replies (P1B) with a promise not to accept any number lower
-  than \emph{n}.
-  \iterm{Phase 2 a}: If the proposer receives a response to its \emph{prepare}
+  \iterm{Phase 1 a}: The proposer selects a number \code{n} and sends it as a
+  \code{prepare} (\code{P1A}) message to all the acceptors.
+  \iterm{Phase 1 b}: The acceptors compares the \code{n} it
+  receives and if it is greater than all previous numbers received as a part of
+  \code{prepare}, it replies (\code{P1B}) with a promise not to accept any
+  number lower than \code{n}.
+  \iterm{Phase 2 a}: If the proposer receives a response to its \code{prepare}
   messages from a quorum%
   \sidenote{
-    \emph{Quorum}: Majority agreement of processes. Quorum is used to ensure
+    \emph{Quorum}: Majority agreement of processes. It is used to ensure
     liveliness in the system.
-  }
-  , it sends a reply (P2A) back to each of the acceptor with an \emph{accept} 
-  message. The message also consists of the value \emph{v} which is the highest 
-  numbered proposal among all the responses from the acceptors. In case it is 
-  empty, the proposer is free to choose the value.
-  \iterm{Phase 2 b}: If the acceptor has not received any \emph{prepare} request
-  with a larger number when it receives an \emph{accept} request from the 
-  proposer, it sends a message (P2B) to the learner with the accepted value 
-  \emph{v}.
-  \iterm{Learner}: If the learner receives a message from quorum of acceptor, it
-  concludes that the value \emph{v} was chosen.
+  }, it sends a reply (\code{P2A}) back to each of the acceptor with an
+  \code{accept} message. The message also consists of the value \code{v}
+  which is the highest numbered proposal among all the responses from the
+  acceptors. In case it is empty, the proposer is free to choose the value.
+  \iterm{Phase 2 b}: If the acceptor has not received any \code{prepare} request
+  with a larger number when it receives an \code{accept} request from the
+  proposer, it sends a message (\code{P2B}) to the learner with the accepted
+  value \code{v}.
+  \iterm{Learner}: If the learner receives a message from a quorum of acceptor,
+  it concludes that the value \code{v} was chosen.
 \end{itemize}
 
 The algorithm makes progress when a proposed value is eventually learned by all
-the learners. However, a scenario where no progress is made is possible when we 
-have multiple proposers. Consider two proposers issuing \emph{prepare} requests
-with alternatively increasing \emph{n}. They would keep preempting each other
-in a loop leading do no agreement being reached among the group. A solution is
-to create the role of \emph{distinguished proposer} or \emph{leader} where it
-becomes the only process that can issue new requests. \citet{FisLynPat85}
-implies the ``election'' of this \emph{leader} should use either randomness
-or timeouts.
+the learners. However, a scenario where no progress can be made is possible
+when we have multiple proposers. Consider two proposers issuing \emph{prepare}
+requests with alternatively increasing \emph{n}. They would keep
+preempting each other in a loop leading to no agreement being reached among the
+group. A solution is to create the role of \emph{distinguished proposer} or
+\emph{leader} where it becomes the only process that can issue new requests.
+\citet{FisLynPat85} implies the ``election'' of this \emph{leader}
+should use either randomness or timeouts.
 
 Although the pseudo-code of the algorithm is relatively small, implementing it
 to create a stable, production ready system is non-trivial \citep{ChandraGR07}.
@@ -92,113 +88,116 @@ requirements.
 The family of Paxos algorithms differ from each other based on the topology
 of the process group, number of phases involved for one instance%
 \sidenote{
-  An instance of Paxos is a single run of the algorithm starting from the value
+  \emph{Paxos Instance}: Single run of the algorithm starting from the value
   being proposed to the learning of the value by the learners.
-}
-, amount of message delays and so on. We explore some of these Paxos variants.
+}, amount of message delays and so on. We explore some of these Paxos variants.
 
 \subsection{Basic Paxos}
 
-Basic Paxos is the simplest version of Paxos and is the same as described 
+Basic Paxos is the simplest version of Paxos and is the same as described
 previously in \sectionref{paxos}. The algorithm proceeds over several rounds
-with the best case taking two rounds.
-
-It is typically not implemented and used in production due to possible race
-conditions and relatively poor performance.
+with the best case taking two rounds. It is typically not implemented and used
+in production due to possible race conditions and relatively poor performance.
 
 \subsection{Multi-Paxos}
 
-The Paxos algorithm needs to be run multiple times for agreeing on a sequence of
-values. \emph{Phase 1 a} and \emph{Phase 1 b} of the algorithm become 
-an unnecessary overhead if the \emph{distinguished proposer} remains the same 
-throughout.
+We run one instance of Paxos algorithm for agreeing on a single value and
+multiple times for mutliple values. We can batch together multiple values
+into a single instance, but this optimization does not reduce the message
+complexity.
 
-Multi-Paxos uses this as its basis to reduce the message flow. The first round 
-of Multi-Paxos is the same as Basic Paxos. For subsequent values, the same
-proposer starts directly with \emph{Phase 2 a} halving the message complexity.
-Another proposer may take over at any point of time by starting with 
-\emph{Phase 1 a} overriding the current proposer. This is not a problem since 
+\emph{Phase 1} of the algorithm become
+an unnecessary overhead if the \emph{distinguished proposer} remains the same
+throughout. Multi-Paxos uses this as its basis to reduce the message count.
+The first round of Multi-Paxos is the same as Basic Paxos. For subsequent
+values, the same
+proposer starts directly with \emph{Phase 2} halving the message complexity.
+Another proposer may take over at any point of time by starting with
+\emph{Phase 1 a} overriding the current proposer. This is not a problem since
 the original proposer can start again with \emph{Phase 1 a}.
 
 \citet{Robbert2011} provides the imperative pseudo-code for Multi-Paxos and
-the details required for making it practical. This thesis uses this paper as 
-its basis for Paxos implementation.
+the details required for making it practical. We use it as a
+basis for implementing Paxos.
 
 \subsection{Fast Paxos}
 
-Fast Paxos \citep{MSRTR2005112} is a variant of Basic Paxos. It has two
+Fast Paxos \citep{MSRTR2005112} is a variation of Basic Paxos, It has two
 message delays compared to four message delays of Basic Paxos and guarantees
-the round in three message delays in case of a collision.
+the round to be over in three message delays in case of a collision.
 
-Clients propose the values directly to the \emph{acceptors} and the 
-\emph{leader} gets involved only in case there is a collision. Versions of Fast
-Paxos can be optimized to a further extent by prespecifying the collision
+Clients propose the values directly to the \emph{acceptors} and the
+\emph{leader} gets involved only in case of a collision. Versions of Fast
+Paxos can be optimized to a further by prespecifying the collision
 resolution technique allowing the clients to fix collisions themselves.
 
-However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007}
-Fast Paxos is not better than Basic Paxos in all scenarios. Basic Paxos was 
-found to be faster in case of systems with small number of replicas owing to 
+However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007},
+Fast Paxos is not better than Basic Paxos in all scenarios. Basic Paxos was
+found to be faster in case of systems with small number of replicas owing to
 the stability provided by its use of a single coordinator and the variation
-of message latencies in practical networks. Fast Paxos also needs larger quorum 
+of message latencies in practical networks. Fast Paxos also needs larger quorum
 sizes of active replicas for it to function.
 
 \subsection{Cheap Paxos}
 
-Basic Paxos requires a total of \emph{2N + 1} servers in a distributed system 
-even though \emph{N + 1} servers are enough (minimum) to make progress. 
-Using servers that are slower or cheaper for the additional \emph{N} servers
-allows us to reduce the total cost of the system. Cheap Paxos is designed along 
+Basic Paxos requires a total of \code{2N+1} servers in a distributed system
+even though \code{N+1} servers are enough (minimum) to make progress.
+Using servers that are slower or cheaper for the additional \code{N} servers
+allows us to reduce the total cost of the system. Cheap Paxos is designed along
 these lines.
 
-Cheap Paxos uses \emph{N} auxiliary servers along with \emph{N + 1} main servers
-which allows it to tolerate \emph{N} failures. The idea is that the auxiliary
-server steps to to replace one of the main servers when it goes down 
+Cheap Paxos uses \code{N} auxiliary servers along with \code{N+1} main servers
+which allows it to tolerate \code{N} failures. The idea is that the auxiliary
+server steps to replace one of the main servers when it goes down
 temporarily. The main server takes back control once restored. The auxiliary
 servers thus act as a backup to the main servers without actively taking part
 in the protocol, but merely acting as observers.
 
-The downside of using Cheap Paxos is that it affects the liveliness of the 
+The downside of using Cheap Paxos is that it affects the liveliness of the
 system when multiple main servers fail at the same time since it takes time
-for the axillary servers to be configured into the system.
+for the auxillary servers to be configured into the system.
 
 \subsection{Ring Paxos}
 
 Ring Paxos \citep{MarandiPSP10} is based on the observations that messaging
 using ip-multicast is more scalable and provides better throughput compared
-to unicast for a distributed system with a well-defined network. It also
+to unicast for a distributed system in a well-defined network. It
 has the property that it provides fixed throughput with variation in number
-of receivers. It claims the throughput of ip-multicast and low latency of
-unicast with the downside being that it provides weak synchrony.
+of receivers. It claims to have the throughput of ip-multicast and low latency
+of unicast with the downside being that it provides weak synchrony.
 
 \begin{figure}
   \includegraphics[width=0.5\wholewidth]{ring_paxos}
   \caption[Ring Paxos]{%
-  Processes and their roles in Ring Paxos. Figure courtesy 
+  Processes and their roles in Ring Paxos. Figure courtesy
   \citep{MarandiPSP10}.}
   \label{figure:ring.paxos}
 \end{figure}
 
+\figureref{ring.paxos} illustrates the outline of Ring Paxos algorithm and
+shows the different communication protocols used between its processes.
+
 \subsection{Stoppable Paxos}
 
-Basic Paxos algorithm is run under the assumption that all the participating
+The Basic Paxos algorithm is run under the assumption that all the participating
 processes are fixed and form a static system. However, the system should
-support reconfiguration to be able to run for long periods of time in a
-practical implementation. Reconfiguration includes adding new servers, 
+support cluster reconfiguration to be able to run for long periods of time in a
+practical environment. Reconfiguration includes adding new servers,
 removing/replacing old/faulty servers, scaling down the number of servers
 when lower throughput is acceptable and so on.
 
 Stoppable Paxos (\citet{LamportSP08}, \citet{LamportMZ10}) is one such algorithm
 that allows us to reconfigure a Paxos based system. The algorithm defines a
-special set of ``stopping'' commands. A stopping command is issued as the
-\emph{i}th command after which no new command \emph{i+1} can be issued. The 
-system proceeds normally after it executes the \emph{i}th command.
+special set of \emph{stopping} commands. A stopping command is issued as the
+\code{i}th command after which no new command \code{i+1} can be issued. The
+system proceeds normally after it executes the \code{i}th command.
 
 This thesis uses a variation of Stoppable Paxos for reconfiguration.
 
 \subsection{Other}
 
 Many other flavors of Paxos exists with some of them focused on the
-implementation aspects of the algorithm. Lets take a look at some of them.
+implementation aspects.
 
 \begin{itemize}
     \iterm{Paxos for system builders}: \citet{Kirsch08paxosfor} provides the
@@ -214,16 +213,16 @@ implementation aspects of the algorithm. Lets take a look at some of them.
 
 There are several implementations of Paxos and its variations. We describe full
 featured implementations used in production in later sections. We discuss few
-Erlang[[]] based implementations below since the thesis project is implemented
-in Erlang.
+Erlang based implementations below since this thesis project is
+implemented in it.
 
 \begin{itemize}
     \iterm{gen\_paxos}: \citep{Uenishi2012} implements Paxos with
     individual processes modelled as finite state machines. Each process can
-    be performing a different role based on what state it is on. This 
-    essentially makes all processes equal and ready to take on different roles
+    be performing a different role based on what state it is on. This
+    makes all processes equal and ready to take on different roles
     as required during runtime.
-    \iterm{LibPaxos}: \citet{Lugano2012} is a collection of open source 
+    \iterm{LibPaxos}: \citet{Lugano2012} is a collection of open source
     implementations of Paxos created specifically for performance measurements
     in \citet{MarandiPSP10}. It also includes a simulator written in Erlang to
     observe the network behaviour.
@@ -235,34 +234,25 @@ in Erlang.
 \section{Google chubby locks}
 \label{section:chubby.locks}
 
-Google created Chubby lock service \citep{Burrows06} that works like a 
-distributed file system with advisory locks for loosely-coupled distributed 
-systems. The goal of the project is to allow the clients to use the service
-to synchronize their activities. For example, Google File System \citep{gfs} 
+Google created Chubby lock service \citep{Burrows06} for loosely-coupled
+distributed systems. It works like a distributed file system with advisory
+locks.The goal of the project is to allow the clients to use the service
+to synchronize their activities. For example, Google File System \citep{gfs}
 and BigTable \citep{ChangDGHWBCFG06} use Chubby locks for co-ordination and
 as a store for small metadata \citep{ChandraGR07}.
 
 \begin{figure}
   \includegraphics[width=0.5\wholewidth]{chubby_structure}
   \caption[Chubby structure]{%
-    Figure shows the connection between Chubby cell and Chubby clients. 
+    Figure shows the connection between Chubby cell and Chubby clients.
     Figure courtesy \citet{Burrows06}.}
   \label{figure:chubby.structure}
 \end{figure}
 
-\begin{figure}
-  \includegraphics[width=0.5\wholewidth]{chubby_replica}
-  \caption[Chubby Replica]{%
-    Figure shows the internal of a single replica inside the Chubby cell.
-    Figure courtesy \citet{ChandraGR07}.}
-  \label{figure:chubby.structure}
-\end{figure}
-
-
 Chubby lock is made up of two components:
 
 \begin{itemize}
-    \iterm{Chubby cell}: Chubby cell is typically made up of five servers 
+    \iterm{Chubby cell}: Chubby cell is typically made up of five servers
     (termed replicas) that elect a master using Paxos protocol. The master
     server serves all the reads requests and co-ordinates the writes requests.
     The rest of the servers are for fault tolerance and are ready to replace the
@@ -282,16 +272,30 @@ Chubby lock is made up of two components:
     .
 \end{itemize}
 
-A Chubby replica mainly consists of a fault tolerant log that is consistent
+\figureref{chubby.structure} shows the network connection between Chubby cell
+ and Chubby clients.
+
+\begin{figure}
+  \includegraphics[width=0.5\wholewidth]{chubby_replica}
+  \caption[Chubby Replica]{%
+    Figure shows the internal of a single replica inside the Chubby cell.
+    Figure courtesy \citet{ChandraGR07}.}
+  \label{figure:chubby.structure}
+\end{figure}
+
+A Chubby replica, shown in \figureref{chubby.structure}, mainly consists of a
+fault tolerant log that is consistent
 with other replicas in the cell by using Paxos protocol. The rest of the
 replica is made of a fault tolerant database and an interface to handle
 requests from Chubby clients. The specific Paxos flavor used is Multi-Paxos
 with slight modifications such as having a ``catch-up'' mechanism for
 slower replicas.
 
-The presence of Chubby locks project and its use in some of the largest 
+The presence of Chubby locks project and its use in some of the largest
 server installations is a testimony for the need for distributed lock
-managers. This thesis uses some of the ideas explored in Chubby locks.
+managers. This thesis uses some of the ideas explored in Chubby locks such
+as using the Paxos protocol to agree on the callback function that can
+eventually be run on the database component.
 
 \section{Google Megastore}
 
@@ -299,13 +303,13 @@ Megastore \citep{BakerBCFKLLLLY11} is an ACID%
 \sidenote{
   ACID properties are used to provide guarantees for database transactions.
   \begin{inparaenum}[(i)]
-    \iterm{Atomicity}: A transaction is either executed completely or not 
+    \iterm{Atomicity}: A transaction is either executed completely or not
     executed at all.
     \iterm{Consistency}: The state of the database remains consistent after
     the transaction has been completed.
     \iterm{Isolation}: Transactions executed in parallel results in the same
     state as running all the transactions serially.
-    \iterm{Durable}: All changes made by a transaction to a database is
+    \iterm{Durability}: All changes made by a transaction to a database is
     permanent.
   \end{inparaenum}
 }
@@ -328,48 +332,40 @@ mechanisms. It provides fast local reads using a service called the
 sequence over the group of replicas. It speeds up writes by pre-preparing
 optimizations and other heuristics.
 
-\todo{Explain diagram}
+\figureref{megastore} shows the core architecture of Megastore. It illustrates
+the relation between different replicas and the coordinator.
 
 \section{Zookeeper}
 \label{section:zookeeper}
 
-Zookeeper \citep{Hunt:2010:ZWC:1855840.1855851, zookeeper} is a open source 
-consensus service written in java that is used for synchronization in 
-distributed applications and as a metadata store. It is inspired by Chubby lock 
-\sectionref{chubby.locks}, but uses its own protocol Zookeeper Atomic Broadcast 
+Zookeeper \citep{Hunt:2010:ZWC:1855840.1855851, zookeeper} is a open source
+consensus service written in java that is used for synchronization in
+distributed applications and as a metadata store. It is inspired by Chubby lock
+\sectionref{chubby.locks}, but uses its own protocol Zookeeper Atomic Broadcast
 (ZAB) in place of Paxos.
 
 \subsection{Zookeeper Atomic Broadcast}
 
-Zookeeper Atomic Broadcast (ZAB) 
-\citep{Reed:2008:STO:1529974.1529978, JunqueiraRS11} is a 
+Zookeeper Atomic Broadcast (ZAB)
+\citep{Reed:2008:STO:1529974.1529978, JunqueiraRS11} is a
 totally ordered atomic broadcast protocol created for usage in Zookeeper. ZAB
 satisfies the constraints imposed by Zookeeper viz.,
-
-\begin{figure}
-  \includegraphics[width=0.7\wholewidth]{zkcomponents}
-  \caption[Zookeeper Components]{%
-    Figure shows the components of Zookeeper and the messaging between them.
-    Figure courtesy \citet{zookeeper}.}
-  \label{figure:megastore}
-\end{figure}
-
 
 \begin{itemize}
     \iterm{Reliable delivery}: Message delivered to one server must eventually
     get delivered to all the servers.
-    \iterm{Total order}: Every server should see the same ordering of the 
+    \iterm{Total order}: Every server should see the same ordering of the
     delivered messages.
     \iterm{Causal order}: Messages should follow causal%
     \sidenote{
       If message \emph{a} is delivered before message \emph{b} on a server then
-      all other servers in the group should receive message \emph{a} before 
+      all other servers in the group should receive message \emph{a} before
       \emph{b}.
     }
     ordering.
 \end{itemize}
 
-ZAB is conceptually similar to Paxos, but uses certain optimizations and 
+ZAB is conceptually similar to Paxos, but uses certain optimizations and
 trade-offs. The service using ZAB has two modes of operation:
 
 \begin{itemize}
@@ -377,25 +373,37 @@ trade-offs. The service using ZAB has two modes of operation:
     using a quorum from the group. The leader's state is now same as rest of
     the servers and can hence start broadcasting messages.
     This mode is similar to two-phase commits \citep{Gray78}, but with quorum.
-    \iterm{Recovery mode}: A new leader has to chosen when the existing leader 
+    \iterm{Recovery mode}: A new leader has to chosen when the existing leader
     is no longer valid. The service is now in recovery mode until a new leader
     emerges.
 \end{itemize}
 
-Zookeeper uses the concept of ``observers'' to increase read throughput. They 
+\begin{figure}
+  \includegraphics[width=0.7\wholewidth]{zkcomponents}
+  \caption[Zookeeper Components]{%
+    Figure shows the components of Zookeeper and the messaging between them.
+    Figure courtesy \citet{zookeeper}.}
+  \label{figure:zookeeper}
+\end{figure}
+
+\figureref{zookeeper} shows the message flow between different components inside
+Zookeeper. We observe the optimization for \emph{read} requests, which allows it
+to be much faster than the \emph{write} requests.
+
+Zookeeper uses the concept of \emph{observers} to increase read throughput. They
 are a set of servers that monitor the zookeeper service, but do not take part
 in the protocol directly thus acting as extended replicas. The write throughput
 is however inversely proportional to the number of servers in the group mainly
 due to the increased co-ordination required for consensus.
 
 Zookeeper worked on a static set of servers with no option to reconfigure the
-cluster at the time of writing. However, the feature is in the works 
+cluster at the time of writing. However, the feature is in the works
 \citep{zab2012}and an initial release is available.
 
 \section{Doozerd}
 
 Doozerd \citep{doozerd} is a consensus service similar to Chubby locks
-\sectionref{chubby.locks} and Zookeeper \sectionref{zookeeper} written in 
+\sectionref{chubby.locks} and Zookeeper \sectionref{zookeeper} written in
 Go \citep{golang}. It uses Paxos protocol internally for maintaining
 write consistency.
 
@@ -403,13 +411,13 @@ write consistency.
 
 \section{Riak}
 
-Riak \citep{riak} is a distributed eventually consistent datastore written in 
+Riak \citep{riak} is a distributed eventually consistent datastore written in
 Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
 
 \begin{figure}
   \includegraphics[width=0.7\wholewidth]{riak-ring}
   \caption[Riak Ring]{%
-    Figure shows the Riak Ring and details how the key space is divided among 
+    Figure shows the Riak Ring and details how the key space is divided among
     four nodes
     Figure courtesy \citet{riak}.}
   \label{figure:megastore}
@@ -419,7 +427,7 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
 
 \section{Amazon Dynamo}
 
-Dynamo \citep{DeCandia07} is a eventually consistent key-value store developed 
+Dynamo \citep{DeCandia07} is a eventually consistent key-value store developed
 inside Amazon designed to be incrementally scalable and highly available.
 
 \todo{Add more details and explain differences}
@@ -439,7 +447,7 @@ Table (DHT)%
 \sidenote{
   \emph{Distributed Hash Table}: DHT is a distributed system that provides
   hash table operations.
-} 
+}
 and is implemented in Erlang.
 
 \todo{Add more details and explain differences}
