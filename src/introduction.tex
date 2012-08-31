@@ -1,32 +1,43 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-\section{Problem}
+\section{Motivation}
 
-Distributed software systems sometimes use services that allow them to 
-synchronize their activities or to access a shared resource. Such a
-service could itself act as a single point of failure depending on the
-application architecture.
+Shared nothing architecture%
+\sidenote[5]{
+  \emph{Shared Nothing}: A type of architecture where the servers do not share
+  any hardware resources between them.
+} \citep{Stonebraker86g} is a popular distributed system design used for
+building high traffic web applications. The servers within such a system setup
+sometimes need to synchronize their activities or need to access a shared
+resource. A service used for such a purpose could act as a single point of
+failure based on its design and the system architecture.
 
 Online social game Magic Land uses a stateful application server architecture to
 handle millions of users. This architecture uses Redis as a global registry to
-keep track of user sessions. Failure of the software Redis, or the machine it
-runs on can lead to application downtime.
+keep track of user sessions. Failure of the software Redis, or the server it
+is deployed on can lead to application downtime. This creates a need for
+building a service that is itself distributed, fault tolerant and primarily
+consistent.
 
 \section{Goals}
 
-The main goals for the design and implementation of a locking service to address
-the problem are
+The goal of this thesis is to build a customized locking service focussed on
+being fault tolerant without compromising on consistency and performance.
+Specifically,
 
 \begin{itemize}
-  \item Strong consistency
-  \item High availability
-  \item Performance
-  \item Fault tolerant
+    \iterm{Strong consistency}: The state of the system remains valid across
+    all concurrent requests.
+    \iterm{High availability}: The system should be operable at all times.
+    \iterm{Performance}: The system should be able to handle large number of
+    requests.
+    \iterm{Fault tolerant}: Server failures should be isolated and the system
+    should continue to function despite these failures.
 \end{itemize}
 
-We will investigate the algorithms for distributed consensus and analyze similar
-projects. We will then create a system design based on these observations and
+We investigate the algorithms for distributed consensus and analyze similar
+projects. We then create a system design based on these observations and
 an working implementation.
 
 \section{Scope}
@@ -37,47 +48,27 @@ to have good test coverage and documented code. The thesis scope does not cover
 creation of any new algorithms or techniques, but rather builds on the basis of
 well known ideas in the field.
 
+\section{Overview}
 
-\section{Outline}
+Consensus in distributed systems is a large topic in itself. They are
+notoriously hard to implement even though the pseudo code describing them can be
+relatively simple. Among the set of algorithms avaiable for arriving at
+consensus in an asynchronous distributed system, we choose Paxos because of its
+literature coverage and usage in the industry.
+
+The Erlang programming language is built with the primitives necessary for
+creating a distributed system, such as, stable messaging, crash tolerance and
+well defined behaviours. The Actor model of Erlang processes maps very well to 
+the algorithms pseudo code. Using Erlang allows us to separate the details of
+the algorithm from the imlementation specifics. This enables us to ensure
+accuracy and makes debugging simpler.
+
+The idea behind the system design is that we use Multi-Paxos for consensus,
+reconfigurable state machine algorithms to make the cluster dynamic and
+implement this in Erlang.
+
+\section{Organization}
 The thesis is divided into three main sections over multiple chapters.
-
-Firstly, we provide the context of the project, separated as:
-
-\begin{itemize}
-    \iterm{Background}: The background chapter provides us with an idea of the
-    problem domain and the set of expected challenges when designing a
-    distributed system.
-    \iterm{Related Work}: We cover the related algorithms and projects in the
-    problem domain in this chapter. We also detail why we cannot existing
-    solutions using comparisons.
-    \iterm{Requirements}: We specify the project requirements and how it
-    related to the project in this chapter.
-\end{itemize}
-
-Secondly, we detail the work done on the thesis as:
-
-\begin{itemize}
-    \iterm{Concepts}: We cover the important domain concepts required to
-    understand the solution in this chapter.
-    \iterm{Analysis and Design}: We observe all the analysis done for the
-    project and detail the design resulting from this analysis.
-    \iterm{Implementation}: This chapter covers specific details in terms of
-    how the project was implemented and how the problem maps to the Erlang
-    language.
-    \iterm{Experiments and Performance}: We take a look at all the performance
-    measurements and different experiments conducted to ascertain the
-    application's capabilities in this chapter.
-\end{itemize}
-
-Lastly, we wrap up with a summary of the thesis:
-
-\begin{itemize}
-    \iterm{Conclusion}: We provide a short description of what the project has
-    achieved and an top down view of all the observations made.
-    \iterm{Future Work}: A list of improvements, in terms of features and
-    performance that can be done to the application is listed in this chapter.
-\end{itemize}
-
 
 The first section provides the context and background information related to the
 project. It details the problem background, related projects, the research
