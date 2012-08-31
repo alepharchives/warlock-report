@@ -29,7 +29,7 @@ pseudo code from \citet{Robbert2011}. It supports a configurable number of
 replicas, leaders and acceptors, allowing us to get an idea of how the protocol
 behaves with different configurations using simple unit tests. Building the
 prototype helps us to single out the core of the system and make sure the
-protocol works correctly before getting to to the other parts.
+protocol works correctly before getting to the other parts.
 
 \section{Algorithm Implementation}
 
@@ -264,7 +264,7 @@ hash table. The operations we can support with this design choice are:
     any data from the other nodes. This command is used to setup the initial
     cluster.
     \iterm{add\_repl\_member}: A new node can be added to the system by first
-    copying data into it and then add to to the cluster once it is in sync with
+    copying data into it and then add to the cluster once it is in sync with
     rest of the member nodes.
     \iterm{leave}: A member node can leave the cluster.
     \iterm{remove}: Any of the members nodes can remove any of the other member
