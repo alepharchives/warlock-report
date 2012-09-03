@@ -1,0 +1,112 @@
+% Generated with LaTeXDraw 2.0.7
+% Mon Sep 03 14:10:06 CEST 2012
+% \usepackage[usenames,dvipsnames]{pstricks}
+% \usepackage{epsfig}
+% \usepackage{pst-grad} % For gradients
+% \usepackage{pst-plot} % For axes
+\scalebox{1} % Change this value to rescale the drawing.
+{
+  \begin{pspicture}(0,-5.577031)(15.62,5.577031)
+    \definecolor{color150}{rgb}{0.21568627450980393,0.49411764705882355,0.7215686274509804}
+    \definecolor{color181}{rgb}{0.8941176470588236,0.10196078431372549,0.10980392156862745}
+    \definecolor{color2692}{rgb}{0.30196078431372547,0.6862745098039216,0.2901960784313726}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(7.8384376,5.118906){\large \psovalbox[linewidth=0.04,framesep=0.24]{start}}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(7.84375,-5.1210938){\large \psovalbox[linewidth=0.04,framesep=0.24]{end}}
+    \psellipse[linewidth=0.04,dimen=outer](2.93,2.6989062)(1.93,0.87)
+    \psellipse[linewidth=0.04,dimen=outer](12.71,2.6989062)(1.93,0.87)
+    \psellipse[linewidth=0.04,dimen=outer](2.89,-1.5010937)(1.93,0.87)
+    \psellipse[linewidth=0.04,dimen=outer](12.73,-1.5010937)(1.93,0.87)
+    \usefont{T1}{ptm}{m}{n}
+    \rput(2.9228125,2.9303124){\large \color{color150}Proposer}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(12.706562,2.726875){\large \color{color181}Acceptor}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(12.72125,-1.5635937){\large \color{color2692}Learner}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(2.9010937,-1.3195312){\large \color{color150}Proposer}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(2.9003124,2.3339062){[preparing]}
+    \usefont{T1}{ptm}{m}{n}
+    \rput(2.8603125,-1.8660938){[proposing]}
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(7.32,4.828906)(4.22,3.3289063)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(8.42,4.828906)(11.12,3.2289062)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(2.92,1.8289063)(2.92,-0.6510937)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(12.72,1.8289063)(12.72,-0.6510937)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(4.82,-1.5310937)(10.82,-1.5310937)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(2.9,-2.3510938)(7.16,-4.9910936)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(12.72,-2.3510938)(8.56,-4.9510937)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(4.84,2.7289062)(10.8,2.6989062)
+    \pscustom[linewidth=0.04]
+    {
+      \newpath
+      \moveto(0.98666686,-1.5310937)
+      \lineto(0.49333343,-1.5310937)
+      \curveto(0.24666686,-1.5310937)(0.0,-1.2826086)(0.0,-1.0341241)
+      \curveto(0.0,-0.78563964)(0.0,-0.28866944)(0.0,-0.040184326)
+      \curveto(0.0,0.20830078)(0.0,0.70526975)(0.0,0.9537549)
+      \curveto(0.0,1.20224)(0.0,1.699209)(0.0,1.9476941)
+      \curveto(0.0,2.1961792)(0.0,2.6931481)(0.0,2.9416332)
+      \curveto(0.0,3.1901183)(0.0,3.687088)(0.0,3.935573)
+      \curveto(0.0,4.1840577)(0.09866669,4.5816336)(0.19733338,4.7307243)
+      \curveto(0.29600006,4.8798156)(0.64133364,5.0289063)(0.8880005,5.0289063)
+      \curveto(1.1346668,5.0289063)(1.6280005,5.0289063)(1.8746667,5.0289063)
+      \curveto(2.1213331,5.0289063)(2.6146667,5.0289063)(2.861333,5.0289063)
+      \curveto(3.1079998,5.0289063)(3.6013336,5.0289063)(3.8480005,5.0289063)
+      \curveto(4.094667,5.0289063)(4.5880003,5.0289063)(4.8346667,5.0289063)
+      \curveto(5.081333,5.0289063)(5.476,5.0289063)(5.92,5.0289063)
+    }
+    \pscustom[linewidth=0.04]
+    {
+      \newpath
+      \moveto(14.633334,-1.5710938)
+      \lineto(15.116668,-1.5710938)
+      \curveto(15.358334,-1.5710938)(15.6,-1.3210938)(15.6,-1.0710938)
+      \curveto(15.6,-0.82109374)(15.6,-0.32109374)(15.6,-0.07109375)
+      \curveto(15.6,0.17890625)(15.6,0.67890626)(15.6,0.92890626)
+      \curveto(15.6,1.1789062)(15.6,1.6789062)(15.6,1.9289062)
+      \curveto(15.6,2.1789062)(15.6,2.6789062)(15.6,2.9289062)
+      \curveto(15.6,3.1789062)(15.6,3.6789062)(15.6,3.9289062)
+      \curveto(15.6,4.1789064)(15.503334,4.578906)(15.406668,4.728906)
+      \curveto(15.31,4.8789062)(14.971667,5.0289063)(14.73,5.0289063)
+      \curveto(14.488333,5.0289063)(14.005,5.0289063)(13.763332,5.0289063)
+      \curveto(13.521667,5.0289063)(13.038334,5.0289063)(12.796667,5.0289063)
+      \curveto(12.555,5.0289063)(12.071668,5.0289063)(11.83,5.0289063)
+      \curveto(11.588332,5.0289063)(11.105,5.0289063)(10.863333,5.0289063)
+      \curveto(10.621666,5.0289063)(10.235,5.0289063)(9.8,5.0289063)
+    }
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(5.62,5.0289063)(7.04,5.0289063)
+    \psline[linewidth=0.04cm,arrowsize=0.113cm 2.5,arrowlength=2.07,arrowinset=0.4]{->}(10.12,5.0289063)(8.66,5.0289063)
+    \usefont{T1}{pcr}{m}{n}
+    \rput(7.83,2.94375){receive}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(7.8271875,2.30375){larger n}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(12.0390625,4.1739063){receive prepare}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(13.876875,1.0339062){receive}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(13.910156,0.47390625){propose}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(12.63125,-3.5460937){receive}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(12.5329685,-4.086094){decide}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(7.99,-1.1460937){timeout}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(8.082188,-1.9060937){failed in majority}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(4.1534376,0.726875){n/2+1 ack}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(2.7534375,-3.6060936){n/2+1 ack}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(2.4098437,-4.086094){decide}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(13.882343,5.413906){timeout}
+    \usefont{T1}{pcr}{m}{n}
+    \rput(1.8823438,5.413906){timeout}
+    \psframe[linewidth=0.02,linestyle=dashed,dash=0.16cm 0.16cm,dimen=outer](10.16,-0.87109375)(5.96,-2.4710937)
+  \end{pspicture} 
+}
+

@@ -175,7 +175,7 @@ of unicast with the downside being that it provides weak synchrony.
 \end{figure}
 
 \figureref{ring.paxos} illustrates the outline of Ring Paxos algorithm and
-shows the different communication protocols used between its processes.
+shows the two communication protocols used between its processes.
 
 \subsection{Stoppable Paxos}
 
@@ -199,37 +199,67 @@ This thesis uses a variation of Stoppable Paxos for reconfiguration.
 Many other flavors of Paxos exists with some of them focused on the
 implementation aspects.
 
-\begin{itemize}
-    \iterm{Paxos for system builders}: \citet{Kirsch08paxosfor} provides the
-    complete specification for implementing a system based on Paxos. It also
-    details the performance, safety and liveliness properties of a prototype
-    built.
-    \iterm{Paxos Made Live - An Engineering Perspective}: \cite{ChandraGR07}
-    details the learning in engineering the Paxos algorithm for use in
-    Google Chubby Locks \citep{Burrows06}.
-\end{itemize}
+\subsubsection{Paxos for System Builders}
+
+\citet{Kirsch08paxosfor} provides a detailed overview of Paxos from the
+implementation perspective. They list the necessary pseudo code required
+along with all the considerations needed to make the algorithm practical.
+Furthermore, they explore performance, safety and liveliness 
+properties of the prototype they built.
+
+\subsubsection{Paxos Made Live \dash{} An Engineering Perspective}
+
+\cite{ChandraGR07}
+details the learning in engineering the Paxos algorithm for use in
+Google Chubby Locks \citep{Burrows06}.
+
+The paper details the experience of engineers from Google in building a
+large scale system centered around Paxos. It details the major challenges faced
+and their solutions, performance considerations, Software Engineering techniques
+used and information of testing the setup.
 
 \subsection{Implementations}
 
-There are several implementations of Paxos and its variations. We describe full
-featured implementations used in production in later sections. We discuss few
-Erlang based implementations below since this thesis project is
-implemented in it.
+There are several implementations of Paxos and its variants. Listed below are
+implementations written mainly in Erlang. These projects serve as a good
+reference from the implementation perspective.
 
-\begin{itemize}
-    \iterm{gen\_paxos}: \citep{Uenishi2012} implements Paxos with
-    individual processes modelled as finite state machines. Each process can
-    be performing a different role based on what state it is on. This
-    makes all processes equal and ready to take on different roles
-    as required during runtime.
-    \iterm{LibPaxos}: \citet{Lugano2012} is a collection of open source
-    implementations of Paxos created specifically for performance measurements
-    in \citet{MarandiPSP10}. It also includes a simulator written in Erlang to
-    observe the network behaviour.
-    \iterm{gen\_leader}: \citet{Ulf2012} implements a leader election algorithm
-    not based on Paxos. It is one of the notable implementations for leader
-    election in Erlang.
-\end{itemize}
+\subsubsection{gen\_paxos}
+
+\citep{Uenishi2012} implements Paxos with
+individual processes modelled as finite state machines. Each process can
+be performing a different role based on what state it is on. This
+makes all processes equal and ready to take on different roles
+as required during runtime.
+   
+\begin{figure}
+  \begin{whole}
+  \includegraphics[width=1\wholewidth]{paxos_fsm}
+  \caption[Paxos FSM]{%
+    Figure shows Paxos algorithm when viewed as a finite state machine.}
+  \label{figure:paxos.fsm}
+  \end{whole}
+\end{figure}
+
+\figureref{paxos.fsm} shows the view of Paxos algorithm as a Finite State
+Machine (FSM). The idea is that each process is run as an instance of this
+FSM, contrary to the regular view of process with a single well defined role.
+While this view of Paxos as a FSM is very helpful in the understanding of the
+protocol we choose to use the protocol in the aleady established form of a
+single role per process.
+
+\subsubsection{LibPaxos}
+
+\citet{Lugano2012} is a collection of open source
+implementations of Paxos created specifically for performance measurements
+in \citet{MarandiPSP10}. It also includes a simulator written in Erlang to
+observe network behaviour.
+
+\subsubsection{gen\_leader}
+
+\citet{Ulf2012} implements a leader election based on First In
+First Out (FIFO) basis. It is one of the notable implementations for leader
+election in Erlang.
 
 \section{Google chubby locks}
 \label{section:chubby.locks}
@@ -252,12 +282,12 @@ as a store for small metadata \citep{ChandraGR07}.
 Chubby lock is made up of two components:
 
 \begin{itemize}
-    \iterm{Chubby cell}: Chubby cell is typically made up of five servers
+    \iterm{Chubby Cell}: Chubby cell is typically made up of five servers
     (termed replicas) that elect a master using Paxos protocol. The master
     server serves all the reads requests and co-ordinates the writes requests.
     The rest of the servers are for fault tolerance and are ready to replace the
     master should it fail.
-    \iterm{Chubby client}: Chubby client maintains and open connection with
+    \iterm{Chubby Client}: Chubby client maintains and open connection with
     the Chubby cell and communicates with it via RPC%
     \sidenote{
       \emph{RPC}: Remote Procedure Call: An inter-process communication
@@ -339,7 +369,7 @@ the relation between different replicas and the coordinator.
 \label{section:zookeeper}
 
 Zookeeper \citep{Hunt:2010:ZWC:1855840.1855851, zookeeper} is a open source
-consensus service written in java that is used for synchronization in
+consensus service written in Java that is used for synchronization in
 distributed applications and as a metadata store. It is inspired by Chubby lock
 \sectionref{chubby.locks}, but uses its own protocol Zookeeper Atomic Broadcast
 (ZAB) in place of Paxos.
@@ -391,23 +421,27 @@ Zookeeper. We observe the optimization for \emph{read} requests, which allows it
 to be much faster than the \emph{write} requests.
 
 Zookeeper uses the concept of \emph{observers} to increase read throughput. They
-are a set of servers that monitor the zookeeper service, but do not take part
+are a set of servers that monitor the Zookeeper service, but do not take part
 in the protocol directly thus acting as extended replicas. The write throughput
 is however inversely proportional to the number of servers in the group mainly
 due to the increased co-ordination required for consensus.
 
+The data model of Zookeeper is that of a generic file system, which allows it
+to be used as a file system as well. It provides features such as access
+controls, automic access, timestamps and so on.
+
 Zookeeper worked on a static set of servers with no option to reconfigure the
-cluster at the time of writing. However, the feature is in the works
-\citep{zab2012}and an initial release is available.
+cluster at the time of writing. However, the feature was in the works
+\citep{zab2012} and an initial release was available.
 
 \section{Doozerd}
 
 Doozerd \citep{doozerd} is a consensus service similar to Chubby locks
 \sectionref{chubby.locks} and Zookeeper \sectionref{zookeeper} written in
 Go \citep{golang}. It uses Paxos protocol internally for maintaining
-write consistency.
-
-\todo{Add more details and explain differences}
+write consistency. Its use case is similar to that of Zookeeper and is
+mainly used as a fast name service. However, it is not as widely used
+or actively maintained as Zookeeper.
 
 \section{Riak}
 
@@ -420,24 +454,29 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
     Figure shows the Riak Ring and details how the key space is divided among
     four nodes
     Figure courtesy \citet{riak}.}
-  \label{figure:megastore}
+  \label{figure:riak.ring}
 \end{figure}
 
-\todo{Add more details and explain differences}
+The primary use of Riak is as a distributed NoSQL%
+\sidenote[-4]{NoSQL, generally called ``Not Only SQL'' or ``Not Relational'',
+  are set of data stores that follow weaker consistency model than ACID and are
+characterised by their ability to scale their operations \citep{Cattell10}.}
+availability and partition tolerance while
+being eventually consistent. \figureref{riak.ring} shows the distribution of the
+key space over multiple nodes using vnodes%
+{}. It might be possible to use this concept to scale key space and avoid having
+to store a complete copy of the data on all the nodes.
 
-\section{Amazon Dynamo}
-
-Dynamo \citep{DeCandia07} is a eventually consistent key-value store developed
-inside Amazon designed to be incrementally scalable and highly available.
-
-\todo{Add more details and explain differences}
+While the project is mature and satisfies all
+the other requirements to be used as a lock manager, absense of strong
+consistency makes its use untenable.
 
 \section{Dynamo DB}
 
 Amazon DynamoDB \citep{dynamoDB} is proprietary key-value datastore based on
-\citet{DeCandia07} available as a service.
-
-\todo{Add more details and explain differences}
+\citet{DeCandia07} available as a service. While providing the regular
+featureset of NoSQL data stores, it also provides strong consistency and
+atomic counters.
 
 \section{Scalaris}
 
@@ -448,8 +487,11 @@ Table (DHT)%
   \emph{Distributed Hash Table}: DHT is a distributed system that provides
   hash table operations.
 }
-and is implemented in Erlang.
+and is implemented in Erlang. It also uses a non-blocking Paxos for consensus
+and provides strong consistency. It uses a Peer to Peer (P2P) protocol \dash{}
+Chord \citep{StoicaMKKB01} for its underlying data replication. 
 
-\todo{Add more details and explain differences}
-
+For our purpose however, Scalaris is a full featured database server with most
+of the features being left unused. Because of this, it affects its performance
+and needs more hardware for the necessary throughput.
 
