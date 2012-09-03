@@ -175,19 +175,20 @@ Several parts of the code that are open to improvement are tagged with
 ``TODO''s. These are possible performance enhancement points, feature and
 stability improvement points. 
 
-For example, all the ETS tables used currently
+For example, all the \abbr{ETS} tables used currently
 are directly running under the processes that created them. If these processes
 crash, the linked ETS table would also crash. Using a table manager would
 help survive these crashes.
 
 \subsection{More OTP}
 
-Certain portions of the code skip some OTP practices to trade for performance.
+Certain portions of the code skip some \abbr{OTP} practices to trade for
+performance.
 For example, the commander is spawned directly by the leader instead of using
 a supervisor. This makes it harder when it comes to hot code loading. In this
 specific issue, it not much of a problem since commanders are short lived
-process. A high level tuning from the OTP perspective can help improve code
-stability and maintainability.
+process. A high level tuning from the \abbr{OTP} perspective can help improve
+code stability and maintainability.
 
 \subsection{Timeouts}
 

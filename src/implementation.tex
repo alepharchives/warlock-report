@@ -4,7 +4,7 @@
 We implement the system as per the requirements (\chapterref{requirements}) and
 design (\chapterref{analysis.design}) in this chapter. We try to explain how the
 design goals matches on to the features of Erlang \citep{erlang} programming
-language and OTP libraries.
+language and \abbr{OTP} libraries.
 
 The choice of Erlang as the programming language for implementation was
 motivated by the factor that the Magic Land back end was already implemented in
@@ -57,8 +57,8 @@ to one or more processes and callback functions handle\_cast%
 } and handle\_info%
 \sidenote[10]{
   \emph{handle\_info} is the gen\_server callback function used to handle all
-  the other types of messages e.g., plain Erlang messages, TCP, UDP messages
-  and so on.
+  the other types of messages e.g., plain Erlang messages, \abbr{TCP},
+  \abbr{UDP} messages and so on.
 }
 to handle incoming messages.
 
@@ -353,8 +353,8 @@ some other commands. A better solution than re-implementing the commands is to
 support entire back ends.
 
 So Warlock acts as a consensus layer and its callback can be used to run
-commands on different back ends. We implemented back ends in ETS, Redis and
-Judy arrays \citep{judy}. It is possible to use other software as back end
+commands on different back ends. We implemented back ends in \abbr{ETS}, Redis
+and Judy arrays \citep{judy}. It is possible to use other software as back end
 since Warlock is transparent to the commands.
 
 \section{Performance}
@@ -368,7 +368,8 @@ the bottlenecks and attempt to fix it without affecting the primary goal.
 \label{section:impl.profiling}
 
 Profiling is analyzing the code dynamically based on different measurements such
-as CPU time, memory consumed, number of function calls made, number of messages
+as \abbr{CPU} time, memory consumed, number of function calls made, number of
+messages
 sent and so on. It allows us to visualize the parts of the source code that take
 the longest to run or is run the most number of times.
 
@@ -410,4 +411,6 @@ many options:
 \end{itemize}
 
 By using generalized hash tables in our code, we were able to evaluate these
-data structures finally choosing ETS for its performance and added features.
+data structures finally choosing \abbr{ETS} for its performance and added
+features.
+

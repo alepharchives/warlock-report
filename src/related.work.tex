@@ -235,18 +235,18 @@ as required during runtime.
 \begin{figure}
   \begin{whole}
   \includegraphics[width=1\wholewidth]{paxos_fsm}
-  \caption[Paxos FSM]{%
+  \caption[Paxos \abbr{FSM}]{%
     Figure shows Paxos algorithm when viewed as a finite state machine.}
   \label{figure:paxos.fsm}
   \end{whole}
 \end{figure}
 
 \figureref{paxos.fsm} shows the view of Paxos algorithm as a Finite State
-Machine (FSM). The idea is that each process is run as an instance of this
-FSM, contrary to the regular view of process with a single well defined role.
-While this view of Paxos as a FSM is very helpful in the understanding of the
-protocol, we chose to use the protocol in the already established form of a
-single role per process.
+Machine (\abbr{FSM}). The idea is that each process is run as an instance of 
+this \abbr{FSM}, contrary to the regular view of process with a single well
+defined role. While this view of Paxos as a \abbr{FSM} is very helpful in the
+understanding of the protocol, we chose to use the protocol in the already
+established form of a single role per process.
 
 \subsubsection{LibPaxos}
 
@@ -258,8 +258,8 @@ observe network behaviour.
 \subsubsection{gen\_leader}
 
 \citet{Ulf2012} implements a leader election based on First In
-First Out (FIFO) basis. It is one of the notable implementations for leader
-election in Erlang.
+First Out (\abbr{FIFO}) basis. It is one of the notable implementations for
+leader election in Erlang.
 
 \section{Google chubby locks}
 \label{section:chubby.locks}
@@ -288,7 +288,7 @@ Chubby lock is made up of two components:
     The rest of the servers are for fault tolerance and are ready to replace the
     master should it fail.
     \iterm{Chubby Client}: Chubby client maintains and open connection with
-    the Chubby cell and communicates with it via RPC%
+    the Chubby cell and communicates with it via \abbr{RPC}%
     \sidenote{
       \emph{RPC}: Remote Procedure Call: An inter-process communication
       technique where one process can run programs on remote processes.
@@ -329,9 +329,10 @@ eventually be run on the database component.
 
 \section{Google Megastore}
 
-Megastore \citep{BakerBCFKLLLLY11} is an ACID%
+Megastore \citep{BakerBCFKLLLLY11} is an \abbr{ACID}%
 \sidenote{
-  ACID properties are used to provide guarantees for database transactions.
+  \abbr{ACID} properties are used to provide guarantees for database
+  transactions.
   \begin{inparaenum}[(i)]
     \iterm{Atomicity}: A transaction is either executed completely or not
     executed at all.
@@ -356,7 +357,8 @@ consistent views while targeting performance by partitioning the data.
 \end{figure}
 
 Megastore users Paxos to replicate a write-ahead log, replicate commit
-records for single phase ACID transactions and as a part of fast fail over
+records for single phase \abbr{ACID} transactions and as a part of fast fail
+over
 mechanisms. It provides fast local reads using a service called the
 \emph{coordinator} which keeps track of the data version/Paxos write
 sequence over the group of replicas. It speeds up writes by pre-preparing
@@ -372,13 +374,13 @@ Zookeeper \citep{Hunt:2010:ZWC:1855840.1855851, zookeeper} is a open source
 consensus service written in Java that is used for synchronization in
 distributed applications and as a metadata store. It is inspired by Chubby lock
 \sectionref{chubby.locks}, but uses its own protocol Zookeeper Atomic Broadcast
-(ZAB) in place of Paxos.
+(\abbr{ZAB}) in place of Paxos.
 
 \subsection{Zookeeper Atomic Broadcast}
 
-Zookeeper Atomic Broadcast (ZAB)
+Zookeeper Atomic Broadcast (\abbr{ZAB})
 \citep{Reed:2008:STO:1529974.1529978, JunqueiraRS11} is a
-totally ordered atomic broadcast protocol created for usage in Zookeeper. ZAB
+totally ordered atomic broadcast protocol created for usage in Zookeeper. \abbr{ZAB}
 satisfies the constraints imposed by Zookeeper viz.,
 
 \begin{itemize}
@@ -395,8 +397,8 @@ satisfies the constraints imposed by Zookeeper viz.,
     ordering.
 \end{itemize}
 
-ZAB is conceptually similar to Paxos, but uses certain optimizations and
-trade-offs. The service using ZAB has two modes of operation:
+\abbr{ZAB} is conceptually similar to Paxos, but uses certain optimizations and
+trade-offs. The service using \abbr{ZAB} has two modes of operation:
 
 \begin{itemize}
     \iterm{Broadcast mode}: Broadcast mode starts when a new leader is chosen
@@ -459,8 +461,9 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
 
 The primary use of Riak is as a distributed NoSQL%
 \sidenote[-4]{NoSQL, generally called ``Not Only SQL'' or ``Not Relational'',
-  are set of data stores that follow weaker consistency model than ACID and are
-characterized by their ability to scale their operations \citep{Cattell10}.}
+  are set of data stores that follow weaker consistency model than \abbr{ACID}
+  and are characterized by their ability to scale their operations 
+\citep{Cattell10}.}
 availability and partition tolerance while
 being eventually consistent. \figureref{riak.ring} shows the distribution of the
 key spaceA over multiple nodes using vnodes%
@@ -485,11 +488,11 @@ atomic counters.
 \section{Scalaris}
 
 Scalaris \citep{scalaris} is distributed key-value database the supports
-consistent writes and full ACID properties. It is based on Distributed Hash
-Table (DHT)%
+consistent writes and full \abbr{ACID} properties. It is based on Distributed 
+Hash Table (\abbr{DHT})%
 \sidenote{
-  \emph{Distributed Hash Table}: DHT is a distributed system that provides
-  hash table operations.
+  \emph{Distributed Hash Table}: \abbr{DHT} is a distributed system that
+  provides hash table operations.
 }
 and is implemented in Erlang. It also uses a non-blocking Paxos for consensus
 and provides strong consistency. It uses a Peer to Peer (P2P) protocol \dash{}

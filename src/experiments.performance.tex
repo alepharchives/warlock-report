@@ -7,8 +7,8 @@ and reliability. We then plot the test results and analyze the graphs.
 \section{Evaluation Process}
 
 The test setup consists of a cluster of servers hosted on Amazon \abbr{EC2}%
-\sidenote[3]{Amazon Elastic Compute Cloud (EC2) is a computing platform that
-  allows us to provision servers on demand as a web service. For details, 
+\sidenote[3]{Amazon Elastic Compute Cloud (\abbr{EC2}) is a computing platform
+  that allows us to provision servers on demand as a web service. For details, 
   see \url{http://aws.amazon.com/ec2/}
 }. We can test our system on different hardware configurations using the
 different \term{instance} types provided. The configuration of the two
@@ -20,10 +20,11 @@ instances used in our tests are shown in \tableref{amazon.instances}
     \multicolumn{3}{|c|}{Amazon Instances} \\
     \hline
     Type & Attribute & Value \\ \hline
-    \multirow{3}{*}{\term{m1.large}} & CPU & 4 EC2 Compute Units \\
+    \multirow{3}{*}{\term{m1.large}} & \abbr{CPU} & 4 \abbr{EC2} Compute Units \\
      & Memory &  7.5 GB \\
      & Platform & 64-bit \\ \hline
-    \multirow{3}{*}{\term{c1.xlarge}} & CPU & 20 EC2 Compute Units \\
+    \multirow{3}{*}{\term{c1.xlarge}} & \abbr{CPU} & 20 \abbr{EC2} Compute Units
+    \\
      & Memory &  7 GB \\
      & Platform & 64-bit \\ \hline
     \hline
@@ -64,7 +65,7 @@ static. Specifically, the tests are
   \item Change in location of the bench client
 \end{enumerate}
 
-We also measure the system health in terms of CPU usage, memory usage and
+We also measure the system health in terms of \abbr{CPU} usage, memory usage and
 process count providing an idea about the resource consumption.
 
 %\section{Load Testing}
@@ -162,14 +163,17 @@ a 3 node Warlock cluster.
   \end{whole}
 \end{figure}
 
-We can connect to a Warlock cluster in two ways \dash{} RPC and Redis protocol
+We can connect to a Warlock cluster in two ways \dash{} \abbr{RPC} and Redis
+protocol
 as discussed in \sectionref{a.n.d.client.conn}. The \textcolor{red}{red} line
 in \figureref{res.concurrency} indicates the successful requests using the
-Redis protocol and the \textcolor{blue}{blue} line indicates those using RPC.
+Redis protocol and the \textcolor{blue}{blue} line indicates those using
+\abbr{RPC}.
 
 We observe that the throughput increases upto 64 concurrent connections and
 stays constant after that. Warlock cluster timed out on some requests when
-using RPC with 1024 connections. Also, we were unable to test the Redis protocol
+using \abbr{RPC} with 1024 connections. Also, we were unable to test the 
+Redis protocol
 with concurrency level of 1024 due to Basho Bench becoming unresponsive.
 
 The distribution of read and write requests for this test was ${}^4/_5$ and

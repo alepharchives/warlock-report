@@ -12,7 +12,7 @@ The goal for Warlock is to
 
 \begin{itemize}
   \item Satisfy all the requirements specified in \chapterref{requirements}.
-  \item Implement the system in Erlang while following OTP principles.
+  \item Implement the system in Erlang while following \abbr{OTP} principles.
   \item Create a modular design to allow for customization for other projects.
 \end{itemize}
 
@@ -50,15 +50,15 @@ commonly used modules. The library consists of
 \begin{itemize}
     \iterm{Configuration Helper}: Reads configuration files to be used as
     settings for Warlock.
-    \iterm{Hash Table}: A hash table implementation based on ETS%
+    \iterm{Hash Table}: A hash table implementation based on \abbr{ETS}%
     \sidenote[-8]{
-      Erlang Term Storage (ETS) is a an in-memory storage provided by the Erlang
-      Virtual Machine. It supports multiple data structures and operations over
-      them.}
+      Erlang Term Storage (\abbr{ETS}) is a an in-memory storage provided by the
+      Erlang Virtual Machine. It supports multiple data structures and
+      operations over them.}
     and dict%
     \sidenote[-3]{
-      dict is Erlang's in-built dictionary implementation. Unlike ETS, it is
-      immutable.}
+      dict is Erlang's in-built dictionary implementation. Unlike \abbr{ETS}, 
+      it is immutable.}
 \end{itemize}
 
 It is used as a dependency in rest of the Warlock components. It also defines
@@ -83,13 +83,13 @@ The system can be interacted with by
 \begin{itemize}
   \item Embedding Warlock in the same virtual machine as the
     client application.
-  \item Accessing the system using RPC.
+  \item Accessing the system using \abbr{RPC}.
   \item Using a well defined binary protocol.
 \end{itemize}
 
 The first two of the options are trivial to implement. For the last option, the
 server manages the incoming client connections which can then send requests. The
-client connections are over TCP and use the Redis binary protocol
+client connections are over \abbr{TCP} and use the Redis binary protocol
 \citep{RedisProtocol}%
 \sidenote{
   The reasoning behind using the Redis binary protocol is that it is well
@@ -155,8 +155,8 @@ this are:
       as the seed. So the \emph{source node} is picked to be a health cluster
       member other than the master.
     }.
-  \item The target node sets up a TCP connection with the seed node and sends
-    a SYNC%
+  \item The target node sets up a \abbr{TCP} connection with the seed node and
+    sends a SYNC%
     \sidenote[3]{
       The \emph{SYNC} signal is used to indicate that the target node is ready
       to receive the data.
@@ -187,7 +187,7 @@ this are:
 \subsection{Database}
 
 The database component is used to store all the data and provides at its
-least the simple API required for a key value store.
+least the simple \abbr{API} required for a key value store.
 
 \subsubsection{Pluggable back ends}
 
@@ -393,7 +393,7 @@ monitoring rest of the members.
 
 \section{API Design}
 
-We try and keep the Application Programming Interface (API) of Warlock as
+We try and keep the Application Programming Interface (\abbr{API}) of Warlock as
 simple as possible. A typical command is of the format
 \sourcecoderef{warlock.generic.cmd}
 
@@ -488,10 +488,4 @@ The current design supports resetting a node's data and replicating from
 a member with good data. Improvements are possible in this area in terms of
 performance and usage of less resources as discussed in
 \chapterref{future.work}.
-
-
-
-
-
-
 
