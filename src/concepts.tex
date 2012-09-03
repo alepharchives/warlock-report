@@ -41,7 +41,7 @@ execution skipping on the smaller details and corner cases.
       information. This proposal is sent to the replica.
     \item The replica checks if the proposal is a duplicate and if not it
       assigns a sequence number%
-      \sidenote{
+      \sidenote[-2]{
         The replica is responsible for maintaining a consistent log of
         operations. This log is made up of slots with each of the slots
         indexed by a sequence number.
@@ -142,17 +142,17 @@ crashes. A typical Erlang supervisor tree looks like
 \end{figure}
 
 A process as per the supervision tree can either be a supervisor%
-\sidenote{
+\sidenote[-6]{
   \emph{Supervisor}: An Erlang process responsible for creating, terminating,
   monitoring and restarting processes as defined.
 }
 or a worker%
-\sidenote[3]{
+\sidenote[-3]{
   \emph{Worker}: A worker process in this context is any other process started
   by the supervisor that is not a supervisor itself.
 }. Processes that crash are restarted by the supervisor as per its
 restart strategy%
-\sidenote[6]{
+\sidenote{
   \emph{Restart Strategy}: This defines how the supervisor should restart
   crashed children.
   \begin{inparaenum}[(i)]
@@ -196,7 +196,7 @@ calls%
   the process can provide a response.
 }
 and asynchronous calls%
-\sidenote[2]{
+\sidenote[3]{
   \emph{Asynchronous calls}: Also called non-blocking calls, is received by the
   process and handled when it has processed all the messages it had received
   before this request.

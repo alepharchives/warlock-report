@@ -91,7 +91,7 @@ The first two of the options are trivial to implement. For the last option, the
 server manages the incoming client connections which can then send requests. The
 client connections are over \abbr{TCP} and use the Redis binary protocol
 \citep{RedisProtocol}%
-\sidenote{
+\sidenote[-2]{
   The reasoning behind using the Redis binary protocol is that it is well
   defined and has a good set of features. It is also implemented in
   multiple languages allowing for usage from a much wider audience.
@@ -144,20 +144,20 @@ this are:
   \item All the nodes in the member group listen on a predefined port.
   \item A command is executed on the new node that is to be added to the cluster
     with the address of a seed%
-    \sidenote{
+    \sidenote[-4]{
       A \emph{seed node} in this context is one that provided all the necessary
       information to setup a data transfer connection.
     } node.
   \item The seed node sends the target node (new node) with the information of
     the source node%
-    \sidenote[1]{
+    \sidenote[-3]{
       Since data transfer is resource intensive, we do not use the master node
       as the seed. So the \emph{source node} is picked to be a health cluster
       member other than the master.
     }.
   \item The target node sets up a \abbr{TCP} connection with the seed node and
     sends a SYNC%
-    \sidenote[3]{
+    \sidenote[-1]{
       The \emph{SYNC} signal is used to indicate that the target node is ready
       to receive the data.
     } signal.
