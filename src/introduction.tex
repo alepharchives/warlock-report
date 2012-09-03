@@ -22,7 +22,7 @@ consistent.
 
 \section{Goals}
 
-The goal of this thesis is to build a customized locking service focussed on
+The goal of this thesis is to build a customized locking service focused on
 being fault tolerant without compromising on consistency and performance.
 Specifically,
 
@@ -52,7 +52,7 @@ well known ideas in the field.
 
 Consensus in distributed systems is a large topic in itself. They are
 notoriously hard to implement even though the pseudo code describing them can be
-relatively simple. Among the set of algorithms avaiable for arriving at
+relatively simple. Among the set of algorithms available for arriving at
 consensus in an asynchronous distributed system, we choose Paxos because of its
 literature coverage and usage in the industry.
 
@@ -60,7 +60,7 @@ The Erlang programming language is built with the primitives necessary for
 creating a distributed system, such as, stable messaging, crash tolerance and
 well defined behaviours. The Actor model of Erlang processes maps very well to 
 the algorithms pseudo code. Using Erlang allows us to separate the details of
-the algorithm from the imlementation specifics. This enables us to ensure
+the algorithm from the implementation specifics. This enables us to ensure
 accuracy and makes debugging simpler.
 
 The idea behind the system design is that we use Multi-Paxos for consensus,

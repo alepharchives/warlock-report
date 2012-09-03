@@ -102,7 +102,7 @@ in production due to possible race conditions and relatively poor performance.
 \subsection{Multi-Paxos}
 
 We run one instance of Paxos algorithm for agreeing on a single value and
-multiple times for mutliple values. We can batch together multiple values
+multiple times for multiple values. We can batch together multiple values
 into a single instance, but this optimization does not reduce the message
 complexity.
 
@@ -128,7 +128,7 @@ the round to be over in three message delays in case of a collision.
 
 Clients propose the values directly to the \emph{acceptors} and the
 \emph{leader} gets involved only in case of a collision. Versions of Fast
-Paxos can be optimized to a further by prespecifying the collision
+Paxos can be optimized to a further by specifying the collision
 resolution technique allowing the clients to fix collisions themselves.
 
 However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007},
@@ -155,7 +155,7 @@ in the protocol, but merely acting as observers.
 
 The downside of using Cheap Paxos is that it affects the liveliness of the
 system when multiple main servers fail at the same time since it takes time
-for the auxillary servers to be configured into the system.
+for the axillary servers to be configured into the system.
 
 \subsection{Ring Paxos}
 
@@ -245,7 +245,7 @@ as required during runtime.
 Machine (FSM). The idea is that each process is run as an instance of this
 FSM, contrary to the regular view of process with a single well defined role.
 While this view of Paxos as a FSM is very helpful in the understanding of the
-protocol we choose to use the protocol in the aleady established form of a
+protocol, we chose to use the protocol in the already established form of a
 single role per process.
 
 \subsubsection{LibPaxos}
@@ -428,7 +428,7 @@ due to the increased co-ordination required for consensus.
 
 The data model of Zookeeper is that of a generic file system, which allows it
 to be used as a file system as well. It provides features such as access
-controls, automic access, timestamps and so on.
+controls, atomic access, timestamps and so on.
 
 Zookeeper worked on a static set of servers with no option to reconfigure the
 cluster at the time of writing. However, the feature was in the works
@@ -460,22 +460,26 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
 The primary use of Riak is as a distributed NoSQL%
 \sidenote[-4]{NoSQL, generally called ``Not Only SQL'' or ``Not Relational'',
   are set of data stores that follow weaker consistency model than ACID and are
-characterised by their ability to scale their operations \citep{Cattell10}.}
+characterized by their ability to scale their operations \citep{Cattell10}.}
 availability and partition tolerance while
 being eventually consistent. \figureref{riak.ring} shows the distribution of the
-key space over multiple nodes using vnodes%
-{}. It might be possible to use this concept to scale key space and avoid having
+key spaceA over multiple nodes using vnodes%
+\sidenote{
+  \emph{Vnodes} or ``Virtual Nodes" are a level of indirection used to map
+  the key space so that any change in the status of the physical node does not
+  affect the key distribution.
+}.It might be possible to use this concept to scale key space and avoid having
 to store a complete copy of the data on all the nodes.
 
 While the project is mature and satisfies all
-the other requirements to be used as a lock manager, absense of strong
+the other requirements to be used as a lock manager, absence of strong
 consistency makes its use untenable.
 
 \section{Dynamo DB}
 
 Amazon DynamoDB \citep{dynamoDB} is proprietary key-value datastore based on
 \citet{DeCandia07} available as a service. While providing the regular
-featureset of NoSQL data stores, it also provides strong consistency and
+feature set of NoSQL data stores, it also provides strong consistency and
 atomic counters.
 
 \section{Scalaris}
