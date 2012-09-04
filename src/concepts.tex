@@ -6,25 +6,33 @@ We introduce the important concepts required for the thesis in this chapter.
 \section{Paxos}
 \label{section:concepts.paxos}
 
-The consensus algorithm used in the system is Paxos \sectionref{paxos}.
-\citet{Robbert2011} is the specific paper referred to for the implementation of
-Warlock. This section describes the specific flavor of the algorithm.
+We use Paxos \sectionref{paxos} as the consensus algorithm for the system.
+\citet{Robbert2011}'s ``Paxos Made Moderately Complex" is the specific paper
+referred to for the implementation of
+Warlock. Firstly, we use this specific flavour since the detailed pseudo code
+specified maps very well to the Erlang's process oriented%
+\sidenote{
+  Erlang uses light weight processes for concurrency. These processes
+  communicate using messages.
+} design. Secondly, the paper discusses multiple optimizations required to make
+the algorithm practical.
 
 The processes of the group can be classified into different roles based on the
 part of algorithm they are responsible for.
 
 \begin{itemize}
-    \iterm{Replica}: Replicas are processes responsible for assigning proposal
-    number to an operation and handle decisions made.
+    \iterm{Replica}: Replicas are processes responsible for assigning a proposal
+    number to an operation and handle decisions received.
     \iterm{Acceptor}: Acceptors are the ``memory'' of the algorithm. They keep
-    track of which leader is currently in-charge to issue commands.
-    \iterm{Leader}: Leaders receive proposals from replicas and they try to
-    co-ordinate the messaging to acceptors for that proposal. It uses ballots%
+    track of which leader is currently in-charge to issue commands using
+    ballots%
     \sidenote{
-      \emph{Ballots} are monotonically increasing ids that are unique to a
-      specific leader. Each leader has an infinite number of ballots.
-    }
-    to track the execution order or proposals.
+      \emph{Ballots} are monotonically increasing identifiers that are unique to
+      a specific leader. Each leader has an infinite number of ballots.
+    }.
+    \iterm{Leader}: Leaders receive proposals from replicas and they try to
+    co-ordinate the messaging to acceptors for that proposal. It uses ballots
+    to track the execution order of proposals.
     \iterm{Scout}: A scout process is spawned by the leader to active a specific
     ballot.
     \iterm{Commander}: A commander process is spawned by the leader to try
@@ -35,9 +43,9 @@ Assuming the scout was already run and the current leader has its ballot as the
 largest one, lets see a typical flow of the proposal from its initiation to its
 execution skipping on the smaller details and corner cases.
 
-\begin{itemize}
+\begin{enum}
     \item A proposal is created by the client based on the request. This
-      proposal is uniquely identified and contains all the necessary request
+      proposal is uniquely identified and contains the complete request
       information. This proposal is sent to the replica.
     \item The replica checks if the proposal is a duplicate and if not it
       assigns a sequence number%
@@ -51,42 +59,45 @@ execution skipping on the smaller details and corner cases.
       the ballot and proposal information.
     \item The commander sends out a message to all acceptors with the ballot
       information to all acceptors asking them to approve the proposal.
-    \item The acceptors respond positively if it has not seem another larger
-      ballot number and negatively otherwise.
+    \item The acceptor respond positively if it has not seen a larger
+      ballot and negatively otherwise.
     \item The commander waits for a quorum (usually a majority of total
-      acceptors) of acceptors. Once it has received majority of the approvals,
+      acceptors). Once it has received majority of the approvals,
       the commander asks all the replicas to execute the proposal and exits.
     \item The replica checks if the received decision is the next index on
       the consistent log and executes the proposal if it is.
-\end{itemize}
+\end{enum}
 
-In the above use case we see the routing for one instance of individual
-processes running. There will be several simultaneously running processes. The
-routing in the algorithm is as follows.
+The above use case constitutes a single Paxos instance among a set of processes.
+In general, the system may consists of several of these processes running
+concurrently. In this scenario, the routing works as follows.
 
-\begin{itemize}
+\begin{enum}
   \item The client broadcasts its command to all the replicas.
-  \item Each of the replica sends a ``propose'' message to all the leaders.
-  \item The leader sends the P1a message to all the acceptors via the scout.
-  \item The acceptor only replies to the sender with a P1b message.
+  \item Each of the replica sends a \term{propose} message to all the leaders.
+  \item The leader sends the \code{P1a} message to all the acceptors via the 
+    scout.
+  \item The acceptor only replies to the sender with a \code{P1b} message.
   \item On quorum acceptance from a quorum of acceptors, the leader sends
-    ``accept'' message (P2a) to all the acceptors via the commander.
-  \item The acceptors responds with P2b only to the sender.
+    \code{accept} message (\code{P2a}) to all the acceptors via the commander.
+  \item The acceptors responds with \code{P2b} only to the sender.
   \item The leader on quorum response, broadcasts the decision to all the
     replicas.
   \item Each of the replica replies to the client.
-\end{itemize}
+\end{enum}
 
-The paper details several optimizations to make the algorithm more practical.
+The paper details a few optimizations for state reduction and improving
+performance, making the implementation more practical. It also offers
+several suggestions from the implementation and deployment perspective.
 
 \section{Erlang}
 
-Erlang \citep{erlang} is a virtual machine based general purpose functional
+Erlang \citep{erlang} is a general purpose functional
 programming language built by Ericsson mainly to develop telephony applications
 \citep{Armstrong07}. Erlang was build to handle large number of network
-requests with special attention given to handling failures.
+requests with special attention directed towards handling failures.
 
-A process is the concurrency primitive of Erlang. Each of the processes are
+The process is the concurrency primitive of Erlang. Each of the processes are
 isolated and have access to their own private memory. This allows us to build
 large scale applications with the Actor model%
 \sidenote{
@@ -97,41 +108,47 @@ large scale applications with the Actor model%
     \item Specify the behaviour to be used when it receives its next message.
   \end{inparaenum}
 }
-\citep{Clinger81}.
+\citep{Clinger81}. These processes are light weight since they do not map onto
+to the operating system's process structure. This allows Erlang to run
+thousands of processes concurrently. The process based concurrency also allows
+us to take advantage of multi-core processors in parallelizing computations.
 
 Erlang also supports hot code loading%
 \sidenote[3]{
-  \emph{Hot code loading}: Dynamically updating running software.
+  \emph{Hot code loading}: Dynamically updating running software without
+  restarts.
 }
-which allows us to upgrade the system's
-code without restarting or disrupting the service.
+which allows us to upgrade the system
+without restarting or disrupting the service.
 
 The ideas of concurrency, fault tolerance, distributability, hot code loading
 behind Erlang maps well on to the building large web applications.
-
-\todo{Add and arrange features}
-
-\todo{define modules, processes}
-
-\todo{define ets, dict}
 
 \section{Open Telecom Platform}
 \label{section:concepts.otp}
 
 Open Telecom Platform (\abbr{OTP}) is a collection of Erlang libraries.
 The \abbr{OTP} code is
-well tested, robust and provide design patterns allowing us to quickly build
-Erlang applications. We take a look at few of the principles from \abbr{OTP}
+well tested, robust and provides design patterns allowing us to quickly build
+Erlang applications. We take a look at few of the \abbr{OTP} principles 
 that is used in the project.
 
 \subsection{Supervision}
 \label{section:concepts.supervision}
 
 Supervisors are processes that monitor workers processes and restart them based
-on a predefined set of rules. An application can be designed in the form of a
-tree with fine grained control to handle crashing processes and to localize such
-crashes. A typical Erlang supervisor tree looks like
-\figureref{supervision.tree}.
+on predefined set of rules. An application can be designed in the form of a
+tree with fine grained control to handle crashing processes. It can also
+localize such crashes.
+
+A typical Erlang supervisor tree looks like \figureref{supervision.tree}. The
+processes are connected to each other using links%
+\sidenote[-4]{
+  \emph{Links}: are bidirectional connections between processes with a maximum
+  of one link per pair of processes.
+}
+. The links propagate upwards and are ``trapped'' by the processes that trap
+exits. This allows them to detect and restart crashed processes.
 
 \begin{figure}
   \includegraphics[width=0.5\wholewidth]{supervision-tree}
@@ -142,18 +159,18 @@ crashes. A typical Erlang supervisor tree looks like
 \end{figure}
 
 A process as per the supervision tree can either be a supervisor%
-\sidenote[-6]{
+\sidenote[-3]{
   \emph{Supervisor}: An Erlang process responsible for creating, terminating,
   monitoring and restarting processes as defined.
 }
 or a worker%
-\sidenote[-3]{
+\sidenote{
   \emph{Worker}: A worker process in this context is any other process started
   by the supervisor that is not a supervisor itself.
 }. Processes that crash are restarted by the supervisor as per its
 restart strategy%
-\sidenote{
-  \emph{Restart Strategy}: This defines how the supervisor should restart
+\sidenote[3]{
+  \emph{Restart Strategy}: defines how the supervisor should restart
   crashed children.
   \begin{inparaenum}[(i)]
     \iterm{One for one}: Only the crashed process is restarted.
@@ -196,25 +213,29 @@ calls%
   the process can provide a response.
 }
 and asynchronous calls%
-\sidenote[3]{
+\sidenote[2]{
   \emph{Asynchronous calls}: Also called non-blocking calls, is received by the
   process and handled when it has processed all the messages it had received
   before this request.
-}
-.
+}.
 
 It also provides other features such as handling other types of messages (such
 as \abbr{TCP}/\abbr{UDP} messages), hot code loading and sending requests to
 other processes.
 
+We use gen\_servers to model the roles described in the algorithm.
+
 \subsection{Applications}
 \label{section:concepts.applications}
 Logical group of components can be glued together to form applications.
-Applications have well-defined roles and Erlang provides convenient modules to
+This allows us to start and stop the group and define the order for it. It also
+makes the code modular, promoting code reusability. Applications have 
+well defined roles and Erlang provides convenient ways to
 manage them.
 
 \subsection{Releases}
 \label{section:concepts.releases}
-A release is a complete system packaged for deployment. Erlang provides modules
-necessary to create packages for deploying new code and upgrading existing code.
+A release is the complete system packaged for deployment. Erlang provides 
+modules necessary to create packages for deploying new code and upgrading
+existing code. This helps in rapid development and maintenance of the code.
 
