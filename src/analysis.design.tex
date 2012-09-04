@@ -4,11 +4,11 @@
 Warlock is a distributed consensus service custom made to be used as a
 lock manger. In this chapter, we discuss the design of the system based on the
 requirements detailed in \chapterref{requirements}. We explain the structure
-of the system and then detail how it maps on to the specified requirements.
+of Warlock and then detail how it maps on to the specified requirements.
 
 \section{Architecture}
 
-The goal for Warlock is to
+The architectural goal for Warlock is to,
 
 \begin{itemize}
   \item Satisfy all the requirements specified in \chapterref{requirements}.
@@ -19,7 +19,7 @@ The goal for Warlock is to
 The Warlock system can be divided into different components based on their
 functionality as shown in figure \figureref{warlock.arch}. In terms of the
 data flow and interaction between the components, the system design is quite
-close to that of Chubby locks \citep{Burrows06} as in
+close to that of Chubby lock service \citep{Burrows06} as in
 \figureref{chubby.structure}.
 
 \begin{figure}
@@ -39,8 +39,8 @@ them.
 With the design goal of keeping the system modular, we separate logically 
 distinct parts of the system into Erlang applications \sectionref{concepts.otp}.
 These applications interact with each other by function calls if they are 
-libraries or by messaging if they are distinct processes. Below we detail the
-purpose and functionality of each of these applications.
+libraries or by message passing if they are distinct processes. Below we
+detail the purpose and functionality of each of these applications.
 
 \subsection{Utilities}
 
@@ -54,16 +54,16 @@ commonly used modules. The library consists of
     \sidenote[-8]{
       Erlang Term Storage (\abbr{ETS}) is a an in-memory storage provided by the
       Erlang Virtual Machine. It supports multiple data structures and
-      operations over them.}
+      operations over them, some of which are atomic.}
     and dict%
-    \sidenote[-3]{
+    \sidenote[-2]{
       dict is Erlang's in-built dictionary implementation. Unlike \abbr{ETS}, 
       it is immutable.}
 \end{itemize}
 
-It is used as a dependency in rest of the Warlock components. It also defines
-Erlang macros%
-\sidenote[5]{
+Utilities is used as a dependency in rest of the Warlock components. It also
+defines Erlang macros%
+\sidenote{
   Erlang macros are similar to C macros. They allow us to define small functions
   and constants that is taken care of by the preprocessor during code
   compilation.
@@ -73,81 +73,47 @@ for enabling different levels of logging.
 \subsection{Server}
 
 The server component of Warlock ties all the other components together and
-indirectly routes messages between them. It provides many functionality.
+indirectly routes messages between them. The main functionalities of this
+component are,
 
 \subsubsection{Handle client connections}
 \label{section:a.n.d.client.conn}
 
-The system can be interacted with by
+Interaction with Warlock can be done in three different ways.
 
-\begin{itemize}
-  \item Embedding Warlock in the same virtual machine as the
-    client application.
+\begin{enum}
+  \item Embedding Warlock with the client application.
   \item Accessing the system using \abbr{RPC}.
   \item Using a well defined binary protocol.
-\end{itemize}
+\end{enum}
 
 The first two of the options are trivial to implement. For the last option, the
 server manages the incoming client connections which can then send requests. The
-client connections are over \abbr{TCP} and use the Redis binary protocol
-\citep{RedisProtocol}%
+client connections are over \abbr{TCP}/\abbr{IP} and use the Redis binary
+protocol \citep{RedisProtocol}%
 \sidenote[-2]{
   The reasoning behind using the Redis binary protocol is that it is well
   defined and has a good set of features. It is also implemented in
   multiple languages allowing for usage from a much wider audience.
 }. Once a connection is setup, it becomes an individual process unaffected by
-other connections making it more robust.
-
-\subsubsection{Callback}
-
-Server provides the callback module that is executed once the request is
-processed. This allows us to keep the core of Warlock independent of the
-database implementation and to treat the commands as simple messages. This
-helps increase the robustness of the consensus component by isolating the
-command execution to the database component.
-
-To enable replication \sectionref{analysis.design.replication} the
-callback module needs to provide few additional features. The database
-component of Warlock has to be in read-only mode to avoid the chances of
-data corruption when it is a source node being replicated from. To allow
-this, callback has two modes of operation.
-
-\begin{itemize}
-    \iterm{Active}: The callback module works normally accepting requests
-    and forwarding them to the database component.
-
-    Change from active to passive mode can be done immediately.
-    \iterm{Passive}: The callback module add new decisions to a queue.
-
-    When changing from passive to active mode, the queue is first processed
-    asynchronously and mode change only happens when the queue is empty.
-\end{itemize}
-
-\subsubsection{Console}
-
-Server provides interface that allows us to interact with Warlock from the
-console. This allows us to start, setup and modify the Warlock cluster from
-the command line. Command line access helps us use automation tools such as
-Chef \citep{Chef} to rapidly deploy it on cloud servers
-\citep{Armbrust:2010:VCC:1721654.1721672, amazonAWS}.
+other connections, making it more robust.
 
 \subsubsection{Replication}
 \label{section:analysis.design.replication}
 
 For the requirement \sectionref{req.dynamic.cluster} of enabling a dynamic
-cluster we need to enable to copy/replicate data between servers.
-Server setups connection between two servers and oversees the data transfer
-between them when a new node is being added to the cluster. The steps for
-this are:
+cluster we need the functionality to copy/replicate data between servers.
+This is done by assigning a seed node to the connecting node and transfer
+data between them. The steps for this are,
 
 \begin{itemize}
   \item All the nodes in the member group listen on a predefined port.
-  \item A command is executed on the new node that is to be added to the cluster
-    with the address of a seed%
+  \item A console command is executed on the new node that is to be added to the
+    cluster. The address of a seed node%
     \sidenote[-4]{
       A \emph{seed node} in this context is one that provided all the necessary
       information to setup a data transfer connection.
-    } node.
+    } is passed to it as a parameter.
   \item The seed node sends the target node (new node) with the information of
     the source node%
     \sidenote[-3]{
@@ -156,24 +122,25 @@ this are:
       member other than the master.
     }.
   \item The target node sets up a \abbr{TCP} connection with the seed node and
-    sends a SYNC%
+    sends a \texttt{SYNC}%
     \sidenote[-1]{
-      The \emph{SYNC} signal is used to indicate that the target node is ready
+      The \code{SYNC} signal is used to indicate that the target node is ready
       to receive the data.
     } signal.
-  \item On the reception of the signal, the seed node does the following:
+  \item On the reception of the signal, the seed node does the following,
     \begin{itemize}
-      \item Change the status of the callback module to ``passive''.
-      \item Ask the database component to backup the entire database to a
+      \item Change the status of the callback module to \term{passive}.
+      \item Ask the database component to backup the entire data to a
         predefined file.
-      \item Transfer the file to the target node using a binary protocol.
+      \item Transfer the file to the target node using a binary file transfer.
       \item Once transfer is complete and the callback module has synced
         the data of the two nodes, request for a state reconfiguration via
         consensus.
-      \item Once callback queue is processes, reset it back to ``active'' state.
+      \item Once callback queue is processed, reset it back to \term{active}
+        state.
     \end{itemize}
   \item On the reception of the data file, the target machine does the
-    following:
+    following,
     \begin{itemize}
       \item Reset the local database.
       \item Load the transferred file into the database.
@@ -184,10 +151,50 @@ this are:
     \end{itemize}
 \end{itemize}
 
+\subsubsection{Callback}
+
+The callback module provided by server component is executed once the request is
+processed. This allows us to keep the core of Warlock independent of the
+implementation of database module and to treat the commands as simple messages.
+This helps increase the robustness of the consensus component by isolating the
+command execution and limiting its exposure only to the database component.
+
+To enable replication \sectionref{analysis.design.replication}, the
+callback module needs to provide few additional features. The database
+component of Warlock has to be in read-only mode to avoid the chances of
+data corruption when it is a source node being replicated from. To allow
+this, callback has two modes of operation.
+
+\begin{enum}
+    \iterm{Active}: The callback module's normal mode of operation where it
+    accepts decision requests and forwards them to the database component.
+
+    Change from active to passive mode can be done immediately.
+    \iterm{Passive}: The callback module does does not forward the decision
+    requests, but adds them to a queue.
+
+    When changing from passive to active mode, the queue is first processed
+    asynchronously and mode change only happens when the queue is empty.
+\end{enum}
+
+\subsubsection{Console}
+
+The server component provides an interface that allows us to interact with
+Warlock from the command line. This allows us to start, setup and modify the
+Warlock cluster from the command line. Command line access helps us use
+automation tools such as Chef \citep{Chef} to rapidly deploy it on cloud servers
+\citep{Armbrust:2010:VCC:1721654.1721672, amazonAWS}.
+
 \subsection{Database}
 
-The database component is used to store all the data and provides at its
-least the simple \abbr{API} required for a key value store.
+The database component is used to store all the data. It receives the
+decisions from the callback module and executes them. A typical database
+implementation is a key value store.
+
+Besides the simple database interface, this component can provide data
+backup and restore functions that can be used by the server component to
+enable the Warlock feature of adding fresh nodes dynamically. The important
+characteristics of the database component are,
 
 \subsubsection{Pluggable back ends}
 
@@ -195,7 +202,7 @@ As per the requirement \sectionref{ml.kv.store}, the database needs to a
 key value store. However, any type of database can be used
 since Warlock by itself does not execute the commands. The commands are passed
 on to the database driver after a successful round allowing us the flexibility
-to use other types of databases. We create a specific behaviour%
+to use other types of database types. We create a specific behaviour%
 \sidenote{
   Erlang behaviours \citep{ErlangBehaviour} are a set of specifications that
   can be used to create a generic reusable component.
@@ -206,17 +213,13 @@ implementing the functions specified in the behaviour.
 \subsubsection{Key Expiry}
 \label{section:a.n.d.expiry}
 
-Allowing stored objects to expire after a certain period of time allows the
-system to remove entries which were left behind when the cleanup process
-of the application using the system fails. However, key expiry in is a
-complex process in itself \todo{appendix?} which can potentially lead to
+The option that allows stored objects to expire after a certain period of time
+enables the system to remove entries which were left behind when the
+cleanup process of the client application fails. However, key expiry in is a
+complex process in itself which can potentially lead to
 poor performance. For our system, we store the expiry time, but cleanup is
-only done when it gets accessed the next time. This allows us to keep
+only done when it gets accessed the next time. This allows us some
 flexibility while keeping the system performance predictable.
-
-Besides the simple database interface, the this component can provide data
-backup and restore functions that can be used by the server component to
-enable the Warlock feature of adding fresh nodes dynamically.
 
 \subsection{Consensus}
 
@@ -230,14 +233,14 @@ a dynamic cluster. However, the algorithm needs some modifications
 \section{Reconfigurable State Machine}
 \label{section:a.n.d.reconfig}
 
-The set of valid nodes in the cluster that take part in the protocol must
-be static. We need to explicitly design the system to handle the requirement
-\sectionref{req.dynamic.cluster}. This can be done by following certain
-ideas from \citet{LamportSP08} and \citet{LamportMZ10}.
+As per the regular Paxos protocol, the cluster nodes that take part in the
+it must be static. We need to explicitly design the system to handle
+the requirement \sectionref{req.dynamic.cluster}. This can be done by
+following certain ideas from \citet{LamportSP08} and \citet{LamportMZ10}.
 
 We can achieve this by treating the consensus state itself as a separate
-parallel state machine along with the data state machine. Now we can use
-the Paxos protocol itself to reconfigure the consensus state which consists
+state machine along with the data state machine in parallel. Now we can use
+the Paxos protocol itself to reconfigure the system state which consists
 of the list of valid member nodes among other data. This modification allows
 us to add new nodes, remove existing nodes, replace nodes as required at any
 point of time.
@@ -247,12 +250,14 @@ alphabetic indexes allowing us better control during reconfiguration. This also
 allows us to make the reconfiguration immediately instead of blocking requests
 like in \citet{LamportSP08}.
 
-The ballot is made up the leaders unique id and a monotonically increasing
+By default, the ballot is made up the leaders unique id and a monotonically
+increasing
 integer that increments whenever there is a change in the leader. It is possible
 that messages tagged with the old ballot is still in transit after a
-reconfiguration. We introduce a new variable called ``view'' to avoid conflicts
-caused by this. ``view'' is a monotonically increasing integer that increments
-whenever there is a cluster configuration change
+reconfiguration. We introduce a new variable in the ballot called \term{view} to
+avoid conflicts caused by this. \term{view} is a monotonically
+increasing integer that increments whenever there is a cluster
+configuration change.
 
 The downside of this specific design is that if the master changes during
 reconfiguration, any of the proposals making progress will time out. It
@@ -262,34 +267,42 @@ as new proposals.
 \section{Consensus Optimization}
 \label{section:consensus.optimization}
 
-The straight implementation of Paxos is not very efficient owing to the overhead
+The direct implementation of Paxos is not very efficient owing to the overhead
 that comes with duplicate messages, duplicate states and the detection of these
-duplicates. The default implementation also requires the entire history of the
-state be stored making it impractical. This section describes the optimizations
+duplicates at every stage. The default implementation also requires the
+entire history of the
+state be stored, making it impractical. This section describes the optimizations
 performed in this project, some of which are from \citet{Robbert2011}.
 
 \subsection{Backoff and Preemption}
 
-Consider the following situation in a Paxos system with two leaders L1 and L2.
+Consider the following situation in a Paxos system with two leaders \code{L1}
+and \code{L2}.
 
-\begin{itemize}
-  \item L1 initiates the protocol by issuing \code{P1A} message.
-  \item L1 receives quorum acceptance and all the acceptors accept its ballot.
-  \item L2 initiates the protocol by issuing \code{P1A} message.
-  \item L2 receives quorum acceptance and all the acceptors accept its ballot.
-  \item L1 initiates \code{P2A} phase only to be preempted with a higher ballot.
-  \item L1 initiates phase 1 with a \code{P1A} message.
-  \item L2 initiates \code{P2A} phase only to be preempted with a higher ballot.
-\end{itemize}
+\begin{enum}
+  \item \code{L1} initiates the protocol by issuing \code{P1A} message.
+  \item \code{L1} receives quorum acceptance and all the acceptors accept its
+    ballot.
+  \item \code{L2} initiates the protocol by issuing \code{P1A} message.
+  \item \code{L2} receives quorum acceptance and all the acceptors accept its
+    ballot.
+  \item \code{L1} initiates \code{P2A} phase only to be preempted with a higher
+    ballot.
+  \item \code{L1} retries by issuing a \code{P1A} message again.
+  \item \code{L1} receives quorum acceptance and all the acceptors accept its
+    ballot.
+  \item \code{L2} initiates \code{P2A} phase only to be preempted with a higher
+    ballot.
+\end{enum}
 
-As we can see, this leads to a race condition which can exist indefinitely. To
+As we can see, this leads to a race condition. To
 fix this, whenever a leader is preempted, it waits for a predefined period of
-time called the ``backoff'' time. This provides the leader with the higher
+time called the \term{backoff} time. This provides the leader with the higher
 ballot sufficient time to make progress, thus avoiding the deadlock.
 
 \subsection{Timeouts}
 
-The leaders launches scouts and commanders depending on the phase the protocol
+The leaders launch scouts and commanders depending on the phase the protocol
 is currently running in. These processes have to wait for the response from
 a quorum of acceptors after sending out their initial message. It is possible
 that not all of these acceptors respond due to reasons such as a network
@@ -320,22 +333,22 @@ Similarly the replica only needs to maintain the data for slots that are
 making progress allowing it to purge data for decided slots. The leader can
 also purge the completed proposal data it maintains to spawn commanders.
 
-All the above optimizations are possible by co-locating replica, leader
-and acceptor for each node. While it is possible to use shared data structures
-between these processes residing on the same node, we avoid it to allow for
-a cleaner implementation.
+All the above optimizations are possible by colocating replica, leader
+and acceptor inside each node. While it is possible to use shared
+data structures between these processes residing on the same node to improve
+performance , we avoid it to allow for a cleaner implementation.
 
 \subsection{Master Node and Leases}
 \label{section:a.n.d.lease}
 
 A leader that is not preempted can proceed directly with phase 2 of the
-protocol for a proposal cutting the message latency by half. We use the
-mechanism of lease to use this to our advantage.
+protocol for a proposal cutting the message latency in half. We use the
+concept of lease to use this to our advantage.
 
 The initial node whose leader manages to complete one round of Paxos is
 termed the master node. We define a period of time called the master lease
 during which leaders from other nodes cannot spawn scouts to push for a
-higher ballot. The master renews its lease before it expires.
+higher ballot. The master tries to renews its lease before it expires.
 
 Failure detectors%
 \sidenote{
@@ -345,11 +358,11 @@ Failure detectors%
 }
 are used to detect if the master node goes down to accelerate the election
 of the next master node. The leaders from other node themselves try to
-get election as soon as the lease of the current master expires. If the
+get elected as soon as the lease of the current master expires. If the
 failure detector takes a long time, then the system as a whole
-stops making progress as long as the lease lasts. By balancing the lease
-time, we can restrict the system to have reasonably short down times in
-the worst case.
+stops making progress as long as the lease lasts. By tweaking the lease
+time, we can restrict the system to have an upper bound on the down time
+due to master node failure.
 
 Usage of lease introduces a timing requirement into the system. The system
 assumes that there is a definite bound on clock drift%
@@ -381,13 +394,13 @@ All the member nodes%
 \sidenote{
   \emph{Member nodes}: Nodes which are in sync with rest of the cluster
 and actively take part in the consensus protocol.}
-keep a list of available nodes.
-The leader of the master node monitors the leaders of rest of the member
+keep a list of nodes that are participating in the protocol.
+The leader of the master node monitors the leaders of rest of the members`
 of the cluster. When the master leader detects any failures, it moves the
 node from the list of available nodes to the list of down nodes via the
 consensus protocol.
 
-Failure of the master leader itself will eventually trigger the election
+Failure of the master leader itself will eventually trigger the master election
 leading to a new master node. This node will then take over the role of
 monitoring rest of the members.
 
@@ -410,7 +423,7 @@ The parts of the format are:
 \begin{itemize}
   \item \texttt{war\_server:x} is the module and function name which acts
     as the external interface.
-  \item \texttt{<command>} operation requested by the client that has to
+  \item \texttt{<command>} is the operation requested by the client that has to
     be eventually executed by the database component.
   \item \texttt{<location>} indicates where \texttt{<command>} has to be
     run.
@@ -438,26 +451,32 @@ The parts of the format are:
 \texttt{<location>} has two possible values:
 
 \begin{itemize}
-    \iterm{Cluster}: Cluster (\texttt{clu}) indicates that the full
+    \iterm{Cluster}: Cluster (\code{clu}) indicates that the full
     consensus protocol must be run so that the command can be executed
     on all the servers.
 
-    The commands are run on \texttt{clu} whenever its execution changes
+    The commands are run on \code{clu} whenever its execution changes
     the database's state. For example, \sourcecoderef{warlock.clu.cmd}
 
-    \iterm{Local}: Local (\texttt{loc}) indicates that the command only
+    \iterm{Local}: Local (\code{loc}) indicates that the command only
     needs to be run on the local replica the client is connected to.
 
     The commands that have no effect on the database's state can be run
-    on \texttt{loc}. For example, \sourcecoderef{warlock.loc.cmd}
+    on \code{loc}. For example, \sourcecoderef{warlock.loc.cmd}
 \end{itemize}
 
+The burden of deciding where the command has to be run rests on the client.
+Warlock has no way of knowing whether a specific command can change the 
+database state. A
+command that changes the state and is sent as \code{loc} will be executed 
+without any errors. However, this leads to creation of divergent states
+on the replicas, equivalent to data corruption.
 
-\section{Read Write separation}
+\section{Read Write Separation}
 
 As per the requirement \sectionref{req.read.write.ratio}, we need to design the
-system to support read loads that are in multiple of the maximum possible write
-loads. It also follows from the system design that each node (replica) has the
+system to support read load that is a multiple of the maximum possible write
+load. It also follows from the system design that each node (replica) has the
 entire dataset available and that we do not need consensus to access it. 
 
 Since the system is quorum based, not all of the nodes in the group take part
@@ -466,8 +485,8 @@ slow nodes existing in the system. Reading data directly from these nodes might
 possibly get stale data.
 
 The solution is to use a compromise between having fresh data and accepting 
-chances slightly stale data in lieu for huge performance improvements. The
-use of leases described in \sectionref{a.n.d.lease} allows us to minimize the
+chances of slightly stale data in lieu of performance improvement. The
+use of lease described in \sectionref{a.n.d.lease} allows us to minimize the
 chances of stale data. The lease is renewed by the master node as per preset 
 time (typically 5 seconds). We use this lease time at the individual node level 
 to check if we are in sync with the rest of the nodes. This allows us to serve 
