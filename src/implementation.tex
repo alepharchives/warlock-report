@@ -414,3 +414,28 @@ By using generalized hash tables in our code, we were able to evaluate these
 data structures finally choosing \abbr{ETS} for its performance and added
 features.
 
+\section{Erlang Libraries}
+
+A few external projects were used for building this system. We describe the
+roles of these project.
+
+\subsection{lager}
+
+Lager \citep{lager} is a logging framework for Erlang applications. It provides
+features such as fine grained log levels, multiple back end support, optimized
+logging and relatively better performance.
+
+\subsection{eredis}
+
+eRedis \citep{eredis} is a non-blocking Erlang client library for Redis.
+
+eRedis is used in this project to support the Redis back end and is used in the
+implementation of Redis protocol support.
+
+\subsection{Ranch}
+
+Ranch \citep{ranch} is a socket acceptor pool for \abbr{TCP} protocols.
+
+Ranch is used in this project for accepting and managing multiple client
+connections for the Redis protocol implementation.
+
