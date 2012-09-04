@@ -75,12 +75,12 @@ concurrently. In this scenario, the routing works as follows.
 \begin{enum}
   \item The client broadcasts its command to all the replicas.
   \item Each of the replica sends a \term{propose} message to all the leaders.
-  \item The leader sends the \code{P1a} message to all the acceptors via the 
+  \item The leader sends the \code{P1A} message to all the acceptors via the 
     scout.
-  \item The acceptor only replies to the sender with a \code{P1b} message.
+  \item The acceptor only replies to the sender with a \code{P1B} message.
   \item On quorum acceptance from a quorum of acceptors, the leader sends
-    \code{accept} message (\code{P2a}) to all the acceptors via the commander.
-  \item The acceptors responds with \code{P2b} only to the sender.
+    \code{accept} message (\code{P2A}) to all the acceptors via the commander.
+  \item The acceptors responds with \code{P2B} only to the sender.
   \item The leader on quorum response, broadcasts the decision to all the
     replicas.
   \item Each of the replica replies to the client.

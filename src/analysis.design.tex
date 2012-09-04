@@ -273,13 +273,13 @@ performed in this project, some of which are from \citet{Robbert2011}.
 Consider the following situation in a Paxos system with two leaders L1 and L2.
 
 \begin{itemize}
-  \item L1 initiates the protocol by issuing P1a message.
+  \item L1 initiates the protocol by issuing \code{P1A} message.
   \item L1 receives quorum acceptance and all the acceptors accept its ballot.
-  \item L2 initiates the protocol by issuing P1a message.
+  \item L2 initiates the protocol by issuing \code{P1A} message.
   \item L2 receives quorum acceptance and all the acceptors accept its ballot.
-  \item L1 initiates P2a phase only to be preempted with a higher ballot.
-  \item L1 initiates phase 1 with a P1a message.
-  \item L2 initiates P2a phase only to be preempted with a higher ballot.
+  \item L1 initiates \code{P2A} phase only to be preempted with a higher ballot.
+  \item L1 initiates phase 1 with a \code{P1A} message.
+  \item L2 initiates \code{P2A} phase only to be preempted with a higher ballot.
 \end{itemize}
 
 As we can see, this leads to a race condition which can exist indefinitely. To
@@ -310,11 +310,11 @@ Warlock timeout to maintain consistency.
 In the basic version of Paxos, the acceptor maintains all the accepted values
 for all the slots. This can be reduced by having the acceptor store only the
 value corresponding to the maximum ballot for each slot resulting in smaller
-acceptor state and P1b message size sent to the leader.
+acceptor state and \code{P1B} message size sent to the leader.
 
 The acceptors are notified at the end of a successful operation. This allows
 them to store the values for only the slots that are currently making
-progress resulting in reduced P1b message size.
+progress resulting in reduced \code{P1B} message size.
 
 Similarly the replica only needs to maintain the data for slots that are
 making progress allowing it to purge data for decided slots. The leader can

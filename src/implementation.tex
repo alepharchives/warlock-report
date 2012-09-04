@@ -130,10 +130,10 @@ mechanism used for it.
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Responds to \texttt{P1a} messages with the \texttt{P1b} message
+  \item Responds to \code{P1A} messages with the \code{P1B} message
     along with maximum ballot and the entire accepted table.
-  \item Responds to \texttt{P2a} messages with the \texttt{P2b} message
-    along with maximum ballot. If the ballot in the \texttt{P2a} message
+  \item Responds to \code{P2A} messages with the \code{P2B} message
+    along with maximum ballot. If the ballot in the \code{P2A} message
     was equal to or great than the one in its state, it adds it to as
     an entry in the accepted table.
 \end{itemize}
@@ -161,7 +161,7 @@ protocol.
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Initiates the first phase of the protocol by sending \texttt{P1a}
+  \item Initiates the first phase of the protocol by sending \code{P1A}
     message to all the acceptors in the group.
   \item It waits to get replies from majority of acceptors while collecting
     all the PValues sent by them. It only maintains the PValues for slots
@@ -185,7 +185,7 @@ PValues, it only stores it own.
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Initiates the second phase of the protocol by sending \texttt{P2a}
+  \item Initiates the second phase of the protocol by sending \code{P2A}
     messages to all the acceptors.
   \item It waits of replies from all the acceptors.
   \item On receiving majority acceptance, it sends a message to all the replicas
