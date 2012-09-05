@@ -6,6 +6,44 @@ We introduce the important concepts required for the thesis in this chapter.
 \section{Paxos}
 \label{section:concepts.paxos}
 
+\subsection{Terminology}
+
+\begin{itemize}
+    \iterm{Proposal}: A request sent by the client that is to be executed on all
+    the nodes in the cluster.
+    \iterm{Decision}: A proposal that is successfully agreed upon by the
+    cluster.
+    \iterm{Master Leader}: The leader process running on the master node.
+    \iterm{Master Replica}: The replica process running on the master node.
+    \iterm{Slot}: Each of the decisions are discrete events. The events can be
+    mapped to a log file. The indices of the transation log file are termed
+    \term{slot}s.
+    \iterm{Node}: An independent Erlang runtime instance.
+    \iterm{Membership}: The nodes in the cluster are called members. They can be
+    a member of different groups based on their condition%
+    \sidenote{
+      The condition of the node is a reference to the node's status in terms of
+      handling the algorithm. Possible conditions are
+      \begin{inparaenum}[(i)]
+        \iterm{Valid}: A node that is ready to handle the messages and take part
+        in the protocol.
+        \iterm{Join}: A fresh node that is in the process of joining the
+        cluster.
+        \iterm{Down}: A node that was once a part of the cluster, but is
+        currently inaccesable is moved to this state until it can be fixed
+        manually.
+      \end{inparaenum}
+    }.
+    \term{join}
+    \iterm{Master}: The node that is elected and is the only one who can handle
+    proposals sent by the replica.
+    \iterm{Lease}: The master node retains its status as master for the duration
+    of the lease. Lease time dictates the maximum possible time for which data
+    read could be stale.
+\end{itemize}
+
+\subsection{Algorithm}
+
 We use Paxos \sectionref{paxos} as the consensus algorithm for the system.
 \citet{Robbert2011}'s ``Paxos Made Moderately Complex" is the specific paper
 referred to for the implementation of
