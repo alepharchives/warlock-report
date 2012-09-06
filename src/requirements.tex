@@ -8,7 +8,7 @@ the system and the derived requirements for Warlock in this chapter.
 
 Magic Land \citep{magicland} is a social%
 \sidenote[2]{
-  A social game usually runs on a ``social network'' and allows in-game
+  A social game usually runs on a \val{social network} and allows in-game
   interaction with other users on the same network.
 }
 resource management game by Wooga%
@@ -70,9 +70,9 @@ The lock manager used is Redis \citep{redis}%
 }
 . The worker uses the Redis command \abbr{SETNX}%
 \sidenote{
-  \texttt{SETNX key value} - is a command that sets the \texttt{key} to hold
-  \texttt{value} in a hash table only if \texttt{key} does not already exist
-  in the table.
+  \texttt{SETNX key value} \dash{} is a command that sets the \texttt{key} to
+  hold \texttt{value} in a hash table only if \texttt{key} does not already
+  exist in the table.
 }. This makes sure that the worker can only start a new session if one is
 not already running. Redis also supports asynchronous replication allowing the
 data to be available in multiple locations.

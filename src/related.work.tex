@@ -29,16 +29,16 @@ without affecting its correctness:
 
 \begin{itemize}
   \iterm{Proposer}: A process that can propose values to the group.
-  \iterm{Acceptor}: Acceptors form the ``memory'' of the algorithm that allows
+  \iterm{Acceptor}: Acceptors form the \val{memory} of the algorithm that allows
   the algorithm to converge to a single value.
-  \iterm{Learner}: The chosen values are ``learned'' by the other processes.
+  \iterm{Learner}: The chosen values are \val{learned} by the other processes.
 \end{itemize}
 
 \begin{figure}
   \includegraphics[width=0.6\wholewidth]{basic-paxos}
       \caption[Basic Paxos]{%
-        Basic Paxos Algorithm: Processes with roles - Proposer, Acceptor,
-        Learner - send messages to each other illustrating the flow of the
+        Basic Paxos Algorithm: Processes with roles \dash{} Proposer, Acceptor,
+        Learner \dash{} send messages to each other illustrating the flow of the
         algorithm in a failure free instance.}
       \label{figure:basic_paxos}
   \normalcaption
@@ -77,7 +77,7 @@ requests with alternatively increasing \emph{n}. They would keep
 preempting each other in a loop leading to no agreement being reached among the
 group. A solution is to create the role of \emph{distinguished proposer} or
 \emph{leader} where it becomes the only process that can issue new requests.
-\citet{FisLynPat85} implies the ``election'' of this \emph{leader}
+\citet{FisLynPat85} implies the \val{election} of this \emph{leader}
 should use either randomness or timeouts.
 
 Although the pseudo-code of the algorithm is relatively small, implementing it
@@ -318,7 +318,7 @@ fault tolerant log that is consistent
 with other replicas in the cell by using Paxos protocol. The rest of the
 replica is made of a fault tolerant database and an interface to handle
 requests from Chubby clients. The specific Paxos flavor used is Multi-Paxos
-with slight modifications such as having a ``catch-up'' mechanism for
+with slight modifications such as having a \val{catch-up} mechanism for
 slower replicas.
 
 The presence of Chubby locks project and its use in some of the largest
@@ -460,15 +460,15 @@ Erlang. It is based on the concepts from Amazon's Dynamo \citep{DeCandia07}.
 \end{figure}
 
 The primary use of Riak is as a distributed NoSQL%
-\sidenote[-4]{NoSQL, generally called ``Not Only SQL'' or ``Not Relational'',
-  are set of data stores that follow weaker consistency model than \abbr{ACID}
-  and are characterized by their ability to scale their operations 
-\citep{Cattell10}.}
-availability and partition tolerance while
+\sidenote[-4]{NoSQL, generally called \val{Not Only SQL} or
+  \val{Not Relational}, are set of data stores that follow weaker
+  consistency model than \abbr{ACID} and are characterized by their ability to
+  scale their operations \citep{Cattell10}.
+}availability and partition tolerance while
 being eventually consistent. \figureref{riak.ring} shows the distribution of the
 key spaceA over multiple nodes using vnodes%
 \sidenote{
-  \emph{Vnodes} or ``Virtual Nodes" are a level of indirection used to map
+  \emph{Vnodes} or \val{Virtual Nodes} are a level of indirection used to map
   the key space so that any change in the status of the physical node does not
   affect the key distribution.
 }.It might be possible to use this concept to scale key space and avoid having
