@@ -1,4 +1,29 @@
 \chapter{Conclusion}
 \label{chapter:conclusion}
 
-\todo{whole chapter}
+The work done on this thesis can be classified into four areas.
+
+\begin{enumerate}
+  \item We have surveyed a number of papers and projects related to distributed
+    lock management and compared them in the context of our requirements.
+  \item We designed a system based on the literature survey and prototyping.
+  \item We implemented a working system in Erlang.
+  \item We tested the system to make sure it satisfies the specified
+    requirements and can sustain it.
+\end{enumerate}
+
+We were able to select a specific flavour of Paxos and optimize it, use other
+state machine algorithms, pick ideas from other projects in the field and build 
+a scaffolding around it to create the lock manager. 
+
+Separating the implementation from the algorithm details turned out
+to be very essential in ensuring the correctness of the implementation. Erlang
+provided us with robust and well tested distributed programming primitives. 
+These led to creation of a modular architecture which enables us to extend
+it to be used in wider application domains.
+
+The graphs indicating performance over time are all simple and remain flat
+across signifying steady operation. Based on these benchmarks and tests, we
+can say that we were able to achieve our goal of creating a strongly consistent
+distributed lock manager.
+
