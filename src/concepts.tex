@@ -81,7 +81,7 @@ Assuming the scout was already run and the current leader has its ballot as the
 largest one, lets see a typical flow of the proposal from its initiation to its
 execution skipping on the smaller details and corner cases.
 
-\begin{enum}
+\begin{enumerate}
     \item A proposal is created by the client based on the request. This
       proposal is uniquely identified and contains the complete request
       information. This proposal is sent to the replica.
@@ -104,13 +104,13 @@ execution skipping on the smaller details and corner cases.
       the commander asks all the replicas to execute the proposal and exits.
     \item The replica checks if the received decision is the next index on
       the consistent log and executes the proposal if it is.
-\end{enum}
+\end{enumerate}
 
 The above use case constitutes a single Paxos instance among a set of processes.
 In general, the system may consists of several of these processes running
 concurrently. In this scenario, the routing works as follows.
 
-\begin{enum}
+\begin{enumerate}
   \item The client broadcasts its command to all the replicas.
   \item Each of the replica sends a \term{propose} message to all the leaders.
   \item The leader sends the \code{P1A} message to all the acceptors via the 
@@ -122,7 +122,7 @@ concurrently. In this scenario, the routing works as follows.
   \item The leader on quorum response, broadcasts the decision to all the
     replicas.
   \item Each of the replica replies to the client.
-\end{enum}
+\end{enumerate}
 
 The paper details a few optimizations for state reduction and improving
 performance, making the implementation more practical. It also offers

@@ -56,35 +56,20 @@ of the system with change in input parameters while keeping the cluster
 static. Specifically, the tests are
 
 \begin{enumerate}
-  \item Write only requests only to master node
-  \item Read only requests only to master node
-  \item Write only requests to all nodes
-  \item Read only requests to all nodes
-  \item Mixed requests to cluster
-  \item Variation in number of concurrent client connections
-  \item Variation in read to write ratio
-  \item Variation in payload size
-  \item Different back ends
-  \item Change in location of the bench client
+  \item Write only requests only to master node.
+  \item Read only requests only to master node.
+  \item Write only requests to all nodes.
+  \item Read only requests to all nodes.
+  \item Mixed requests to cluster.
+  \item Variation in number of concurrent client connections.
+  \item Variation in read to write ratio.
+  \item Variation in payload size.
+  \item Different back ends.
+  \item Change in location of the bench client.
 \end{enumerate}
 
 We also measure the system health in terms of \abbr{CPU} usage, memory usage and
 process count providing an idea about the resource consumption.
-
-%\section{Load Testing}
-
-%\section{Failure Testing}
-
-%safety testing, liveliness testing
-
-%bugs, fixes, master election
-
-%integration with kingdom backend
-
-%\todo{evaluation of running the code in production,
-%live on test, staging, 20\% of production etc.}
-
-%\todo{Add tables for results?}
 
 \section{Results}
 
@@ -217,6 +202,5 @@ messages.
 again observe a nearly linear increase in latency.
 
 The amount of read and write requests for this test was ${}^4/_5$ and
-${}^1/_5$ of the total respectively.
-
+${}^1/_5$ of the total number of requests respectively.
 

@@ -81,11 +81,11 @@ component are,
 
 Interaction with Warlock can be done in three different ways.
 
-\begin{enum}
+\begin{enumerate}
   \item Embedding Warlock with the client application.
   \item Accessing the system using \abbr{RPC}.
   \item Using a well defined binary protocol.
-\end{enum}
+\end{enumerate}
 
 The first two of the options are trivial to implement. For the last option, the
 server manages the incoming client connections which can then send requests. The
@@ -165,7 +165,7 @@ component of Warlock has to be in read-only mode to avoid the chances of
 data corruption when it is a source node being replicated from. To allow
 this, callback has two modes of operation.
 
-\begin{enum}
+\begin{enumerate}
     \iterm{Active}: The callback module's normal mode of operation where it
     accepts decision requests and forwards them to the database component.
 
@@ -175,7 +175,7 @@ this, callback has two modes of operation.
 
     When changing from passive to active mode, the queue is first processed
     asynchronously and mode change only happens when the queue is empty.
-\end{enum}
+\end{enumerate}
 
 \subsubsection{Console}
 
@@ -279,7 +279,7 @@ performed in this project, some of which are from \citet{Robbert2011}.
 Consider the following situation in a Paxos system with two leaders \code{L1}
 and \code{L2}.
 
-\begin{enum}
+\begin{enumerate}
   \item \code{L1} initiates the protocol by issuing \code{P1A} message.
   \item \code{L1} receives quorum acceptance and all the acceptors accept its
     ballot.
@@ -293,7 +293,7 @@ and \code{L2}.
     ballot.
   \item \code{L2} initiates \code{P2A} phase only to be preempted with a higher
     ballot.
-\end{enum}
+\end{enumerate}
 
 As we can see, this leads to a race condition. To
 fix this, whenever a leader is preempted, it waits for a predefined period of
