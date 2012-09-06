@@ -3,14 +3,15 @@
 
 The Warlock project in its current state is quite stable and ready to be used.%
 \sidenote[6]{
-  Based on load tests in \chapterref{experiments.performance}.
-}
-
-\todo{Add details about Warlock's current usage}
+  As per load tests listed in \chapterref{experiments.performance}.
+}. As of writing this report, a test run of Warlock is being done on Magic Land
+production. Though the project satisfies the requirements
+ (\chapterref{requirements}), Warlock still has scope for improvement which is
+ detailed in this chapter.
 
 \section{Security}
 
-Warlock is meant to be run within the internal network and is currently lacking
+Warlock is meant to be run within an internal network and is currently lacking
 in terms of security. While this makes it reasonably safe to run within a secure
 network, improved security will allow it to run in more diverse environments.
 
@@ -20,12 +21,13 @@ transmission.
 
 \section{Consistency Checks}
 
-We treat the database part of Warlock as the state machine and update it based
-on the proposals that made through the protocol. However, it might be possible
-that few of nodes become slow in executing these decisions, falling behind
+We treat the database part of Warlock as a state machine and update it based
+on the proposals that make it through the protocol. However, it
+might be possible that few of nodes become slow in executing
+these decisions, falling behind
 rest of the cluster. If the decision queue grows too large, some of the
 decisions may even be skipped. While, this has not been observed even under
-heavy loads, it is a good idea to have a consistency hash based on the data
+heavy loads, it is a good idea to have a consistency checksum based on the data
 which is shared periodically with the cluster, providing us with an idea of
 how many nodes are in sync and how many are catching up.
 
@@ -61,8 +63,8 @@ the build works are expected on multiple nodes.
 \section{Performance}
 
 Performance is crucial for projects serving requests for millions of users.
-While Warlock if tuned to provide necessary performance for Magic Land, it
-can still be tweaked to push it even further.
+While Warlock is tuned to provide necessary performance for Magic Land, it
+can be tweaked to push the performance even further.
 
 \subsection{Code Profiling}
 
@@ -70,24 +72,24 @@ Profiling, as explained in \sectionref{impl.profiling}, can help us identify the
 bottlenecks in the codebase. Erlang comes with lots of different profilers
 which can be used to identify bottlenecks from different perspectives. This
 should allow us to focus more on the most frequently used functions and try
-to reduce the most common messages, resulting in better performance.
+to optimize the most common messages.
 
 \subsection{Latency}
 
 While latency is not a major concern for Magic Land%
 \sidenote{
   The front end of Magic Land (written in Adobe Flash) takes several seconds
-  to load. A difference for few milliseconds does not make an overall impact
+  to load. A difference of few milliseconds does not make an overall impact
   on the user experience.
 }
 , improving it is necessary since it blocks the client accessing it. Latency
 can be improved by reducing the number of processes the proposal/message has
 to travel through. However, this is quite tricky to optimize without breaking
-the algorithm itself.
+the algorithm.
 
 \section{Scalability}
 
-In this context, scalability refers to increase the throughput of the system
+Scalability for us is to increase the throughput of the system
 by increasing the number of nodes in the cluster.
 
 \subsection{Reads}
@@ -98,16 +100,16 @@ replicas.
 
 It should be possible to create additional nodes that just subscribes to all
 the decisions without taking part in the consensus protocol. We can then use
-these nodes as read-only sources. This setup should allow us to scale the reads
+these nodes as read-only sources. This setup should allow us to scale reads
 to a fairly large extent.
 
 \subsection{Writes}
 
 Increasing the number of nodes in the cluster decreases its throughput since
-more nodes are now involved in approving a proposal. Increasing number of writes
-is hence a much harder task.
+more nodes are now involved in approving a proposal. This makes increasing
+number of writes a much harder task.
 
-Couple of possible areas for improvements are:
+Few of possible areas for improvements are:
 
 \begin{itemize}
   \item Change the algorithm itself to reduce the total number of messages
@@ -117,11 +119,11 @@ Couple of possible areas for improvements are:
   \item Batch multiple request together to decrease individual round trip times.
 \end{itemize}
 
-\section{Back end Support}
+\section{Back End Support}
 
 Warlock's current back ends are key value stores. Since Warlock is transparent
 to the commands, we can potentially use any data store as a back end. Adding
-more types of back ends to Warlock can bring it to a wider audience.
+more types of back ends to Warlock can help bring it to a wider audience.
 
 \section{Recovery Techniques}
 
@@ -130,10 +132,11 @@ another node in the cluster using replication. While this method has its
 advantages, there are cases where this might be a problem.
 
 \begin{itemize}
-  \item Certain back ends may be full blown disk recovery system. Allowing for
-    conflict resolution between nodes can decrease the recovery time for a
-    node drastically, especially for clusters with lot of data.
-  \item Certain back ends may be provide the data backup and loading mechanism
+  \item Certain back ends may have a full blown disk recovery system.
+    Allowing for conflict resolution between nodes can decrease the
+    recovery time for a node drastically, especially for clusters
+    with lot of data.
+  \item Certain back ends may provide the data backup and loading mechanism
     required by Warlock.
 \end{itemize}
 
@@ -145,31 +148,32 @@ node on Warlock and improve availability. Some suggestions for such a improved
 client are:
 
 \begin{itemize}
-  \item The client can store the list of Warlock nodes when it initiates the
+  \item The client can store the list of Warlock nodes when it initiates
     connection. This will allow the client to connect to other Warlock nodes
-    (say in a round robin fashion) in case the one it is connected to goes down.
-  \item Client can have certain timeout are provided by a Warlock node. Till
+    (e.g., using round robin) in case the one it is connected to goes down.
+  \item Client can have certain timeout as provided by a Warlock node.This 
     allows us to control client timeouts from the server side.
-  \item The Warlock nodes current route all the proposals they receive to the
+  \item The Warlock nodes currently route all the proposals they receive to the
     Master node. An alternative would be to have the client broadcast the
-    request to all the nodes, resulting in reduction of traffic in the cluster.
+    request to all the nodes resulting in reduction of a single message latency
+    when the request is being sent to a node that is not the master.
   \item The client could queue proposals when the Warlock service is down for
     reasons such as leader election in progress or temporarily failed quorums.
   \item A technique used in \citet{Burrows06}, the client could cache the data
     and the master could actively invalidate cached data on updates. However,
-    this could require a change in the current Warlock client server
+    this could require a large change in the current Warlock client server
     architecture, possibly making the system more complex.
 \end{itemize}
 
 \section{Expire}
 
 Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}. 
-However, its implementation has severe trade-offs with performance. Hence, the
-needs for performant key expiry exits.
+However, testing a few types of implementation led to having severe trade-offs
+with performance. The needs for performant key expiry exits.
 
 \section{Others}
 
-\subsection{Code improvement}
+\subsection{Code Improvement}
 
 Several parts of the code that are open to improvement are tagged with 
 ``TODO''s. These are possible performance enhancement points, feature and
@@ -177,7 +181,7 @@ stability improvement points.
 
 For example, all the \abbr{ETS} tables used currently
 are directly running under the processes that created them. If these processes
-crash, the linked ETS table would also crash. Using a table manager would
+crash, the linked ETS table would get lost. Using a table manager would
 help survive these crashes.
 
 \subsection{More OTP}
@@ -192,28 +196,28 @@ code stability and maintainability.
 
 \subsection{Timeouts}
 
-Warlock relies heavily in timers which are currently static. Making these
+Warlock relies heavily on timers which are currently static. Making these
 timeouts as a function of, say system load, can make the system more tolerant
 of high loads.
 
 \subsection{Reconfiguration}
 
-The selection of nodes when transferring the master or when allocation the
-seed node for replication is currently very simple. By using things such
-as a priority list to keep track of the most stable nodes will allow us to
-ensure more stable and operation.
+The selection mechanism of nodes when transferring the master or when
+allocating the seed node for replication is currently very simple.
+By using things such as a priority list to keep track of the most stable
+nodes will allow us to ensure more stable operation.
 
 \subsection{Shared Data}
 
 Certain data within the Warlock consensus application is repeated between
-processes. We currently do not share such data, making it simpler for us
+processes. For example, replicas and leaders share the same proposal map.
+We currently do not share such data, making it simpler for us
 to reason the system and allowing for localizing the failures. It might
-be possible to improve performance trading for more complex code.
+be possible to improve performance while trading for more complex code.
 
 \subsection{Backups}
 
-Warlock is designed to be an in-memory service with each node having a copy
-of the entire dataset. This allows the database module to directly access
-backup functions of the back end. The implementation of this feature should be
-quite simple.
+Warlock is designed to be an in-memory service with each node having a full copy
+of the dataset. This allows the database module to directly access
+backup functions of the back end.
 
