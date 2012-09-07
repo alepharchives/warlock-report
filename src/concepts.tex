@@ -181,7 +181,7 @@ localize such crashes.
 
 A typical Erlang supervisor tree looks like \figureref{supervision.tree}. The
 processes are connected to each other using links%
-\sidenote[-4]{
+\sidenote[-10]{
   \emph{Links}: are bidirectional connections between processes with a maximum
   of one link per pair of processes.
 }
@@ -197,17 +197,17 @@ exits. This allows them to detect and restart crashed processes.
 \end{figure}
 
 A process as per the supervision tree can either be a supervisor%
-\sidenote[-3]{
+\sidenote[-8]{
   \emph{Supervisor}: An Erlang process responsible for creating, terminating,
   monitoring and restarting processes as defined.
 }
 or a worker%
-\sidenote{
+\sidenote[-5]{
   \emph{Worker}: A worker process in this context is any other process started
   by the supervisor that is not a supervisor itself.
 }. Processes that crash are restarted by the supervisor as per its
 restart strategy%
-\sidenote[3]{
+\sidenote[-2]{
   \emph{Restart Strategy}: defines how the supervisor should restart
   crashed children.
   \begin{inparaenum}[(i)]
@@ -251,7 +251,7 @@ calls%
   the process can provide a response.
 }
 and asynchronous calls%
-\sidenote[2]{
+\sidenote[3]{
   \emph{Asynchronous calls}: Also called non-blocking calls, is received by the
   process and handled when it has processed all the messages it had received
   before this request.
