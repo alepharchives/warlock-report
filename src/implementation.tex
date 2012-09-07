@@ -52,8 +52,7 @@ to one or more processes. The callback functions \term{handle\_cast}%
   used to handle asynchronous messages. It also cannot reply to the caller
   directly and must use \term{\term{gen\_server}:reply/2} function if it
   wants to do so.
-}
-, \term{handle\_call}%
+}, \term{handle\_call}%
 \sidenote[5]{
   \emph{handle\_call}: A \term{gen\_server} callback function used to handle
   synchronous messages. It has the callers address and it blocks the caller

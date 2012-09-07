@@ -10,8 +10,7 @@ it attributes such as concurrency%
 \sidenote[3]{
   \emph{Concurrency}: Simultaneous execution of processes (may or may not be 
   in parallel).
-}
-, non usage of global clock%
+}, non usage of global clock%
 \sidenote[5]{
   \emph{No global clock}: The computers in the distributed system are not 
   co-ordinated using a single global clock and use other mechanisms such as
@@ -30,7 +29,7 @@ processes to synchronize their activities or to serialize their access to
 shared resources.
 
 A distributed lock manager can be implemented in many different ways. We use
-Paxos, a consensus algorithm as our system asynchronous.
+Paxos, a consensus algorithm as our system is asynchronous.
 
 \section{Consensus algorithm}
 
@@ -64,8 +63,7 @@ possible to achieve consistency%
   \emph{Consistency}: Requests sent to a distributed system is said to be
   consistent if the result of the request is the same as compared to sending
   the the request to a single node executing the request one by one.
-}
-, availability%
+}, availability%
 \sidenote[6]{
   \emph{Available}: Every request sent to the system must eventually terminate.
 }
@@ -134,18 +132,15 @@ Testing distributed systems is a hard problem \citep{BoyCPW2003}.
 Different types of tests such as unit tests%
 \sidenote{
   \emph{Unit Testing}: Testing individual "units" of code.
-}
-, integration tests%
+}, integration tests%
 \sidenote[2]{
   \emph{Integration Testing}: Testing that different components of the system
   work together.
-}
-, system tests%
+}, system tests%
 \sidenote[4]{
   \emph{System Testing}: Testing the system as a while works well and meets
   specified requirements.
-}
-, load tests%
+}, load tests%
 \sidenote[7]{
   \emph{Load Testing}: Amount of traffic the system can safely handle.
 }

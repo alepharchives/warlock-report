@@ -109,8 +109,8 @@ complexity.
 \emph{Phase 1} of the algorithm become
 an unnecessary overhead if the \emph{distinguished proposer} remains the same
 throughout. Multi-Paxos uses this as its basis to reduce the message count.
-The first round of Multi-Paxos is the same as Basic Paxos. For subsequent
-values, the same
+The first round of Multi-Paxos \citep{dumulti} is the same as Basic Paxos.
+For subsequent values, the same
 proposer starts directly with \emph{Phase 2} halving the message complexity.
 Another proposer may take over at any point of time by starting with
 \emph{Phase 1 a} overriding the current proposer. This is not a problem since
@@ -143,8 +143,8 @@ sizes of active replicas for it to function.
 Basic Paxos requires a total of \code{2N+1} servers in a distributed system
 even though \code{N+1} servers are enough (minimum) to make progress.
 Using servers that are slower or cheaper for the additional \code{N} servers
-allows us to reduce the total cost of the system. Cheap Paxos is designed along
-these lines.
+allows us to reduce the total cost of the system. Cheap Paxos \citep{LamportM04}
+is designed along these lines.
 
 Cheap Paxos uses \code{N} auxiliary servers along with \code{N+1} main servers
 which allows it to tolerate \code{N} failures. The idea is that the auxiliary
@@ -160,11 +160,23 @@ for the axillary servers to be configured into the system.
 \subsection{Ring Paxos}
 
 Ring Paxos \citep{MarandiPSP10} is based on the observations that messaging
-using ip-multicast is more scalable and provides better throughput compared
-to unicast for a distributed system in a well-defined network. It
+using ip-multicast%
+\sidenote{
+  \emph{Ip-Multicast}: is the process sending messages to a group of receivers
+  in a single transmission.
+}
+is more scalable and provides better throughput compared
+to unicast%
+\sidenote[2]{
+  \emph{Unicast}: trasmission of message to a single destination.
+}
+for a distributed system in a well-defined network. It
 has the property that it provides fixed throughput with variation in number
 of receivers. It claims to have the throughput of ip-multicast and low latency
-of unicast with the downside being that it provides weak synchrony.
+of unicast with the downside being that it provides weak synchrony%
+\sidenote{
+  Message loss is possible.
+}.
 
 \begin{figure}
   \includegraphics[width=0.5\wholewidth]{ring_paxos}
