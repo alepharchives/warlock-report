@@ -70,7 +70,8 @@ possible to achieve consistency%
   the the request to a single node executing the request one by one.
 }, availability%
 \sidenote[6]{
-  \emph{Available}: Every request sent to the system must eventually terminate.
+  \emph{Availability}: Every request sent to the system must eventually
+  terminate.
 }
 and partition tolerance%
 \sidenote[9]{
@@ -95,7 +96,11 @@ Scaling in this context refers to increase in throughput by increasing the
 number of machines in the network. However, in the case of a distributed 
 consensus based locking system, the throughput is inversely proportional to the
 number of nodes in the network since it involves more messages and possibly
-more phases needed for agreement.
+more phases needed for agreement%
+\sidenote{
+  \citet{dumulti} states that throughput reduces as a $1/x$ function with the
+  increase in number of nodes ($x$).
+}.
 
 \subsection{Configuration}
 
@@ -105,7 +110,7 @@ configuration to allow increasing and decreasing the cluster size as required.
 
 \subsection{Failure tolerance}
 
-The set of servers a distributed system is made of susceptible to failures.
+The set of servers in a distributed system is susceptible to failures.
 Machines occasionally fail, messages can be lost in transit, networks can be
 partitioned, disk drives can fail and so on. The system should be able to
 isolate the failures and make sure that it can function despite such failures.

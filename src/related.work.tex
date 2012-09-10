@@ -18,7 +18,7 @@ while satisfying its safety requirements%
 \sidenote{
   Safety requirements of a consensus algorithm \citep{LamportM04}:
   \begin{inparaenum}[(i)]
-    \item \emph{Nontriviality}: A value has to be proposed to be chosen.
+    \item \emph{Non triviality}: A value has to be proposed to be chosen.
     \item \emph{Consistency}: Different learners cannot learn different values.
     \item \emph{Conservatism}: Only chosen values can be learned and it can be
       learned at most once.
@@ -140,8 +140,9 @@ sizes of active replicas for it to function.
 
 \subsection{Cheap Paxos}
 
-Basic Paxos requires a total of \code{2N+1} servers in a distributed system
-even though \code{N+1} servers are enough (minimum) to make progress.
+Basic Paxos requires a total of \code{2N+1} servers in a distributed system to
+tolerate \code{N} failures. However, \code{N+1} servers are enough (minimum) to
+make progress.
 Using servers that are slower or cheaper for the additional \code{N} servers
 allows us to reduce the total cost of the system. Cheap Paxos \citep{LamportM04}
 is designed along these lines.
@@ -168,14 +169,14 @@ using ip-multicast%
 is more scalable and provides better throughput compared
 to unicast%
 \sidenote[2]{
-  \emph{Unicast}: trasmission of message to a single destination.
+  \emph{Unicast}: transmission of message to a single destination.
 }
 for a distributed system in a well-defined network. It
 has the property that it provides fixed throughput with variation in number
 of receivers. It claims to have the throughput of ip-multicast and low latency
 of unicast with the downside being that it provides weak synchrony%
 \sidenote{
-  Message loss is possible.
+  \emph{Weak synchrony}: Message loss is possible.
 }.
 
 \begin{figure}
@@ -201,8 +202,8 @@ when lower throughput is acceptable and so on.
 Stoppable Paxos (\citet{LamportSP08}, \citet{LamportMZ10}) is one such algorithm
 that allows us to reconfigure a Paxos based system. The algorithm defines a
 special set of \emph{stopping} commands. A stopping command is issued as the
-\code{i}th command after which no new command \code{i+1} can be issued. The
-system proceeds normally after it executes the \code{i}th command.
+\code{i}th command after which no new command at \code{i+1}the position can be
+issued. The system proceeds normally after it executes the \code{i}th command.
 
 This thesis uses a variation of Stoppable Paxos for reconfiguration.
 
@@ -278,7 +279,11 @@ leader election in Erlang.
 
 Google created Chubby lock service \citep{Burrows06} for loosely-coupled
 distributed systems. It works like a distributed file system with advisory
-locks.The goal of the project is to allow the clients to use the service
+locks%
+\sidenote{
+  \emph{Advisory Locks}: Long term locks used specifically within an
+  application.
+}. The goal of the project is to allow the clients to use the service
 to synchronize their activities. For example, Google File System \citep{gfs}
 and BigTable \citep{ChangDGHWBCFG06} use Chubby locks for co-ordination and
 as a store for small metadata \citep{ChandraGR07}.
@@ -486,6 +491,10 @@ key space over multiple nodes using vnodes%
 }.It might be possible to use this concept to scale key space and avoid having
 to store a complete copy of the data on all the nodes.
 
+Riak is written in Erlang and is hence useful from this project's perspective
+for providing a good conceptual view of building distributed database
+applications in Erlang.
+
 While the project is mature and satisfies all
 the other requirements to be used as a lock manager, absence of strong
 consistency makes its use untenable.
@@ -495,7 +504,8 @@ consistency makes its use untenable.
 Amazon DynamoDB \citep{dynamoDB} is proprietary key-value datastore based on
 \citet{DeCandia07} available as a service. While providing the regular
 feature set of NoSQL data stores, it also provides strong consistency and
-atomic counters.
+atomic counters. While DynamoDB satisfies most of this project's requirements,
+usage of Warlock reduces the latency and provides quicker performance.
 
 \section{Scalaris}
 

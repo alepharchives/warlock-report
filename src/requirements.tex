@@ -90,9 +90,15 @@ From the above background, we can now elaborate the system requirements:
 \req{The system should act as a key value store.}
 
 The user is referenced across the system uniquely using a numeric user id
-(\abbr{UID}). The user's session present in any of the workers can be uniquely 
+(\abbr{UID}%
+\sidenote{
+  The \abbr{UID} is of the integer format.
+}). The user's session present in any of the workers can be uniquely 
 referenced across all the workers uniquely using the session's process id
-(\abbr{PID}).
+(\abbr{PID}%
+\sidenote{
+  The \abbr{PID} is an Erlang process identifier.
+}).
 The \abbr{UID} maps to \abbr{PID} and this mapping is stored in the lock
 manager. To support this, the lock manager should support the hash
 table primitives.
