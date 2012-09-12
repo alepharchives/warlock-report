@@ -4,22 +4,22 @@
 
 \author{Sukumar Yethadka}
 
-\includeonly{%
-abstract,%
-preface,%
-introduction,%
-background,%
-related.work,%
-requirements,%
-concepts,%
-analysis.design,%
-implementation,%
-experiments.performance,%
-conclusion,%
-future.work,%
-source.code,%
-building.deployment,%
-}
+%\includeonly{%
+%abstract,%
+%preface,%
+%introduction,%
+%background,%
+%related.work,%
+%requirements,%
+%concepts,%
+%analysis.design,%
+%implementation,%
+%experiments.performance,%
+%conclusion,%
+%future.work,%
+%source.code,%
+%building.deployment,%
+%}
 
 \begin{document}
   \chapterstyle{uio}
@@ -56,11 +56,10 @@ building.deployment,%
       \include{experiments.performance}
 
     \part{Summary}
-      \include{conclusion}
       \include{future.work}
+      \include{conclusion}
 
-      \bibliographystyle{uio}
-      \bibliography{bibliography}
+    \appendix
 
     \addcontentsline{toc}{part}{\appendixtocname}
     \appendixpage*
@@ -69,5 +68,10 @@ building.deployment,%
       \include{source.code}
       \include{building.deployment}
     \end{appendices}
+
+    \backmatter
+
+      \bibliographystyle{uio}
+      \bibliography{bibliography}
 
 \end{document}
