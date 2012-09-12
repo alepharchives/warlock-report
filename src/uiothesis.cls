@@ -630,7 +630,7 @@
 \newcommand{\chap}[1]{chapter~#1}
 \newcommand{\chaps}[2]{chapters~#1--#2}
 \newcommand{\vol}[1]{vol.~#1}
-\newcommand\req[1]{\begin{flushleft}\textit{#1}\end{flushleft}}
+\newcommand{\req}[1]{\begin{flushleft}\textit{#1}\end{flushleft}}
 
 % Inline quotations
 \newcommand{\prequote}[4][]{\citet[#1]{#2} #3 \q{#4}.}
@@ -671,12 +671,6 @@
 \newcommand{\urort}{Ur\o{}rt}
 \newcommand{\siste}{\q{Siste fra dine Favoritter}}
 \newcommand{\latest}{\q{Latest from your Favorites}}
-
-%%
-%% Latex Draw
-%%
-
-\usepackage[usenames,dvipsnames]{pstricks}
 
 %%
 %% Front matter
