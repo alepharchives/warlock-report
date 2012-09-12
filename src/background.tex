@@ -6,7 +6,7 @@ management. We introduce the basics of these fields for a better
 understanding of the thesis in this chapter. We also look at the factors that
 need to be addressed for an effective execution of the requirements.
 
-\section{Distributed locking}
+\section{Distributed Locking}
 
 A Distributed System is defined by \citet[\p{2}]{coulouris2005distributed} as 
 hardware or software components of networked computers performing activities by
@@ -36,7 +36,7 @@ shared resources.
 A distributed lock manager can be implemented in many different ways. We use
 Paxos, a consensus algorithm as our system is asynchronous.
 
-\section{Consensus algorithm}
+\section{Consensus Algorithm}
 
 \citet{Lamclocks} first suggested that distributed systems can be modelled as
 state machines. The system as a whole makes progress when these state machines
@@ -108,7 +108,7 @@ Distributed systems need to plan ahead in terms of handling node failures and
 should provide ways to replace failed nodes. The system needs to support dynamic
 configuration to allow increasing and decreasing the cluster size as required.
 
-\subsection{Failure tolerance}
+\subsection{Failure Tolerance}
 
 The set of servers in a distributed system is susceptible to failures.
 Machines occasionally fail, messages can be lost in transit, networks can be
