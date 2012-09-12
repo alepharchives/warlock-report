@@ -2,7 +2,8 @@
 \label{chapter:related.work}
 
 The design of Warlock is based on well known distributed algorithms. We discuss
-these algorithms in this chapter and list similar projects.
+these algorithms in this chapter and list similar projects that meet few of our
+requirements (\chapterref{requirements}).
 
 \section{Paxos}
 \label{section:paxos}
@@ -72,7 +73,9 @@ The algorithm proceeds in two phases with each phase having two sub phases.
 
 The algorithm makes progress when a proposed value is eventually learned by all
 the learners. However, a scenario where no progress can be made is possible
-when we have multiple proposers. Consider two proposers issuing \emph{prepare}
+when we have multiple proposers.
+
+Consider two proposers issuing \emph{prepare}
 requests with alternatively increasing \emph{n}. They would keep
 preempting each other in a loop leading to no agreement being reached among the
 group. A solution is to create the role of \emph{distinguished proposer} or
