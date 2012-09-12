@@ -4,4 +4,3 @@
 :vendor_dir: vendor
 :engine: :pdflatex
 :color: true
-:format: pdf
