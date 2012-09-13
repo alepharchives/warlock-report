@@ -1,40 +1,38 @@
 \chapter{Background}
 \label{chapter:background}
 
-The concept area of this thesis is a combination of distributed systems and lock
-management. We introduce the basics of these fields for a better
-understanding of the thesis in this chapter. We also look at the factors that
+The concept area of this thesis is a mixture of distributed systems and lock
+management. In this chapter, we introduce the basics of these fields for a 
+better understanding of the thesis. We also look at the factors that
 need to be addressed for an effective execution of the requirements.
 
-\section{Distributed Locking}
+\section{CAP Theorem}
 
-A Distributed System is defined by \citet[\p{2}]{coulouris2005distributed} as 
-hardware or software components of networked computers performing activities by
-communicating with each other only by passing messages. Said definition gives
-it attributes such as concurrency%
-\sidenote[3]{
-  \emph{Concurrency}: Simultaneous execution of processes (may or may not be 
-  in parallel).
-}, non usage of global clock%
-\sidenote[5]{
-  \emph{No global clock}: The computers in the distributed system are not 
-  co-ordinated using a single global clock and use other mechanisms such as
-  vector clocks \citep{Lamclocks} for it.
+The \abbr{CAP} theorem or Brewer's conjecture states that it is not 
+possible to achieve consistency%
+\sidenote{
+  \emph{Consistency}: Requests sent to a distributed system is said to be
+  consistent if the result of the request is the same as compared to sending
+  the the request to a single node executing the request one by one.
+}, availability%
+\sidenote[6]{
+  \emph{Availability}: Every request sent to the system must eventually
+  terminate.
 }
-and ability to handle independent failures
-\sidenote[11]{
-  \emph{Independent failures}: Failure of individual computers does not lead
-  to the failure of the entire system but, rather has other consequences such
-  as degraded performance.
-}.
+and partition tolerance%
+\sidenote[9]{
+  \emph{Partition tolerance}: Communication loss between set of nodes in the
+  network.
+}
+at the same time in an asynchronous network model
+\citep{journals/sigact/GilbertL02}. A choice of two of these attributes must
+be made when designing a system in such a network.
 
-One of the ways to co-ordinate concurrent processes in a loosely coupled 
-distributed system is to use a distributed lock manager. It helps such
-processes to synchronize their activities or to serialize their access to
-shared resources.
-
-A distributed lock manager can be implemented in many different ways. We use
-Paxos, a consensus algorithm as our system is asynchronous.
+In this project, we focus mainly on consistency and partition tolerance%
+\sidenote[7]{
+  Parition tolerance is not really an option. See \citet{partition.tol}.
+}
+as a primary goals with availability as a secondary goal.
 
 \section{Consensus Algorithm}
 
@@ -60,30 +58,35 @@ Paxos is one of many available consensus algorithms but, its core is the best
 known asynchronous consensus algorithm \citep{Lampson:1996:HBH}. It is covered
 in more detail in \sectionref{paxos}.
 
-\section{CAP Theorem}
+\section{Distributed Locking}
 
-The \abbr{CAP} theorem or Brewer's conjecture states that it is not 
-possible to achieve consistency%
+A Distributed System is defined by \citet[\p{2}]{coulouris2005distributed} as 
+hardware or software components of networked computers performing activities by
+communicating with each other only by passing messages. Said definition gives
+it attributes such as concurrency%
 \sidenote{
-  \emph{Consistency}: Requests sent to a distributed system is said to be
-  consistent if the result of the request is the same as compared to sending
-  the the request to a single node executing the request one by one.
-}, availability%
-\sidenote[6]{
-  \emph{Availability}: Every request sent to the system must eventually
-  terminate.
+  \emph{Concurrency}: Simultaneous execution of processes (may or may not be 
+  in parallel).
+}, non usage of global clock%
+\sidenote[2]{
+  \emph{No global clock}: The computers in the distributed system are not 
+  co-ordinated using a single global clock and use other mechanisms such as
+  vector clocks \citep{Lamclocks} for it.
 }
-and partition tolerance%
-\sidenote[9]{
-  \emph{Partition tolerance}: Communication loss between set of nodes in the
-  network.
-}
-at the same time in an asynchronous network model
-\citep{journals/sigact/GilbertL02}. A choice of two of these attributes must
-be made when designing a system in such a network.
+and ability to handle independent failures
+\sidenote[8]{
+  \emph{Independent failures}: Failure of individual computers does not lead
+  to the failure of the entire system but, rather has other consequences such
+  as degraded performance.
+}.
 
-In this project, we focus mainly on consistency and partition tolerance 
-as a primary goals with availability as a secondary goal.
+One of the ways to co-ordinate concurrent processes in a loosely coupled 
+distributed system is to use a distributed lock manager. It helps such
+processes to synchronize their activities or to serialize their access to
+shared resources.
+
+A distributed lock manager can be implemented in many different ways. We use
+Paxos as our consensus algorithm since our system is asynchronous.
 
 \section{Challenges}
 
@@ -98,8 +101,8 @@ consensus based locking system, the throughput is inversely proportional to the
 number of nodes in the network since it involves more messages and possibly
 more phases needed for agreement%
 \sidenote{
-  \citet{dumulti} states that throughput reduces as a $1/x$ function with the
-  increase in number of nodes ($x$).
+  Given $x$ as the number of nodes, \citet{dumulti} states that throughput of a
+  system based on Multi-Paxos decreases as a $1/x$ function.
 }.
 
 \subsection{Configuration}
@@ -152,7 +155,8 @@ Different types of tests such as unit tests%
   specified requirements.
 }, load tests%
 \sidenote[7]{
-  \emph{Load Testing}: Amount of traffic the system can safely handle.
+  \emph{Load Testing}: Testing the amount of traffic the system can safely
+  handle.
 }
 are needed for a robust implementation. Furthermore, the implementation needs
 to be tested with different cluster sizes.

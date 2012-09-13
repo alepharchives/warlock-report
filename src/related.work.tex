@@ -2,7 +2,7 @@
 \label{chapter:related.work}
 
 The design of Warlock is based on well known distributed algorithms. We discuss
-these algorithms in this chapter and list similar projects that meet few of our
+these algorithms here and list similar projects that meet few of our
 requirements (\chapterref{requirements}).
 
 \section{Paxos}
@@ -212,8 +212,9 @@ This thesis uses a variation of Stoppable Paxos for reconfiguration.
 
 \subsection{Other}
 
-Many other flavors of Paxos exists with some of them focused on the
-implementation aspects.
+Even though most of the Paxos papers detail the algorithm in pseudo code, it is
+non trivial to actually implement it. A few papers detail the fine points to
+consider from the implementation perspective.
 
 \subsubsection{Paxos for System Builders}
 
@@ -281,7 +282,7 @@ leader election in Erlang.
 \label{section:chubby.locks}
 
 Google created Chubby lock service \citep{Burrows06} for loosely-coupled
-distributed systems. It works like a distributed file system with advisory
+distributed systems. It works as a distributed file system with advisory
 locks%
 \sidenote{
   \emph{Advisory Locks}: Long term locks used specifically within an
@@ -387,7 +388,7 @@ optimizations and other heuristics.
 \figureref{megastore} shows the core architecture of Megastore. It illustrates
 the relation between different replicas and the coordinator.
 
-\section{Zookeeper}
+\section{Apache Zookeeper}
 \label{section:zookeeper}
 
 Zookeeper \citep{Hunt:2010:ZWC:1855840.1855851, zookeeper} is a open source
@@ -400,8 +401,8 @@ distributed applications and as a metadata store. It is inspired by Chubby lock
 
 Zookeeper Atomic Broadcast (\abbr{ZAB})
 \citep{Reed:2008:STO:1529974.1529978, JunqueiraRS11} is a
-totally ordered atomic broadcast protocol created for usage in Zookeeper. \abbr{ZAB}
-satisfies the constraints imposed by Zookeeper viz.,
+totally ordered atomic broadcast protocol created for usage in Zookeeper.
+\abbr{ZAB} satisfies the constraints imposed by Zookeeper viz.,
 
 \begin{itemize}
     \iterm{Reliable delivery}: Message delivered to one server must eventually
@@ -421,13 +422,13 @@ satisfies the constraints imposed by Zookeeper viz.,
 trade-offs. The service using \abbr{ZAB} has two modes of operation:
 
 \begin{itemize}
-    \iterm{Broadcast mode}: Broadcast mode starts when a new leader is chosen
+    \iterm{Broadcast mode}: Broadcast mode begins when a new leader is chosen
     using a quorum from the group. The leader's state is now same as rest of
     the servers and can hence start broadcasting messages.
     This mode is similar to two-phase commits \citep{Gray78}, but with quorum.
     \iterm{Recovery mode}: A new leader has to chosen when the existing leader
     is no longer valid. The service is now in recovery mode until a new leader
-    emerges.
+    emerges using an alternative leader election algorithm.
 \end{itemize}
 
 \begin{figure}
@@ -491,7 +492,7 @@ key space over multiple nodes using vnodes%
   \emph{Vnodes} or \val{Virtual Nodes} are a level of indirection used to map
   the key space so that any change in the status of the physical node does not
   affect the key distribution.
-}.It might be possible to use this concept to scale key space and avoid having
+}. It might be possible to use this concept to scale key space and avoid having
 to store a complete copy of the data on all the nodes.
 
 Riak is written in Erlang and is hence useful from this project's perspective

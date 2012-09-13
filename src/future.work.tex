@@ -19,18 +19,6 @@ The client based on Redis protocol supports basic authentication. However, it
 needs improvements in terms of the password storage, configuration and
 transmission.
 
-\section{Consistency Checks}
-
-We treat the database part of Warlock as a state machine and update it based
-on the proposals that make it through the protocol. However, it
-might be possible that few of nodes become slow in executing
-these decisions, falling behind
-rest of the cluster. If the decision queue grows too large, some of the
-decisions may even be skipped. While, this has not been observed even under
-heavy loads, it is a good idea to have a consistency checksum based on the data
-which is shared periodically with the cluster, providing us with an idea of
-how many nodes are in sync and how many are catching up.
-
 \section{Testing}
 
 As discussed in \sectionref{impl.testing}, testing is essential for distributed
@@ -118,12 +106,6 @@ Few of possible areas for improvements are:
   \item Batch multiple request together to decrease individual round trip times.
 \end{itemize}
 
-\section{Back End Support}
-
-Warlock's current back ends are key value stores. Since Warlock is transparent
-to the commands, we can potentially use any data store as a back end. Adding
-more types of back ends to Warlock can help bring it to a wider audience.
-
 \section{Recovery Techniques}
 
 Currently if a Warlock node fails, we wipe all its data and restore it from
@@ -143,14 +125,14 @@ advantages, there are cases where this might be a problem.
 
 The current Warlock client is quite simple. It just connects to the server and
 issues commands to it. Improving the client can allow us to decrease some
-node on Warlock and improve availability. Some suggestions for such a improved
+node on Warlock and improve availability. Some suggestions for such an improved
 client are:
 
 \begin{itemize}
   \item The client can store the list of Warlock nodes when it initiates
     connection. This will allow the client to connect to other Warlock nodes
     (e.g., using round robin) in case the one it is connected to goes down.
-  \item Client can have certain timeout as provided by a Warlock node.This 
+  \item Client can have certain timeout as provided by a Warlock node. This 
     allows us to control client timeouts from the server side.
   \item The Warlock nodes currently route all the proposals they receive to the
     Master node. An alternative would be to have the client broadcast the
@@ -164,13 +146,25 @@ client are:
     architecture, possibly making the system more complex.
 \end{itemize}
 
-\section{Expire}
+\section{Other}
 
-Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}. 
-However, testing a few types of implementation led to having severe trade-offs
-with performance. The needs for performant key expiry exits.
+\subsection{Consistency Checks}
 
-\section{Others}
+We treat the database part of Warlock as a state machine and update it based
+on the proposals that make it through the protocol. However, it
+might be possible that few of nodes become slow in executing
+these decisions, falling behind
+rest of the cluster. If the decision queue grows too large, some of the
+decisions may even be skipped. While, this has not been observed even under
+heavy loads, it is a good idea to have a consistency checksum based on the data
+which is shared periodically with the cluster, providing us with an idea of
+how many nodes are in sync and how many are catching up.
+
+\subsection{Back End Support}
+
+Warlock's current back ends are key value stores. Since Warlock is transparent
+to the commands, we can potentially use any data store as a back end. Adding
+more types of back ends to Warlock can help bring it to a wider audience.
 
 \subsection{Code Improvement}
 
@@ -182,6 +176,12 @@ For example, all the \abbr{ETS} tables used currently
 are directly running under the processes that created them. If these processes
 crash, the linked ETS table would get lost. Using a table manager would
 help survive these crashes.
+
+\subsection{Expire}
+
+Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}. 
+However, testing a few types of implementation led to having severe trade-offs
+with performance. The needs for performant key expiry exits.
 
 \subsection{More OTP}
 
