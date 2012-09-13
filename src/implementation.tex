@@ -47,23 +47,23 @@ on to this behaviour.
 \term{gen\_server}s can internally maintain state that can be accessed using
 all of its
 callback functions. It also provides functions to send messages%
-\sidenote[-2]{
+\sidenote{
   \term{gen\_server} messages can either be call (synchronous) or cast
   (asynchronous).
 }
 to one or more processes. The callback functions \term{handle\_cast}%
-\sidenote{
+\sidenote[3]{
   \emph{handle\_cast}: A \term{gen\_server} callback function
   used to handle asynchronous messages. It also cannot reply to the caller
   directly and must use \term{\term{gen\_server}:reply/2} function if it
   wants to do so.
 }, \term{handle\_call}%
-\sidenote[5]{
+\sidenote[8]{
   \emph{handle\_call}: A \term{gen\_server} callback function used to handle
   synchronous messages. It has the callers address and it blocks the caller
   till it sends a reply.
 } and \term{handle\_info}%
-\sidenote[10]{
+\sidenote[13]{
   \emph{handle\_info} is the \term{gen\_server} callback function used to
   handle all the other types of messages e.g., plain Erlang messages,
   \abbr{TCP}, \abbr{UDP} messages and so on.
