@@ -221,7 +221,7 @@ consider from the implementation perspective.
 \citet{Kirsch08paxosfor} provides a detailed overview of Paxos from the
 implementation perspective. They list the necessary pseudo code required
 along with all the considerations needed to make the algorithm practical.
-Furthermore, they explore performance, safety and liveliness 
+Furthermore, they explore performance, safety and liveliness
 properties of the prototype they built.
 
 \subsubsection{Paxos Made Live \dash{} An Engineering Perspective}
@@ -248,7 +248,7 @@ individual processes modelled as finite state machines. Each process can
 be performing a different role based on what state it is on. This
 makes all processes equal and ready to take on different roles
 as required during runtime.
-   
+
 \begin{figure}
   \begin{whole}
   \includegraphics[width=1\wholewidth]{paxos_fsm}
@@ -259,7 +259,7 @@ as required during runtime.
 \end{figure}
 
 \figureref{paxos.fsm} shows the view of Paxos algorithm as a Finite State
-Machine (\abbr{FSM}). The idea is that each process is run as an instance of 
+Machine (\abbr{FSM}). The idea is that each process is run as an instance of
 this \abbr{FSM}, contrary to the regular view of process with a single well
 defined role. While this view of Paxos as a \abbr{FSM} is very helpful in the
 understanding of the protocol, we chose to use the protocol in the already
@@ -514,7 +514,7 @@ usage of Warlock reduces the latency and provides quicker performance.
 \section{Scalaris}
 
 Scalaris \citep{scalaris} is distributed key-value database the supports
-consistent writes and full \abbr{ACID} properties. It is based on Distributed 
+consistent writes and full \abbr{ACID} properties. It is based on Distributed
 Hash Table (\abbr{DHT})%
 \sidenote[-1]{
   \emph{Distributed Hash Table}: \abbr{DHT} is a distributed system that
@@ -522,7 +522,7 @@ Hash Table (\abbr{DHT})%
 }
 and is implemented in Erlang. It also uses a non-blocking Paxos for consensus
 and provides strong consistency. It uses a Peer to Peer (P2P) protocol \dash{}
-Chord \citep{StoicaMKKB01} for its underlying data replication. 
+Chord \citep{StoicaMKKB01} for its underlying data replication.
 
 For our purpose however, Scalaris is a full featured database server with most
 of the features being left unused. Because of this, it affects its performance

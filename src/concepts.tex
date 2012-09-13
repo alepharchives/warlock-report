@@ -113,7 +113,7 @@ concurrently. In this scenario, the routing works as follows.
 \begin{enumerate}
   \item The client broadcasts its command to all the replicas.
   \item Each of the replica sends a \term{propose} message to all the leaders.
-  \item The leader sends the \code{P1A} message to all the acceptors via the 
+  \item The leader sends the \code{P1A} message to all the acceptors via the
     scout.
   \item The acceptor only replies to the sender with a \code{P1B} message.
   \item On quorum acceptance from a quorum of acceptors, the leader sends
@@ -174,7 +174,7 @@ behind Erlang maps well on to the building large web applications.
 Open Telecom Platform (\abbr{OTP}) is a collection of Erlang libraries.
 The \abbr{OTP} code is
 well tested, robust and provides design patterns allowing us to quickly build
-Erlang applications. We take a look at few of the \abbr{OTP} principles 
+Erlang applications. We take a look at few of the \abbr{OTP} principles
 that is used in the project.
 
 \subsection{Supervision}
@@ -273,13 +273,13 @@ We use gen\_servers to model the roles described in the algorithm.
 \label{section:concepts.applications}
 Logical group of components can be glued together to form applications.
 This allows us to start and stop the group and define the order for it. It also
-makes the code modular, promoting code reusability. Applications have 
+makes the code modular, promoting code reusability. Applications have
 well defined roles and Erlang provides convenient ways to
 manage them.
 
 \subsection{Releases}
 \label{section:concepts.releases}
-A release is the complete system packaged for deployment. Erlang provides 
+A release is the complete system packaged for deployment. Erlang provides
 modules necessary to create packages for deploying new code and upgrading
 existing code. This helps in rapid development and maintenance of the code.
 

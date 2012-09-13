@@ -11,7 +11,7 @@ used for this and analyzes the results.
 
 The test setup consists of a cluster of servers hosted on Amazon \abbr{EC2}%
 \sidenote[3]{Amazon Elastic Compute Cloud (\abbr{EC2}) is a computing platform
-  that allows us to provision servers on demand as a web service. For details, 
+  that allows us to provision servers on demand as a web service. For details,
   see \url{http://aws.amazon.com/ec2/}
 }. We can test our system on different hardware configurations using the
 different \term{instance} types provided. The configuration of the two
@@ -31,7 +31,7 @@ instances used in our tests are shown in \tableref{amazon.instances}
     \hline
   \end{tabular}
   \caption[Amazon Instance Types]{%
-    Amazon instances used for testing.   
+    Amazon instances used for testing.
   }
   \label{table:amazon.instances}
 \end{table}
@@ -91,7 +91,7 @@ requests based on the type was ${}^2/_3$ read , ${}^1/_6$ write and ${}^1/_6$
 delete.
 
 
-The results show that the Warlock can handle $\approx$ 5,000 writes/second, 
+The results show that the Warlock can handle $\approx$ 5,000 writes/second,
 $\approx$ 14,000 reads/second and $\approx$ 8,000 mixed requests/second. The
 performance remains consistent throughout the test. This also helps us
 acknowledge that Warlock can handle the load generated in Magic Land.
@@ -114,7 +114,7 @@ acknowledge that Warlock can handle the load generated in Magic Land.
 } with change in request types. We observe that the \term{GET} requests have the
 lowest latency. This is expected since these requests do not have to go through
 the protocol. The \term{PUT} and \term{DEL} requests are close together since
-they are very much similar. We also observe that \term{PUT} and \term{DEL} 
+they are very much similar. We also observe that \term{PUT} and \term{DEL}
 requests sent to the master have lower latency as expected since we save a
 message trip.
 
@@ -160,7 +160,7 @@ Redis protocol and the \textcolor{blue}{blue} line indicates those using
 
 We observe that the throughput increases upto 64 concurrent connections and
 stays constant after that. Warlock cluster timed out on some of the requests
-when using \abbr{RPC} with 1024 connections. Also, we were unable to test the 
+when using \abbr{RPC} with 1024 connections. Also, we were unable to test the
 Redis protocol
 with concurrency level of 1024 due to Basho Bench becoming unresponsive.
 

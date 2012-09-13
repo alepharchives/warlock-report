@@ -1,7 +1,7 @@
 \chapter{Implementation}
 \label{chapter:implementation}
 
-We detail the implementation of the system as per the requirements 
+We detail the implementation of the system as per the requirements
 (\chapterref{requirements}) and
 design (\chapterref{analysis.design}) in this chapter. We also explain how the
 design goals matches on to the features of Erlang programming
@@ -20,7 +20,7 @@ The development of the system was done in iterations%
 }, roughly a week in size.
 The target of each iteration was to extend the existing base or to develop
 new features. This allowed us to quickly identify the part of the system that
-forms the core and other features that are just good to have. 
+forms the core and other features that are just good to have.
 
 \section{Prototype}
 
@@ -39,7 +39,7 @@ protocol works correctly before getting to the other parts.
 \section{Algorithm Implementation}
 
 Each of the process described in \sectionref{concepts.paxos} have some state
-and have to send and receive messages to and from other process. We use 
+and have to send and receive messages to and from other process. We use
 \term{gen\_server}s
 \sectionref{gen.server} to implement these processes since process roles map
 on to this behaviour.
@@ -373,7 +373,7 @@ as back end since Warlock is transparent to the commands.
 
 While consistency is the primary goal, the system needs to focus on performance
 to handle systems with millions of users. Apart from the many optimizations
-described in \chapterref{analysis.design}, we use some tools to locate 
+described in \chapterref{analysis.design}, we use some tools to locate
 the bottlenecks and attempt to fix it without affecting the primary goal.
 
 \subsection{Profiling}

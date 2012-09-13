@@ -36,9 +36,9 @@ close to that of Chubby lock service \citep{Burrows06} as in
 The figure shows the internal components of Warlock and the dependencies between
 them.
 
-With the design goal of keeping the system modular, we separate logically 
+With the design goal of keeping the system modular, we separate logically
 distinct parts of the system into Erlang applications \sectionref{concepts.otp}.
-These applications interact with each other by function calls if they are 
+These applications interact with each other by function calls if they are
 libraries or by message passing if they are distinct processes. Below we
 detail the purpose and functionality of each of these applications.
 
@@ -57,7 +57,7 @@ commonly used modules. The library consists of
       operations over them, some of which are atomic.}
     and dict%
     \sidenote[-2]{
-      dict is Erlang's in-built dictionary implementation. Unlike \abbr{ETS}, 
+      dict is Erlang's in-built dictionary implementation. Unlike \abbr{ETS},
       it is immutable.}
 \end{itemize}
 
@@ -371,7 +371,7 @@ assumes that there is a definite bound on clock drift%
   clocks, the time maintained by individual clocks tend to drift away from
   each other. Many mechanisms can be used to correct the drift, allowing us to
   set a bound on this drift.
-} 
+}
 between the nodes.
 
 \subsection{Message Reduction}
@@ -466,9 +466,9 @@ The parts of the format are:
 \end{itemize}
 
 The burden of deciding where the command has to be run rests on the client.
-Warlock has no way of knowing whether a specific command can change the 
+Warlock has no way of knowing whether a specific command can change the
 database state. A
-command that changes the state and is sent as \code{loc} will be executed 
+command that changes the state and is sent as \code{loc} will be executed
 without any errors. However, this leads to creation of divergent states
 on the replicas, equivalent to data corruption.
 
@@ -477,20 +477,20 @@ on the replicas, equivalent to data corruption.
 As per the requirement \sectionref{req.read.write.ratio}, we need to design the
 system to support read load that is a multiple of the maximum possible write
 load. It also follows from the system design that each node (replica) has the
-entire dataset available and that we do not need consensus to access it. 
+entire dataset available and that we do not need consensus to access it.
 
 Since the system is quorum based, not all of the nodes in the group take part
-in every round of consensus. This means that there are possibilities of a few 
+in every round of consensus. This means that there are possibilities of a few
 slow nodes existing in the system. Reading data directly from these nodes might
 possibly get stale data.
 
-The solution is to use a compromise between having fresh data and accepting 
+The solution is to use a compromise between having fresh data and accepting
 chances of slightly stale data in lieu of performance improvement. The
 use of lease described in \sectionref{a.n.d.lease} allows us to minimize the
-chances of stale data. The lease is renewed by the master node as per preset 
-time (typically 5 seconds). We use this lease time at the individual node level 
-to check if we are in sync with the rest of the nodes. This allows us to serve 
-read-only data from individual nodes directly with a predictable limit on the 
+chances of stale data. The lease is renewed by the master node as per preset
+time (typically 5 seconds). We use this lease time at the individual node level
+to check if we are in sync with the rest of the nodes. This allows us to serve
+read-only data from individual nodes directly with a predictable limit on the
 age of data. In case the lease has expired, we return an error response to
 the client in line with the goal of serving consistent data.
 

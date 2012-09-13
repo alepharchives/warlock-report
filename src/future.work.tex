@@ -38,7 +38,7 @@ earlier stage.
 
 System tests%
 \sidenote{
-  \emph{System Testing}: Testing the system as a whole, usually treating it as 
+  \emph{System Testing}: Testing the system as a whole, usually treating it as
   a black box (ignoring the implementation details).
 }
 become necessary in distributed systems to make sure changes made to the code
@@ -132,7 +132,7 @@ client are:
   \item The client can store the list of Warlock nodes when it initiates
     connection. This will allow the client to connect to other Warlock nodes
     (e.g., using round robin) in case the one it is connected to goes down.
-  \item Client can have certain timeout as provided by a Warlock node. This 
+  \item Client can have certain timeout as provided by a Warlock node. This
     allows us to control client timeouts from the server side.
   \item The Warlock nodes currently route all the proposals they receive to the
     Master node. An alternative would be to have the client broadcast the
@@ -168,9 +168,9 @@ more types of back ends to Warlock can help bring it to a wider audience.
 
 \subsection{Code Improvement}
 
-Several parts of the code that are open to improvement are tagged with 
+Several parts of the code that are open to improvement are tagged with
 \val{TODO}s. These are possible performance enhancement points, feature and
-stability improvement points. 
+stability improvement points.
 
 For example, all the \abbr{ETS} tables used currently
 are directly running under the processes that created them. If these processes
@@ -179,7 +179,7 @@ help survive these crashes.
 
 \subsection{Expire}
 
-Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}. 
+Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}.
 However, testing a few types of implementation led to having severe trade-offs
 with performance. The needs for performant key expiry exits.
 

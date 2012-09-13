@@ -45,7 +45,7 @@ The system consists of the following components as shown in the figure
 \end{figure}
 
 \begin{itemize}
-    \iterm{Database}: The database is a persistent store used to store the 
+    \iterm{Database}: The database is a persistent store used to store the
     user's session information for long periods when the user is offline.
     \iterm{Worker}: User sessions are run on the worker. Each user session
     consists of an stateful Erlang process that handles all the requests
@@ -97,7 +97,7 @@ The user is referenced across the system uniquely using a numeric user id
 (\abbr{UID}%
 \sidenote{
   The \abbr{UID} is of the integer format.
-}). The user's session present in any of the workers can be uniquely 
+}). The user's session present in any of the workers can be uniquely
 referenced across all the workers uniquely using the session's process id
 (\abbr{PID}%
 \sidenote{
@@ -109,7 +109,7 @@ table primitives.
 
 \subsection{Strong Consistency}
 
-\req{All processes accessing the system concurrently should see the same 
+\req{All processes accessing the system concurrently should see the same
 results.}
 
 The lock manager will be accessed by multiple workers concurrently. This

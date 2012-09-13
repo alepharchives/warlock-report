@@ -2,13 +2,13 @@
 \label{chapter:background}
 
 The concept area of this thesis is a mixture of distributed systems and lock
-management. In this chapter, we introduce the basics of these fields for a 
+management. In this chapter, we introduce the basics of these fields for a
 better understanding of the thesis. We also look at the factors that
 need to be addressed for an effective execution of the requirements.
 
 \section{CAP Theorem}
 
-The \abbr{CAP} theorem or Brewer's conjecture states that it is not 
+The \abbr{CAP} theorem or Brewer's conjecture states that it is not
 possible to achieve consistency%
 \sidenote{
   \emph{Consistency}: Requests sent to a distributed system is said to be
@@ -43,7 +43,7 @@ messages between the networked machines. To ensure that all the servers in the
 system are at the same state, they need to agree on sequence of these messages.
 
 Consensus is arriving at a single decision by the agreement of participants in a
-group. Consensus algorithms allows a group of connected processes agree with 
+group. Consensus algorithms allows a group of connected processes agree with
 each other, which is important in case of failures. Solving consensus allows
 us to use it as a primitive to solve more advanced problems in distributed
 computing such as atomic commits and totally ordered broadcasts. This is a
@@ -60,16 +60,16 @@ in more detail in \sectionref{paxos}.
 
 \section{Distributed Locking}
 
-A Distributed System is defined by \citet[\p{2}]{coulouris2005distributed} as 
+A Distributed System is defined by \citet[\p{2}]{coulouris2005distributed} as
 hardware or software components of networked computers performing activities by
 communicating with each other only by passing messages. Said definition gives
 it attributes such as concurrency%
 \sidenote{
-  \emph{Concurrency}: Simultaneous execution of processes (may or may not be 
+  \emph{Concurrency}: Simultaneous execution of processes (may or may not be
   in parallel).
 }, non usage of global clock%
 \sidenote[2]{
-  \emph{No global clock}: The computers in the distributed system are not 
+  \emph{No global clock}: The computers in the distributed system are not
   co-ordinated using a single global clock and use other mechanisms such as
   vector clocks \citep{Lamclocks} for it.
 }
@@ -80,7 +80,7 @@ and ability to handle independent failures
   as degraded performance.
 }.
 
-One of the ways to co-ordinate concurrent processes in a loosely coupled 
+One of the ways to co-ordinate concurrent processes in a loosely coupled
 distributed system is to use a distributed lock manager. It helps such
 processes to synchronize their activities or to serialize their access to
 shared resources.
@@ -96,7 +96,7 @@ important ones below and address them in the design section.
 \subsection{Scale}
 
 Scaling in this context refers to increase in throughput by increasing the
-number of machines in the network. However, in the case of a distributed 
+number of machines in the network. However, in the case of a distributed
 consensus based locking system, the throughput is inversely proportional to the
 number of nodes in the network since it involves more messages and possibly
 more phases needed for agreement%
@@ -133,8 +133,8 @@ failures. This project only deals with non-byzantine failures.
 
 \subsection{Finding and Fixing Bugs}
 
-Many things can go wrong in a distributed system 
-\citep{Rotem-gal-oz_fallaciesof}. The algorithms can be hard to implement, 
+Many things can go wrong in a distributed system
+\citep{Rotem-gal-oz_fallaciesof}. The algorithms can be hard to implement,
 minute logical errors in the implementation could cause race conditions and
 it is hard to estimate time and message complexities in advance. This makes it
 hard to discover bugs, reproduce them, find its source and fix them.
