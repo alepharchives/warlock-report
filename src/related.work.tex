@@ -50,7 +50,7 @@ The algorithm proceeds in two phases with each phase having two sub phases.
 \begin{itemize}
   \iterm{Phase 1 a}: The proposer selects a number \code{n} and sends it as a
   \code{prepare} (\code{P1A}) message to all the acceptors.
-  \iterm{Phase 1 b}: The acceptors compares the \code{n} it
+  \iterm{Phase 1 b}: Each acceptor compares the \code{n} it
   receives and if it is greater than all previous numbers received as a part of
   \code{prepare}, it replies (\code{P1B}) with a promise not to accept any
   number lower than \code{n}.
@@ -59,16 +59,16 @@ The algorithm proceeds in two phases with each phase having two sub phases.
   \sidenote{
     \emph{Quorum}: Majority agreement of processes. It is used to ensure
     liveliness in the system.
-  }, it sends a reply (\code{P2A}) back to each of the acceptor with an
+  }, it sends a reply (\code{P2A}) back to each of the acceptors with an
   \code{accept} message. The message also consists of the value \code{v}
   which is the highest numbered proposal among all the responses from the
   acceptors. In case it is empty, the proposer is free to choose the value.
-  \iterm{Phase 2 b}: If the acceptor has not received any \code{prepare} request
+  \iterm{Phase 2 b}: If the acceptor has not received \code{prepare} request
   with a larger number when it receives an \code{accept} request from the
   proposer, it sends a message (\code{P2B}) to the learner with the accepted
   value \code{v}.
-  \iterm{Learner}: If the learner receives a message from a quorum of acceptor,
-  it concludes that the value \code{v} was chosen.
+  \iterm{Learner}: If the learner receives a message from a quorum of
+  acceptors, it concludes that the value \code{v} was chosen.
 \end{itemize}
 
 The algorithm makes progress when a proposed value is eventually learned by all
@@ -131,7 +131,7 @@ the round to be over in three message delays in case of a collision.
 
 Clients propose the values directly to the \emph{acceptors} and the
 \emph{leader} gets involved only in case of a collision. Versions of Fast
-Paxos can be optimized to a further by specifying the collision
+Paxos can be optimized further by specifying the collision
 resolution technique allowing the clients to fix collisions themselves.
 
 However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007},
@@ -152,10 +152,10 @@ is designed along these lines.
 
 Cheap Paxos uses \code{N} auxiliary servers along with \code{N+1} main servers
 which allows it to tolerate \code{N} failures. The idea is that the auxiliary
-server steps to replace one of the main servers when it goes down
+server steps in to replace one of the main servers when it goes down
 temporarily. The main server takes back control once restored. The auxiliary
 servers thus act as a backup to the main servers without actively taking part
-in the protocol, but merely acting as observers.
+in the protocol, merely acting as observers.
 
 The downside of using Cheap Paxos is that it affects the liveliness of the
 system when multiple main servers fail at the same time since it takes time
@@ -308,7 +308,7 @@ Chubby lock is made up of two components:
     server serves all the reads requests and co-ordinates the writes requests.
     The rest of the servers are for fault tolerance and are ready to replace the
     master should it fail.
-    \iterm{Chubby Client}: Chubby client maintains and open connection with
+    \iterm{Chubby Client}: Chubby client maintains an open connection with
     the Chubby cell and communicates with it via \abbr{RPC}%
     \sidenote{
       \emph{RPC}: Remote Procedure Call: An inter-process communication
@@ -331,10 +331,10 @@ Chubby lock is made up of two components:
   \caption[Chubby Replica]{%
     Figure shows the internal of a single replica inside the Chubby cell.
     Figure courtesy \citet{ChandraGR07}.}
-  \label{figure:chubby.structure}
+  \label{figure:chubby.replica}
 \end{figure}
 
-A Chubby replica, shown in \figureref{chubby.structure}, mainly consists of a
+A Chubby replica, shown in \figureref{chubby.replica}, mainly consists of a
 fault tolerant log that is consistent
 with other replicas in the cell by using Paxos protocol. The rest of the
 replica is made of a fault tolerant database and an interface to handle
@@ -342,10 +342,10 @@ requests from Chubby clients. The specific Paxos flavor used is Multi-Paxos
 with slight modifications such as having a \val{catch-up} mechanism for
 slower replicas.
 
-The presence of Chubby locks project and its use in some of the largest
-server installations is a testimony for the need for distributed lock
-managers. This thesis uses some of the ideas explored in Chubby locks such
-as using the Paxos protocol to agree on the callback function that can
+The presence of the Chubby locks project and its use in some of the largest
+server installations is a testimony of the need for distributed lock
+managers. This thesis uses some of the ideas explored in Chubby locks, such
+as using the Paxos protocol to agree on a callback function that can
 eventually be run on the database component.
 
 \section{Google Megastore}
@@ -411,9 +411,9 @@ totally ordered atomic broadcast protocol created for usage in Zookeeper.
     delivered messages.
     \iterm{Causal order}: Messages should follow causal%
     \sidenote{
-      If message \emph{a} is delivered before message \emph{b} on a server then
-      all other servers in the group should receive message \emph{a} before
-      \emph{b}.
+      \emph{Causal Ordering}: If message \emph{a} is delivered before message
+      \emph{b} on a server then all other servers in the group should receive
+      message \emph{a} before \emph{b}.
     }
     ordering.
 \end{itemize}
@@ -426,7 +426,7 @@ trade-offs. The service using \abbr{ZAB} has two modes of operation:
     using a quorum from the group. The leader's state is now same as rest of
     the servers and can hence start broadcasting messages.
     This mode is similar to two-phase commits \citep{Gray78}, but with quorum.
-    \iterm{Recovery mode}: A new leader has to chosen when the existing leader
+    \iterm{Recovery mode}: A new leader has to be chosen when the existing leader
     is no longer valid. The service is now in recovery mode until a new leader
     emerges using an alternative leader election algorithm.
 \end{itemize}

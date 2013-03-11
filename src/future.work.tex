@@ -11,8 +11,8 @@ production. Though the project satisfies the requirements
 
 \section{Security}
 
-Warlock is meant to be run within an internal network and is currently lacking
-in terms of security. While this makes it reasonably safe to run within a secure
+Warlock is meant to be run within an internal network and it is still
+in terms of security. While reasonably safe to run within a secure
 network, improved security will allow it to run in more diverse environments.
 
 The client based on Redis protocol supports basic authentication. However, it
@@ -22,8 +22,8 @@ transmission.
 \section{Testing}
 
 As discussed in \sectionref{impl.testing}, testing is essential for distributed
-projects. While basic set of tests cover the common use cases and flows, more
-tests help us to cover the corner cases better.
+projects. A basic set of tests only focus on the common use cases and flows,
+whereas more tests will help us cover corner cases better.
 
 Warlock can benefit from PropEr%
 \sidenote{
@@ -94,16 +94,16 @@ to a fairly large extent.
 
 Increasing the number of nodes in the cluster decreases its throughput since
 more nodes are now involved in approving a proposal. This makes increasing
-number of writes a much harder task.
+the number of writes a much harder task.
 
-Few of possible areas for improvements are:
+A few of the possible areas for improvements are:
 
 \begin{itemize}
-  \item Change the algorithm itself to reduce the total number of messages
+  \item Changing the algorithm to reduce the total number of messages
     exchanged.
-  \item Use different ways to broadcast messages. Such as ip-multicast as
+  \item Using different ways to broadcast messages. Such as ip-multicast as
     described in \citet{MarandiPSP10}
-  \item Batch multiple request together to decrease individual round trip times.
+  \item Batching multiple requests together to decrease individual round trip times.
 \end{itemize}
 
 \section{Recovery Techniques}
@@ -124,15 +124,15 @@ advantages, there are cases where this might be a problem.
 \section{Smart Client}
 
 The current Warlock client is quite simple. It just connects to the server and
-issues commands to it. Improving the client can allow us to decrease some
-node on Warlock and improve availability. Some suggestions for such an improved
-client are:
+issues commands to it. Improving the client can allow us to decrease the
+number of Warlock nodes and improve availability. Some
+suggestions for such an improved client are:
 
 \begin{itemize}
   \item The client can store the list of Warlock nodes when it initiates
     connection. This will allow the client to connect to other Warlock nodes
     (e.g., using round robin) in case the one it is connected to goes down.
-  \item Client can have certain timeout as provided by a Warlock node. This
+  \item Clients can have a certain timeout as provided by a Warlock node. This
     allows us to control client timeouts from the server side.
   \item The Warlock nodes currently route all the proposals they receive to the
     Master node. An alternative would be to have the client broadcast the
@@ -142,7 +142,7 @@ client are:
     reasons such as leader election in progress or temporarily failed quorums.
   \item A technique used in \citet{Burrows06}, the client could cache the data
     and the master could actively invalidate cached data on updates. However,
-    this could require a large change in the current Warlock client server
+    this would require a large change in the current Warlock client server
     architecture, possibly making the system more complex.
 \end{itemize}
 
@@ -152,8 +152,8 @@ client are:
 
 We treat the database part of Warlock as a state machine and update it based
 on the proposals that make it through the protocol. However, it
-might be possible that few of nodes become slow in executing
-these decisions, falling behind
+might be the case that a few of the nodes become slow in executing
+these decisions, falling behind the
 rest of the cluster. If the decision queue grows too large, some of the
 decisions may even be skipped. While, this has not been observed even under
 heavy loads, it is a good idea to have a consistency checksum based on the data
@@ -181,7 +181,7 @@ help survive these crashes.
 
 Key expiry has many benefits, as discussed in \sectionref{a.n.d.expiry}.
 However, testing a few types of implementation led to having severe trade-offs
-with performance. The needs for performant key expiry exits.
+with performance. Hence the need for performant implementation of key expiry.
 
 \subsection{More OTP}
 
@@ -211,7 +211,7 @@ nodes will allow us to ensure more stable operation.
 Certain data within the Warlock consensus application is repeated between
 processes. For example, replicas and leaders share the same proposal map.
 We currently do not share such data, making it simpler for us
-to reason the system and allowing for localizing the failures. It might
+to reason about the system and allowing for localizing the failures. It might
 be possible to improve performance while trading for more complex code.
 
 \subsection{Backups}

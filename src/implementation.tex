@@ -24,8 +24,9 @@ forms the core and other features that are just good to have.
 
 \section{Prototype}
 
-The core of the consensus component is the variation of Paxos protocol based
-in \citet{Robbert2011}. While the algorithm is straight forward, implementation
+The core of the consensus component is a variation of
+the Paxos protocol formulated in \citet{Robbert2011}. While
+the algorithm is straight forward, implementation
 oriented and covers more edge cases than \citet{Lamport01}, a working prototype
 helps to get a more through understanding of the protocol itself.
 
@@ -38,8 +39,8 @@ protocol works correctly before getting to the other parts.
 
 \section{Algorithm Implementation}
 
-Each of the process described in \sectionref{concepts.paxos} have some state
-and have to send and receive messages to and from other process. We use
+Each of the processes described in \sectionref{concepts.paxos} has some state
+and has to send and receive messages to and from other processes. We use
 \term{gen\_server}s
 \sectionref{gen.server} to implement these processes since process roles map
 on to this behaviour.
@@ -54,18 +55,18 @@ callback functions. It also provides functions to send messages%
 to one or more processes. The callback functions \term{handle\_cast}%
 \sidenote[3]{
   \emph{handle\_cast}: A \term{gen\_server} callback function
-  used to handle asynchronous messages. It also cannot reply to the caller
-  directly and must use \term{\term{gen\_server}:reply/2} function if it
+  used to handle asynchronous messages. It cannot reply to the caller
+  directly, but must use \term{\term{gen\_server}:reply/2} function if it
   wants to do so.
 }, \term{handle\_call}%
 \sidenote[8]{
   \emph{handle\_call}: A \term{gen\_server} callback function used to handle
-  synchronous messages. It has the callers address and it blocks the caller
-  till it sends a reply.
+  synchronous messages. It has the caller's address and blocks the caller
+  until it sends a reply.
 } and \term{handle\_info}%
 \sidenote[13]{
   \emph{handle\_info} is the \term{gen\_server} callback function used to
-  handle all the other types of messages e.g., plain Erlang messages,
+  handle all the other types of messages, e.g. plain Erlang messages,
   \abbr{TCP}, \abbr{UDP} messages and so on.
 }
 are used to handle incoming messages.
@@ -89,7 +90,7 @@ sequence across all the nodes in the cluster.
 
 In the original algorithm, the replica maintains a transaction log. The goal of
 the protocol is to keep this log consistent across multiple nodes. Instead of
-this log, we execute the log entries (callback functions).
+maintaining such a log, we execute the agreed commands (using callback functions).
 
 \subsubsection{State}
 
@@ -101,7 +102,7 @@ this log, we execute the log entries (callback functions).
     The current slot number is the next open slot available for a decision.
     \iterm{Minimum slot number}: The protocol allows for concurrent proposals.
     Each of the incoming proposals are allotted the next available slot and
-    until they are decided upon and committed.
+    kept there until they are decided upon and committed.
 
     The minimum slot number is the next available slot for a new incoming
     proposal.
@@ -119,9 +120,9 @@ this log, we execute the log entries (callback functions).
 \subsubsection{Role}
 
 \begin{itemize}
-  \item Receive proposals, assign slot number to them and forward it to the
-    leader.
-  \item Receive decisions from the leader, commit them sequentially.
+  \item Receives proposals the leader, assigns slot numbers to them and
+    forwards them to the leader.
+  \item Receives decisions from the leader and commits them sequentially.
 \end{itemize}
 
 \subsection{Acceptor}
@@ -190,7 +191,7 @@ is spawned for every proposal.
 
 \subsubsection{State}
 
-Same as that of scout \sectionref{scout.state} but instead of storing all the
+Same as that of the scout, but instead of storing all the
 PValues, it only stores the PValue corresponding to the proposal it is working
 on.
 
@@ -235,7 +236,7 @@ The leader process co-ordinates votes for proposals using scouts and commanders.
         existing master node's lease has expired. This is the check that is run
         before spawning a new scout.
         \iterm{membership}: A new node being added to the cluster has to wait
-        till it gets accepted. This flag is used to poll its acceptance.
+        until it gets accepted. This flag is used to poll its acceptance.
     \end{itemize}
     \iterm{Monitors}: Monitors are used by the master leader to keep track of
     the process status of leaders of the other nodes.
@@ -246,22 +247,22 @@ The leader process co-ordinates votes for proposals using scouts and commanders.
 \begin{itemize}
   \item Receives proposals from the replica and either queues or spawns a
     commander for it based on its active flag's value.
-  \item Handle communication between scout and commander, spawning them
+  \item Handles communication between scout and commander, spawning them
     when required and acting on the results sent by them.
-  \item Handle all ballot related activities such as incrementing the ballot
+  \item Handles all ballot related activities such as incrementing the ballot
     when preempted and incrementing the view with the change in the system
     configuration.
-  \item Initiate and participate in master node elections.
-  \item Receive and act on the messages resulting from monitoring of other
+  \item Initiates and participates in master node elections.
+  \item Receives and acts on the messages resulting from monitoring of other
     nodes.
-  \item Use a single timer based on its current status to poll for the
+  \item Uses a single timer based on its current status to poll for the
     reasons mentioned.
 \end{itemize}
 
 \subsection{Client}
 
-The consensus client process is only used for reconfiguration requests
-\sectionref{impl.rcfg}. The client behaves as a code library for the actual
+The consensus client process is only used for reconfiguration requests.
+The client behaves as a code library for the actual
 proposals. The replica uses the client as a execution point for the decided
 proposals.
 
@@ -339,11 +340,11 @@ only when the system is running as a part of the cluster.
 
 \section{Logging}
 
-Logging of events in the system is very essential since it is one of the primary
+Logging of events in the system is essential since it is one of the primary
 methods of debugging in a distributed system. It also allows us to track rare
 failures and helps during system implementation.
 
-We use lager \citep{lager} library for logging. It has the flexibility of
+We use lager \citep{lager}, a library for logging. It has the flexibility of
 providing many log levels%
 \sidenote{
   \emph{Log levels}: Log levels determines the severity of the event that is
@@ -371,7 +372,7 @@ as back end since Warlock is transparent to the commands.
 
 \section{Performance}
 
-While consistency is the primary goal, the system needs to focus on performance
+While consistency is the primary goal, the system also needs to focus on performance
 to handle systems with millions of users. Apart from the many optimizations
 described in \chapterref{analysis.design}, we use some tools to locate
 the bottlenecks and attempt to fix it without affecting the primary goal.
@@ -382,7 +383,7 @@ the bottlenecks and attempt to fix it without affecting the primary goal.
 Profiling is analyzing the code dynamically based on different measurements such
 as \abbr{CPU} time used, memory consumed, number of function calls made,
 number of messages
-sent and so on. It allows us to visualize the parts of the source code that take
+sent and so on. It allows us to discover the parts of the source code that take
 the longest to run or is run the most number of times.
 
 Erlang has a number of built in specialized profilers available

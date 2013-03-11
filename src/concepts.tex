@@ -1,7 +1,7 @@
 \chapter{Concepts}
 \label{chapter:concepts}
 
-We introduce the important concepts required for the thesis in this chapter.
+In this chapter we introduce the important concepts required for this thesis.
 
 \section{Paxos}
 \label{section:concepts.paxos}
@@ -13,6 +13,8 @@ We introduce the important concepts required for the thesis in this chapter.
     the nodes in the cluster.
     \iterm{Decision}: A proposal that is successfully agreed upon by the
     cluster.
+    \iterm{Master}: The node that is elected and is the only one who can handle
+    proposals sent by the replica.
     \iterm{Master Leader}: The leader process running on the master node.
     \iterm{Master Replica}: The replica process running on the master node.
     \iterm{Slot}: Each of the decisions are discrete events. The events can be
@@ -22,6 +24,7 @@ We introduce the important concepts required for the thesis in this chapter.
     \iterm{Membership}: The nodes in the cluster are called members. They can be
     a member of different groups based on their condition%
     \sidenote{
+      \emph{Node Condition}:
       The condition of the node is a reference to the node's status in terms of
       handling the algorithm. Possible conditions are
       \begin{inparaenum}[(i)]
@@ -34,12 +37,13 @@ We introduce the important concepts required for the thesis in this chapter.
         manually.
       \end{inparaenum}
     }.
-    \term{join}
-    \iterm{Master}: The node that is elected and is the only one who can handle
-    proposals sent by the replica.
-    \iterm{Lease}: The master node retains its status as master for the duration
+    \iterm{Lease}: The master node retains its status for the duration
     of the lease. Lease time dictates the maximum possible time for which data
-    read could be stale.
+    read could be stale%
+    \sidenote{
+      \emph{Stale Data}: Data on the local node that is no longer consistent
+      with the rest of the cluster.
+    }.
 \end{itemize}
 
 \subsection{Algorithm}
@@ -55,8 +59,8 @@ specified maps very well to the Erlang's process oriented%
 } design. Secondly, the paper discusses multiple optimizations required to make
 the algorithm practical.
 
-The processes of the group can be classified into different roles based on the
-part of algorithm they are responsible for.
+The processes of the group can be classified into different roles based on
+which part of the algorithm they are responsible for.
 
 \begin{itemize}
     \iterm{Replica}: Replicas are processes responsible for assigning a proposal
@@ -68,10 +72,10 @@ part of algorithm they are responsible for.
       \emph{Ballots} are monotonically increasing identifiers that are unique to
       a specific leader. Each leader has an infinite number of ballots.
     }.
-    \iterm{Leader}: Leaders receive proposals from replicas and they try to
+    \iterm{Leader}: Leaders receive proposals from replicas and try to
     co-ordinate the messaging to acceptors for that proposal. It uses ballots
     to track the execution order of proposals.
-    \iterm{Scout}: A scout process is spawned by the leader to active a specific
+    \iterm{Scout}: A scout process is spawned by a leader to activate a specific
     ballot.
     \iterm{Commander}: A commander process is spawned by the leader to try
     and get votes for a specific proposal.
@@ -82,8 +86,8 @@ largest one, lets see a typical flow of the proposal from its initiation to its
 execution skipping on the smaller details and corner cases.
 
 \begin{enumerate}
-    \item A proposal is created by the client based on the request. This
-      proposal is uniquely identified and contains the complete request
+    \item The client creates a proposal based on the request. This
+      proposal is uniquely identified by a ballot and contains the complete request
       information. This proposal is sent to the replica.
     \item The replica checks if the proposal is a duplicate and if not it
       assigns a sequence number%
@@ -93,10 +97,10 @@ execution skipping on the smaller details and corner cases.
         indexed by a sequence number.
       }
       to it before sending it off to the leader.
-    \item The leader, which already has run the scout, spawns a commander with
+    \item The leader, which has already run the scout, spawns a commander with
       the ballot and proposal information.
     \item The commander sends out a message to all acceptors with the ballot
-      information to all acceptors asking them to approve the proposal.
+      information asking them to approve the proposal.
     \item The acceptor respond positively if it has not seen a larger
       ballot and negatively otherwise.
     \item The commander waits for a quorum (usually a majority of total
@@ -107,26 +111,27 @@ execution skipping on the smaller details and corner cases.
 \end{enumerate}
 
 The above use case constitutes a single Paxos instance among a set of processes.
-In general, the system may consists of several of these processes running
+In general, the system consists of several of these processes running
 concurrently. In this scenario, the routing works as follows.
 
 \begin{enumerate}
   \item The client broadcasts its command to all the replicas.
-  \item Each of the replica sends a \term{propose} message to all the leaders.
+  \item Each of the replicas sends a \term{propose} message to all the leaders.
   \item The leader sends the \code{P1A} message to all the acceptors via the
     scout.
   \item The acceptor only replies to the sender with a \code{P1B} message.
-  \item On quorum acceptance from a quorum of acceptors, the leader sends
+  \item On acceptance from a quorum of acceptors, the leader sends an
     \code{accept} message (\code{P2A}) to all the acceptors via the commander.
-  \item The acceptors responds with \code{P2B} only to the sender.
-  \item The leader on quorum response, broadcasts the decision to all the
+  \item The acceptors respond with \code{P2B}, only to the sender.
+  \item The leader, on quorum response, broadcasts the decision to all the
     replicas.
-  \item Each of the replica replies to the client.
+  \item Each of the replicas replies to the client.
 \end{enumerate}
 
-The paper details a few optimizations for state reduction and improving
-performance, making the implementation more practical. It also offers
-several suggestions from the implementation and deployment perspective.
+The paper \citep{Robbert2011} details a few optimizations for state reduction
+and improving performance, making the implementation more practical.
+It also offers several suggestions from the implementation and
+deployment perspective.
 
 \section{Erlang}
 
@@ -142,7 +147,7 @@ programming%
 requests with special attention directed towards handling failures.
 
 The process is the concurrency primitive of Erlang. Each of the processes are
-isolated and have access to their own private memory. This allows us to build
+isolated and have access to their own private memory. This allows building
 large scale applications with the Actor model%
 \sidenote{
   An actor is a process that can
@@ -155,7 +160,7 @@ large scale applications with the Actor model%
 \citep{Clinger81}. These processes are light weight since they do not map onto
 to the operating system's process structure. This allows Erlang to run
 thousands of processes concurrently. The process based concurrency also allows
-us to take advantage of multi-core processors in parallelizing computations.
+taking advantage of multi-core processors when parallelizing computations.
 
 Erlang also supports hot code loading%
 \sidenote[3]{
@@ -165,8 +170,8 @@ Erlang also supports hot code loading%
 which allows us to upgrade the system
 without restarting or disrupting the service.
 
-The ideas of concurrency, fault tolerance, distributability, hot code loading
-behind Erlang maps well on to the building large web applications.
+The ideas of concurrency, fault tolerance, distributability and hot code loading
+behind Erlang maps well on to building large web applications.
 
 \section{Open Telecom Platform}
 \label{section:concepts.otp}
@@ -180,8 +185,8 @@ that is used in the project.
 \subsection{Supervision}
 \label{section:concepts.supervision}
 
-Supervisors are processes that monitor workers processes and restart them based
-on predefined set of rules. An application can be designed in the form of a
+Supervisors are processes that monitor worker processes and restart them based
+on predefined sets of rules. An application can be designed in the form of a
 tree with fine grained control to handle crashing processes. It can also
 localize such crashes.
 
@@ -242,7 +247,8 @@ The three main behaviours provided by the OTP library are
     \iterm{gen\_server}: A process that waits for incoming events, performs
     actions based on the events and responds to the request.
     \iterm{gen\_event}: A process that acts as an event manager waiting for
-    events to happen and runs specific event handlers based depending on it.
+    events to happen and runs specific event handlers subscribed to that
+    specific type of event.
     \iterm{gen\_fsm}: A process that acts as a finite state machine.
 \end{itemize}
 
@@ -250,7 +256,7 @@ The three main behaviours provided by the OTP library are
 \label{section:gen.server}
 
 gen\_server is based on the typical architecture of client-server model
-\citep{reliable.dist.sys}. It supports two types of requests viz, synchronous
+\citep{reliable.dist.sys}. It supports two types of requests namely, synchronous
 calls%
 \sidenote{
   \emph{Synchronous calls}: Also called blocking calls, has the caller wait till
@@ -271,8 +277,8 @@ We use gen\_servers to model the roles described in the algorithm.
 
 \subsection{Applications}
 \label{section:concepts.applications}
-Logical group of components can be glued together to form applications.
-This allows us to start and stop the group and define the order for it. It also
+Logical group of components can be grouped together to form applications.
+This allows us to start and stop a group and define orders for it. It also
 makes the code modular, promoting code reusability. Applications have
 well defined roles and Erlang provides convenient ways to
 manage them.
