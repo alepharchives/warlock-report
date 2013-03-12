@@ -53,7 +53,8 @@ The algorithm proceeds in two phases with each phase having two sub phases.
   \iterm{Phase 1 b}: Each acceptor compares the \code{n} it
   receives and if it is greater than all previous numbers received as a part of
   \code{prepare}, it replies (\code{P1B}) with a promise not to accept any
-  number lower than \code{n}.
+  number lower than \code{n}. This response message also consists of the
+  highest value \code{v} it has seen.
   \iterm{Phase 2 a}: If the proposer receives a response to its \code{prepare}
   messages from a quorum%
   \sidenote{
@@ -98,8 +99,10 @@ of the process group, number of phases involved for one instance%
 \subsection{Basic Paxos}
 
 Basic Paxos is the simplest version of Paxos and is the same as described
-previously in \sectionref{paxos}. The algorithm proceeds over several rounds
-with the best case taking two rounds. It is typically not implemented and used
+previously in \sectionref{paxos}. The algorithm proceeds over several rounds%
+\sidenote{
+  \emph{Paxos Round}: A message round-trip between Paxos processes.
+} with the best case taking two rounds. It is typically not implemented and used
 in production due to possible race conditions and relatively poor performance.
 
 \subsection{Multi-Paxos}
@@ -136,8 +139,16 @@ resolution technique allowing the clients to fix collisions themselves.
 
 However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007},
 Fast Paxos is not better than Basic Paxos in all scenarios. Basic Paxos was
-found to be faster in case of systems with small number of replicas owing to
-the stability provided by its use of a single coordinator and the variation
+found to be faster in case of systems with small number of replicas%
+\sidenote{
+  \emph{Paxos Replica}: A node that participates in the protocol.
+}
+owing to
+the stability provided by its use of a single coordinator%
+\sidenote{
+  \emph{Paxos Coordinator}: A Paxos process that acts as a leader by
+  coordinating the message transmission between the processes.
+} and the variation
 of message latencies in practical networks. Fast Paxos also needs larger quorum
 sizes of active replicas for it to function.
 
@@ -528,3 +539,11 @@ For our purpose however, Scalaris is a full featured database server with most
 of the features being left unused. Because of this, it affects its performance
 and needs more hardware for the necessary throughput.
 
+\section{Summary}
+
+Warlock focusses on consistency and fault tolerance. The design of Warlock is
+influenced by the algorithms and architectures of the projects mentioned in
+this chapter.
+
+Warlock differentiates itself from these projects by providing consistent
+operations while allowing for flexibility to add or remove nodes.

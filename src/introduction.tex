@@ -13,9 +13,11 @@ failure based on its design and the system architecture.
 
 The online social game Magic Land uses a stateful application server
 architecture to handle millions of users. This architecture uses Redis as
-a global registry to keep track of user sessions. Failure of this
-software, or the server it is deployed on can lead to application
-downtime. This creates a need for building a service that is itself
+a global registry to keep track of user sessions. The registry acts as a
+locking mechanism allowing for at most of one user session at a time. Failure
+of this software, or the server it is deployed on can
+lead to application downtime. This creates a need for
+building a service that is itself
 distributed, fault tolerant and, primarily, consistent.
 
 \section{Goals}
@@ -34,9 +36,11 @@ Specifically we require,
     should continue to function despite these failures.
 \end{itemize}
 
-We investigate the algorithms for distributed consensus and analyze similar
+This locking mechanism can be realized by using state machines replicated
+across multiple servers which are kept consistent using distributed consensus
+algorithms. We investigate such algorithms and analyze similar
 projects. We then create a system design based on these observations and
-an working implementation.
+a working implementation.
 
 \section{Overview}
 
@@ -60,6 +64,8 @@ The idea behind the system design is that we use Multi-Paxos%
   consensus in fewer number of messages and steps.
 } for consensus, reconfigurable state machine algorithms to make the
 cluster dynamic and implement this in Erlang.
+
+The Erlang implementation of this thesis is named \term{Warlock}.
 
 \section{Organization}
 The thesis is divided into three main sections over multiple chapters.

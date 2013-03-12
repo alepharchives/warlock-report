@@ -76,7 +76,8 @@ which part of the algorithm they are responsible for.
     co-ordinate the messaging to acceptors for that proposal. It uses ballots
     to track the execution order of proposals.
     \iterm{Scout}: A scout process is spawned by a leader to activate a specific
-    ballot.
+    ballot. It sends out prepare messages to the acceptors and tries to get a
+    quorum acceptance for its leader.
     \iterm{Commander}: A commander process is spawned by the leader to try
     and get votes for a specific proposal.
 \end{itemize}
@@ -192,12 +193,18 @@ localize such crashes.
 
 A typical Erlang supervisor tree looks like \figureref{supervision.tree}. The
 processes are connected to each other using links%
-\sidenote[-10]{
+\sidenote[-17]{
   \emph{Links}: are bidirectional connections between processes with a maximum
   of one link per pair of processes.
 }
 . The links propagate upwards and are \val{trapped} by the processes that trap
-exits. This allows them to detect and restart crashed processes.
+exits%
+\sidenote[-15]{
+  \emph{Trap Exit}: When links are broken due to crashed processes, the
+  failure propagates to the linked processes who themselves shutdown.
+  Processes which should not stop even when links to it are broken can set a
+  flag to do so. Such a process is said to trap exits.
+}. This allows them to detect and restart crashed processes.
 
 \begin{figure}
   \includegraphics[width=0.5\wholewidth]{supervision-tree}

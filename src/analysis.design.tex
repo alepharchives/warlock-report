@@ -235,7 +235,8 @@ a dynamic cluster. However, the algorithm needs some modifications
 
 In the regular Paxos protocol, the cluster nodes that take part in the
 it must be static. We need to explicitly design the system to handle
-the requirement \sectionref{req.dynamic.cluster}. This can be done by
+the requirement \sectionref{req.dynamic.cluster} of having a dynamic cluster.
+This can be done by
 following certain ideas from \citet{LamportSP08} and \citet{LamportMZ10}.
 
 We can achieve this by treating the consensus state itself as a separate
@@ -245,12 +246,17 @@ of the list of valid member nodes among other data. This modification allows
 us to add new nodes, remove existing nodes, replace nodes as required at any
 point of time.
 
-For the implementation, instead of using the regular slots, we use specialized
+For the implementation, instead of using the slots assigned for regular
+consensus operations, we use slots with
 alphabetic indexes allowing for better control during reconfiguration. This also
 allows us to make the reconfiguration immediately instead of blocking requests
 like in \citet{LamportSP08}.
 
-By default, the ballot is made up of the leaders unique id and a monotonically
+By default, the ballot%
+\sidenote{
+  \emph{Ballots} are monotonically increasing identifiers that are unique to
+  a specific leader. Each leader has an infinite number of ballots.
+} is made up of the leaders unique id and a monotonically
 increasing
 integer that increments whenever there is a change in the leader. It is possible
 that messages tagged with the old ballot is still in transit after a
@@ -262,7 +268,7 @@ configuration change.
 The downside of this specific design is that if the master changes during
 reconfiguration, any of the proposals making progress will time out. It
 should be possible to fix this by transferring such proposals to the new master
-as new proposals.
+as new proposals by having the clients resend proposals that have timed out.
 
 \section{Consensus Optimization}
 \label{section:consensus.optimization}
@@ -297,7 +303,12 @@ and \code{L2}.
 
 As we can see, this leads to a race condition. To
 fix this, whenever a leader is preempted, it waits for a predefined period of
-time called the \term{backoff} time. This provides the leader with the higher
+time called the \term{backoff} time%
+\sidenote{
+   \emph{Backoff Time}: Backoff time can either be something constant or based
+   on a multiplicatively increasing number. In most cases, using a constant
+   backoff time should suffice, which is what Warlock uses.
+}. This provides the leader with the higher
 ballot sufficient time to make progress, thus avoiding the deadlock.
 
 \subsection{Timeouts}
@@ -317,6 +328,9 @@ Introduction of timeouts in scouts and commanders allows us to timebox the
 protocol creating a maximum bound for response time to the client. The client
 itself can use timeouts, but this should always be greater than the internal
 Warlock timeout to maintain consistency.
+
+In case a timeout occurs, the message is aborted. The client is notified of
+this which can then decide if it needs to resend the proposal.
 
 \subsection{State reduction}
 
@@ -475,8 +489,10 @@ on the replicas, equivalent to data corruption.
 
 \section{Read Write Separation}
 
-As per the requirement \sectionref{req.read.write.ratio}, we need to design the
-system to support read load that is a multiple of the maximum possible write
+As per the requirement \sectionref{req.read.write.ratio} of supporting a high
+read to write ratio, we need to design the
+system to support read load that is a multiple (> 5 times)
+of the maximum possible write
 load. It also follows from the system design that each node (replica) has the
 entire dataset available and that we do not need consensus to access it.
 
@@ -494,6 +510,9 @@ to check if we are in sync with the rest of the nodes. This allows us to serve
 read-only data from individual nodes directly with a predictable limit on the
 age of data. In case the lease has expired, we return an error response to
 the client in line with the goal of serving consistent data.
+
+Such a compromise allows us to reduce the message complexity of the system
+allowing for faster reads.
 
 \section{Failure Recovery}
 
