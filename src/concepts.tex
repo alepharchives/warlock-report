@@ -23,7 +23,7 @@ In this chapter we introduce the important concepts required for this thesis.
     \iterm{Node}: An independent Erlang runtime instance.
     \iterm{Membership}: The nodes in the cluster are called members. They can be
     a member of different groups based on their condition%
-    \sidenote{
+    \sidenote[-8]{
       \emph{Node Condition}:
       The condition of the node is a reference to the node's status in terms of
       handling the algorithm. Possible conditions are
@@ -69,7 +69,7 @@ which part of the algorithm they are responsible for.
     track of which leader is currently in-charge to issue commands using
     ballots%
     \sidenote{
-      \emph{Ballots} are monotonically increasing identifiers that are unique to
+      \emph{Ballots}: Monotonically increasing identifiers that are unique to
       a specific leader. Each leader has an infinite number of ballots.
     }.
     \iterm{Leader}: Leaders receive proposals from replicas and try to
@@ -151,7 +151,7 @@ The process is the concurrency primitive of Erlang. Each of the processes are
 isolated and have access to their own private memory. This allows building
 large scale applications with the Actor model%
 \sidenote{
-  An actor is a process that can
+  \emph{Actor}: A process that can
   \begin{inparaenum}[(i)]
     \item Send messages to other actors.
     \item Spawn new actors.
@@ -193,8 +193,8 @@ localize such crashes.
 
 A typical Erlang supervisor tree looks like \figureref{supervision.tree}. The
 processes are connected to each other using links%
-\sidenote[-17]{
-  \emph{Links}: are bidirectional connections between processes with a maximum
+\sidenote[-18]{
+  \emph{Links}: Bidirectional connections between processes with a maximum
   of one link per pair of processes.
 }
 . The links propagate upwards and are \val{trapped} by the processes that trap

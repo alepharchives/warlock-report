@@ -140,7 +140,7 @@ resolution technique allowing the clients to fix collisions themselves.
 However, according to \citet{Vieira08theperformance} and \citet{Junqueira2007},
 Fast Paxos is not better than Basic Paxos in all scenarios. Basic Paxos was
 found to be faster in case of systems with small number of replicas%
-\sidenote{
+\sidenote[-3]{
   \emph{Paxos Replica}: A node that participates in the protocol.
 }
 owing to
@@ -177,13 +177,13 @@ for the axillary servers to be configured into the system.
 Ring Paxos \citep{MarandiPSP10} is based on the observations that messaging
 using ip-multicast%
 \sidenote{
-  \emph{Ip-Multicast}: is the process sending messages to a group of receivers
+  \emph{Ip-Multicast}: The process sending messages to a group of receivers
   in a single transmission.
 }
 is more scalable and provides better throughput compared
 to unicast%
 \sidenote[2]{
-  \emph{Unicast}: transmission of message to a single destination.
+  \emph{Unicast}: Transmission of message to a single destination.
 }
 for a distributed system in a well-defined network. It
 has the property that it provides fixed throughput with variation in number

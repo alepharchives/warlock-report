@@ -9,8 +9,8 @@ the system and the derived requirements for Warlock in this chapter.
 
 Magic Land \citep{magicland} is a social%
 \sidenote[2]{
-  A social game usually runs on a \val{social network} and allows in-game
-  interaction with other users on the same network.
+  \emph{Social Games}: Games running on a \val{social network}
+  that allow interactions with users on the same network.
 }
 resource management game by Wooga%
 \sidenote[5]{
@@ -21,8 +21,8 @@ resource management game by Wooga%
 thousands of \abbr{HTTP} requests every second. 90\% of these requests are
 writes. This requires the back end to%
 \sidenote[7]{
-  Back end is the part of the system that handles all the user's actions and
-  state and is not directly accessed by the user.
+  \emph{Back end}:  The part of the system that handles all the user's actions and
+  state and is not directly accessible to the user.
 }
 handle lot of requests that are not cacheable. Traditional solutions which
 involves using stateless servers for application management in which all
@@ -66,7 +66,7 @@ notifies that it is ready to accept requests.
 
 The lock manager used is Redis \citep{redis}%
 \sidenote{
-  Redis is a performance oriented key-value store with support for multiple
+  \emph{Redis}: A performance oriented key-value store with support for multiple
   data structures and atomic primitives.
 }
 . The worker uses the Redis command \abbr{SETNX}%

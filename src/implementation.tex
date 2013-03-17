@@ -54,18 +54,18 @@ callback functions. It also provides functions to send messages%
 }
 to one or more processes. The callback functions \term{handle\_cast}%
 \sidenote[3]{
-  \emph{handle\_cast}: A \term{gen\_server} callback function
+  \emph{handle\_cast}: \term{gen\_server} callback function
   used to handle asynchronous messages. It cannot reply to the caller
   directly, but must use \term{\term{gen\_server}:reply/2} function if it
   wants to do so.
 }, \term{handle\_call}%
 \sidenote[8]{
-  \emph{handle\_call}: A \term{gen\_server} callback function used to handle
+  \emph{handle\_call}: \term{gen\_server} callback function used to handle
   synchronous messages. It has the caller's address and blocks the caller
   until it sends a reply.
 } and \term{handle\_info}%
 \sidenote[13]{
-  \emph{handle\_info} is the \term{gen\_server} callback function used to
+  \emph{handle\_info}: \term{gen\_server} callback function used to
   handle all the other types of messages, e.g. plain Erlang messages,
   \abbr{TCP}, \abbr{UDP} messages and so on.
 }
@@ -164,8 +164,8 @@ protocol.
     \iterm{Leader}: Address of the leader that spawned it.
     \iterm{PValues}:%
     \sidenote{
-      A PValue is a tuple consisting of the ballot number, slot number and the
-      proposal.
+      \emph{PValue}: A tuple consisting of the ballot number, slot
+      number and the proposal.
     }
     Unique set of PValues returned by the acceptor. It is implemented as a
     hash table.
