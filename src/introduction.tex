@@ -7,7 +7,7 @@ Shared nothing architecture%
   any hardware resources between them.
 } \citep{Stonebraker86g} is a popular distributed system design used for
 building high traffic web applications. The servers within such a system setup
-sometimes need to synchronize their activities or need to access a shared
+sometimes need to synchronize their activities or to access a shared
 resource. A service used for such a purpose could act as a single point of
 failure based on its design and the system architecture.
 
@@ -23,7 +23,7 @@ distributed, fault tolerant and, primarily, consistent.
 \section{Goals}
 
 The goal of this thesis is to build a customized locking service focused on
-being fault tolerant without compromising consistency and performance.
+being fault tolerant without compromising consistency or performance.
 Specifically we require,
 
 \begin{itemize}
@@ -74,11 +74,11 @@ The first section provides the context and background information related to the
 project. It details the problem background, related projects, the research
 area and the set of requirements the project is based on.
 
-The second section describes the analysis, design, implementation of the project
-and the experiments performed on it.
+The second section describes the analysis, design and implementation of
+the project, and the experiments performed on it.
 
 The final section discusses the project results and provides an outline for
-the future work.
+future work.
 
 \section{Scope}
 
