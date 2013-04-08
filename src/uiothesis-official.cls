@@ -678,10 +678,15 @@
 
 % Titlepage
 \RequirePackage{pdfpages}
-\includepdf[pages={1}]{cover.pdf}
+\renewcommand{\maketitle}{%
+  % \includepdf[pages={1,{}}]{uiofrontpage}
 
-\newpage
-\thispagestyle{empty}
-\mbox{}
 
-\includepdf[pages={1}]{abstract.pdf}
+  \includepdf[pages={1,{}}]{cover}
+
+%  \newpage
+%      \thispagestyle{empty}
+%  \mbox{}
+%
+  \includepdf[pages={1,{}}]{abstract}
+}
